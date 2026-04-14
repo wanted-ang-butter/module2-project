@@ -1,9 +1,11 @@
-package com.wanted.naeil;
+package com.wanted.naeil.global.config;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SpringBootApplication
+@EnableJpaAuditing
 public class NaeIlApplication {
 
     public static void main(String[] args) {
