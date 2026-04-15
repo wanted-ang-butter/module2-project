@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "post_like")
+@Table(name = "post_likes")
 @Getter
 @NoArgsConstructor
 //@Builder
