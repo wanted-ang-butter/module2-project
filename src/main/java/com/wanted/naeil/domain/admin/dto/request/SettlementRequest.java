@@ -1,4 +1,4 @@
 package com.wanted.naeil.domain.admin.dto.request;
 
-public class CategoryResponse {
+public class SettlementRequest {
 }
