@@ -40,7 +40,7 @@ public class Course extends BaseTimeEntity {
     private String description;
 
     @Column(nullable = false)
-    private Integer price;
+    private int price;
 
     private String thumbnail;
 
@@ -53,7 +53,7 @@ public class Course extends BaseTimeEntity {
     private List<Section> sections = new ArrayList<>();
 
     @Builder
-    public Course(User instructor, Category category, String title, String description, Integer price, String thumbnail) {
+    public Course(User instructor, Category category, String title, String description, int price, String thumbnail) {
         this.instructor = instructor;
         this.category = category;
         this.title = title;

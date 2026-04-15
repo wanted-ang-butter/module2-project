@@ -31,10 +31,10 @@ public class LiveLecture extends BaseTimeEntity {
     private String description;
 
     @Column(name = "max_capacity", nullable = false)
-    private Integer maxCapacity;
+    private int maxCapacity;
 
     @Column(name = "current_count", nullable = false)
-    private Integer currentCount;
+    private int currentCount;
 
     @Column(name = "reservation_start_at")
     private LocalDateTime reservationStartAt;
@@ -53,7 +53,7 @@ public class LiveLecture extends BaseTimeEntity {
     private LiveLectureStatus status;
 
     @Builder
-    public LiveLecture(User instructor, String title, String description, Integer maxCapacity,
+    public LiveLecture(User instructor, String title, String description, int maxCapacity,
                        LocalDateTime reservationStartAt, LocalDateTime startAt, LocalDateTime endAt) {
         this.instructor = instructor;
         this.title = title;
