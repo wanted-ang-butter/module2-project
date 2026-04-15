@@ -3,12 +3,9 @@ package com.wanted.naeil.domain.community.entity;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "comments")
@@ -21,7 +18,6 @@ public class Comment extends BaseTimeEntity {
     @Column(name = "comment_id")
     private Long commentId;
 
-    // 양방향 - Post의 comments 리스트와 연결
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
@@ -44,5 +40,9 @@ public class Comment extends BaseTimeEntity {
 
     public void update(String content) {
         this.content = content;
+    }
+
+    public boolean isDeleted() {
+        return this.getDeletedAt()!= null;
     }
 }
