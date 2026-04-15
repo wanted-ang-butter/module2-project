@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
-public class CourseApprovalResponse {
+public class ApprovalResponse {
     private Long approvalId;
     private ApprovalRequestType requestType;
     private ApprovalStatus status;

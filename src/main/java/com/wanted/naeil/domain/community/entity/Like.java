@@ -4,16 +4,15 @@ import com.wanted.naeil.domain.course.entity.Course;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "post_likes")
+@Table(name = "likes")
 @Getter
 @NoArgsConstructor
 //@Builder
-public class PostLike extends BaseTimeEntity {
+public class Like extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
