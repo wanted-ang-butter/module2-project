@@ -38,7 +38,7 @@ public class PaymentItem {
     @Column(name = "final_price", nullable = false)
     private int finalPrice;
 
-    public PaymentItem(Course course, PaymentItemType itemType, Integer price, Integer discountAmount, Integer finalPrice) {
+    public PaymentItem(Course course, PaymentItemType itemType, int price, int discountAmount, int finalPrice) {
         this.course = course;
         this.itemType = itemType;
         this.price = price;
