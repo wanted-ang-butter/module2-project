@@ -2,8 +2,6 @@ package com.wanted.naeil.domain.course.repository;
 
 import com.wanted.naeil.domain.course.entity.Course;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
-public interface CourseRepository extends JpaRepository <Course, Long> {
+public interface CourseRepository extends JpaRepository<Course, Long> {
 }
