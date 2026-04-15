@@ -19,14 +19,15 @@ public class AdminCourseApprovalService {
     //public AdminCourseApprovalService(CourseApprovalRepository courseApprovalRepository) {
     //    this.courseApprovalRepository = courseApprovalRepository;
     // 이렇게 길게 써야하는걸 final + @RequiredArgsConstructor 이거써서 자동 생성
-    public List<CourseApprovalRepository> getApprovals(ApprovalRequestType){
-        List<CourseApproval>approvals = courseApprovalRepository.findAllByRequestTypeAndStatus(type, ApprovalStatus.PENDING);
-        return approvals.stream()
-                .map(approval -> CourseApprovalResponse.builder()
-                        .approvalId()
-                        .title()
-                        .build())
-                .collect(Collectors.toList());
-
-    }
+//    public List<CourseApprovalRepository> getApprovals(ApprovalRequestType){
+//        List<CourseApproval>approvals = courseApprovalRepository.findAllByRequestTypeAndStatus(type, ApprovalStatus.PENDING);
+//        return approvals.stream()
+//                .map(approval -> CourseApprovalResponse.builder()
+//                        .approvalId()
+//                        .title()
+//                        .build())
+//
+//                .collect(Collectors.toList());
+//
+//    }
 }
