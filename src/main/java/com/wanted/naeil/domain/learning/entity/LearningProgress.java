@@ -30,6 +30,7 @@ public class LearningProgress extends BaseTimeEntity {
     private Section section;
 
     @Column(nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
     private ProgressStatus status; // IN_PROGRESS, COMPLETED
 
     @Column(name = "last_accessed_at")
