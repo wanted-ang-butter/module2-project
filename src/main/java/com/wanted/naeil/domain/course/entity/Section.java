@@ -1,5 +1,6 @@
 package com.wanted.naeil.domain.course.entity;
 
+import com.wanted.naeil.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import org.hibernate.annotations.Where;
 @NoArgsConstructor
 @SQLDelete(sql = "UPDATE sections SET deleted_at = CURRENT_TIMESTAMP WHERE section_id = ?")
 @Where(clause = "deleted_at IS NULL")
-public class Section {
+public class Section extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,13 +32,13 @@ public class Section {
     private String videoUrl;
 
     @Column(name = "play_time")
-    private Integer playTime;
+    private int playTime;
 
     @Column(name = "attachment_url", length = 500)
     private String attachmentUrl;
 
     @Column(nullable = false)
-    private Integer sequence; // 강의 순서
+    private int sequence; // 강의 순서
 
     @Column(name = "is_free", nullable = false)
     private Boolean isFree;
@@ -47,7 +48,7 @@ public class Section {
     private SectionStatus status;
 
     @Builder
-    public Section(Course course, String title, String videoUrl, Integer playTime, String attachmentUrl, Integer sequence, Boolean isFree) {
+    public Section(Course course, String title, String videoUrl, int playTime, String attachmentUrl, int sequence, Boolean isFree) {
         this.course = course;
         this.title = title;
         this.videoUrl = videoUrl;
@@ -57,7 +58,7 @@ public class Section {
         this.isFree = (isFree != null) ? isFree : false;
     }
 
-    public void updateSequence(Integer newSequence) {
+    public void updateSequence(int newSequence) {
         this.sequence = newSequence;
     }
 
