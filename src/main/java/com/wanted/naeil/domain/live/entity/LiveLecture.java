@@ -48,9 +48,9 @@ public class LiveLecture extends BaseTimeEntity {
     @Column(name = "streaming_url", length = 500)
     private String streamingUrl;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private LiveLectureStatus status;
+    @Enumerated(EnumType.STRING)
+    private LiveLectureStatus status; // RESERVED, CANCELED
 
     @Builder
     public LiveLecture(User instructor, String title, String description, int maxCapacity,

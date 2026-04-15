@@ -30,7 +30,6 @@ public class LiveReservation extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private LiveReservationStatus status; // RESERVED, CANCELED
 
-
     @Builder
     public LiveReservation(User user, LiveLecture liveLecture) {
         this.user = user;
