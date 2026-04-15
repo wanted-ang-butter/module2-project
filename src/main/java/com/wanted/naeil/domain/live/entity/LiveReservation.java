@@ -24,12 +24,11 @@ public class LiveReservation extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "live_id", nullable = false)
-    private LiveLecture liveLecture ; // DB에는 live_id로 저장
+    private LiveLecture liveLecture;
 
     @Column(nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     private LiveReservationStatus status; // RESERVED, CANCELED
-
 
     @Builder
     public LiveReservation(User user, LiveLecture liveLecture) {
