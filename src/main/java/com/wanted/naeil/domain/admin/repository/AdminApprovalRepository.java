@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface CourseApprovalRepository extends JpaRepository<AdminApproval, Long> {
+public interface AdminApprovalRepository extends JpaRepository<AdminApproval, Long> {
     List<AdminApproval> findAllByRequestTypeAndStatus(ApprovalRequestType type, ApprovalStatus status);
 
 }

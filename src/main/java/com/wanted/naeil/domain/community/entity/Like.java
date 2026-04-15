@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "likes",
         uniqueConstraints = {
-        @UniqueConstraint(name = "uk_like_user_post",
-                columnNames = {"user_id", "post_id"}),
-        @UniqueConstraint(name = "uk_like_user_course",
-                columnNames = {"user_id", "course_id"})
+                @UniqueConstraint(name = "uk_like_user_post",
+                        columnNames = {"user_id", "post_id"}),
+                @UniqueConstraint(name = "uk_like_user_course",
+                        columnNames = {"user_id", "course_id"})
         })
 @Getter
 @NoArgsConstructor
