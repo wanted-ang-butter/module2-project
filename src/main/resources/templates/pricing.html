@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>구독 플랜 | Nae-Il</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body class="min-h-screen bg-gradient-to-b from-white via-blue-50/30 to-white relative overflow-hidden">
+
+<!-- Back to home -->
+<div class="relative max-w-7xl mx-auto px-6 py-6">
+  <a th:href="@{/}" href="/"
+     class="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors">
+    <i class="fa-solid fa-arrow-left text-sm"></i>
+    <span class="text-sm font-medium">홈으로</span>
+  </a>
+</div>
+
+<!-- Main Content -->
+<div class="relative max-w-5xl mx-auto px-6 py-8 md:py-16">
+
+  <!-- Header -->
+  <div class="text-center mb-12">
+    <h1 class="text-4xl md:text-5xl font-bold mb-4">
+        <span class="bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+          프리미엄으로 시작하세요
+        </span>
+    </h1>
+    <p class="text-lg md:text-xl text-gray-600 font-medium">언제든 해지 가능한 멤버십</p>
+  </div>
+
+  <!-- Pricing Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+
+    <!-- th:each로 서버에서 plans 목록을 반복 -->
+    <div th:each="plan : ${pricingPlans}"
+         th:class="'relative ' + (${plan.popular} ? '' : '')">
+
+      <div th:class="'relative bg-white rounded-3xl overflow-hidden transition-all duration-300 h-full hover:scale-[1.03] ' +
+                       (${plan.popular} ? 'shadow-2xl border-2 border-blue-500' : 'shadow-xl border-2 border-gray-100 hover:border-blue-300')">
+
+        <!-- Popular Badge -->
+        <div th:if="${plan.badge != null}"
+             class="absolute top-0 right-0 bg-gradient-to-r from-blue-600 to-green-600 text-white px-5 py-2 rounded-bl-3xl font-bold text-sm flex items-center gap-2 shadow-lg">
+          <i class="fa-solid fa-wand-magic-sparkles text-xs"></i>
+          <span th:text="${plan.badge}">추천</span>
+        </div>
+
+        <div class="p-8">
+          <!-- Plan Title -->
+          <h3 class="text-2xl font-bold mb-2 text-gray-900" th:text="${plan.title}">플랜명</h3>
+
+          <!-- Discount Badge -->
+          <div th:if="${plan.discount != null}" class="inline-block mb-4">
+              <span class="px-4 py-1.5 bg-green-100 text-green-700 rounded-full text-sm font-bold"
+                    th:text="${plan.discount}">17% 할인</span>
+          </div>
+
+          <!-- Price -->
+          <div class="mb-8">
+            <div class="flex items-baseline gap-2">
+                <span class="text-5xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
+                      th:text="${plan.price}">9,900 크레딧</span>
+              <span class="text-xl text-gray-500 font-bold">/ <span th:text="${plan.period}">월</span></span>
+            </div>
+          </div>
+
+          <!-- Benefits -->
+          <div class="space-y-4 mb-8">
+            <div th:each="benefit : ${plan.benefits}" class="flex items-center gap-3">
+              <div class="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+                <i class="fa-solid fa-check text-white text-xs"></i>
+              </div>
+              <span class="text-gray-700 font-semibold" th:text="${benefit}">혜택</span>
+            </div>
+          </div>
+
+          <!-- CTA Button -->
+          <a th:href="@{/membership-payment(plan=${plan.id})}" href="/membership-payment">
+            <button th:class="'w-full py-4 rounded-2xl font-bold text-lg transition-all duration-300 ' +
+                                (${plan.popular} ? 'bg-gradient-to-r from-blue-600 to-green-600 text-white shadow-lg hover:shadow-xl hover:shadow-blue-500/30' : 'bg-gray-900 text-white hover:bg-gray-800 shadow-lg hover:shadow-xl')"
+                    th:text="${plan.id == 'yearly'} ? '연간 플랜 시작하기' : '시작하기'">
+              시작하기
+            </button>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 서버 데이터 없을 때를 위한 정적 fallback (th:remove로 서버에서 제거 가능) -->
+    <!-- th:remove="all" 처리 또는 th:if로 조건 분기 -->
+
+  </div>
+
+  <!-- Trust Message -->
+  <div class="text-center mt-8">
+    <p class="text-sm text-gray-500 font-medium">언제든 해지 가능 · 이미 많은 수강생들이 이용 중입니다</p>
+  </div>
+</div>
+
+<!-- FAQ Section -->
+<div class="relative max-w-5xl mx-auto px-6 py-16">
+  <div class="text-center mb-12">
+    <h2 class="text-3xl font-bold mb-3">
+      <span class="bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">자주 묻는 질문</span>
+    </h2>
+    <p class="text-gray-600 font-medium">궁금한 점이 있으신가요?</p>
+  </div>
+
+  <div class="grid gap-6 max-w-3xl mx-auto">
+    <!-- th:each로 FAQ 반복 -->
+    <div th:each="faq : ${faqs}"
+         class="bg-white rounded-2xl p-6 border-2 border-gray-100 hover:border-blue-300 transition-all shadow-sm hover:shadow-lg">
+      <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+        <span class="w-2 h-2 bg-gradient-to-r from-blue-500 to-green-500 rounded-full inline-block"></span>
+        <span th:text="${faq.question}">질문</span>
+      </h3>
+      <p class="text-sm text-gray-600 leading-relaxed pl-4" th:text="${faq.answer}">답변</p>
+    </div>
+
+    <!-- 정적 fallback FAQ (서버 데이터 없을 때) -->
+    <div th:if="${#lists.isEmpty(faqs)}" class="space-y-6">
+      <div class="bg-white rounded-2xl p-6 border-2 border-gray-100 hover:border-blue-300 transition-all shadow-sm hover:shadow-lg">
+        <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+          <span class="w-2 h-2 bg-gradient-to-r from-blue-500 to-green-500 rounded-full inline-block"></span>
+          언제든지 해지할 수 있나요?
+        </h3>
+        <p class="text-sm text-gray-600 leading-relaxed pl-4">
+          네, 프리미엄 멤버십은 언제든지 해지 가능합니다. 해지 후에도 결제하신 기간까지는 프리미엄 혜택이 유지됩니다.
+        </p>
+      </div>
+      <div class="bg-white rounded-2xl p-6 border-2 border-gray-100 hover:border-blue-300 transition-all shadow-sm hover:shadow-lg">
+        <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+          <span class="w-2 h-2 bg-gradient-to-r from-blue-500 to-green-500 rounded-full inline-block"></span>
+          매월 3개 코스는 어떻게 선택하나요?
+        </h3>
+        <p class="text-sm text-gray-600 leading-relaxed pl-4">
+          프리미엄 멤버십이 활성화되면 원하는 코스를 자유롭게 선택하실 수 있습니다. 매월 1일에 선택 권한이 초기화됩니다.
+        </p>
+      </div>
+      <div class="bg-white rounded-2xl p-6 border-2 border-gray-100 hover:border-blue-300 transition-all shadow-sm hover:shadow-lg">
+        <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+          <span class="w-2 h-2 bg-gradient-to-r from-blue-500 to-green-500 rounded-full inline-block"></span>
+          실시간 강의 선예매는 무엇인가요?
+        </h3>
+        <p class="text-sm text-gray-600 leading-relaxed pl-4">
+          일반 회원보다 24시간 먼저 실시간 강의를 예약할 수 있는 혜택입니다. 인기 강의의 원하는 시간대를 먼저 확보하실 수 있습니다.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center mt-12">
+    <p class="text-sm text-gray-500 mb-4 font-medium">더 궁금한 점이 있으신가요?</p>
+    <a th:href="@{/contact}" href="/contact"
+       class="text-sm text-blue-600 hover:text-blue-700 font-bold inline-flex items-center gap-2 hover:gap-3 transition-all">
+      문의하기
+      <i class="fa-solid fa-arrow-right text-xs"></i>
+    </a>
+  </div>
+</div>
+
+<!-- Bottom CTA -->
+<div class="relative max-w-5xl mx-auto px-6 py-12 mb-12">
+  <div class="bg-gradient-to-br from-blue-600 via-purple-600 to-green-600 rounded-3xl p-12 text-center text-white shadow-2xl relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+    <div class="relative">
+      <h2 class="text-3xl md:text-4xl font-bold mb-4">지금 시작하세요</h2>
+      <p class="text-lg mb-8 text-white/90 font-medium">코드로 미래를 만드는 당신의 내일</p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a th:href="@{/signup}" href="/signup"
+           class="px-10 py-4 bg-white text-blue-700 rounded-2xl font-bold hover:shadow-2xl transition-all hover:scale-105">
+          무료로 시작하기
+        </a>
+        <a th:href="@{/login}" href="/login"
+           class="px-10 py-4 bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white rounded-2xl font-bold hover:bg-white/20 transition-all">
+          로그인
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

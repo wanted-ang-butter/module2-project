@@ -1,5 +1,6 @@
 package com.wanted.naeil.domain.course.entity;
 
+import com.wanted.naeil.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import org.hibernate.annotations.Where;
 @NoArgsConstructor
 @SQLDelete(sql = "UPDATE sections SET deleted_at = CURRENT_TIMESTAMP WHERE section_id = ?")
 @Where(clause = "deleted_at IS NULL")
-public class Section {
+public class Section extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

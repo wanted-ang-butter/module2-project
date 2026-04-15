@@ -50,7 +50,7 @@ public class LiveLecture extends BaseTimeEntity {
 
     @Column(nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
-    private LiveLectureStatus status;
+    private LiveLectureStatus status; // RESERVED, CANCELED
 
     @Builder
     public LiveLecture(User instructor, String title, String description, int maxCapacity,

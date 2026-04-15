@@ -39,13 +39,15 @@ public class Enrollment extends BaseTimeEntity {
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private EnrollmentStatus status;
 
-    // 진도율 (%)
     @Column(name = "courses_rate", nullable = false)
     private double coursesRate;
+
+    //created_at 컬럼 삭제
 
     // 진도율 업데이트
     public void updateProgress(double rate) {

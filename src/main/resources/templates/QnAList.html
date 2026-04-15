@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Q&A</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white">
+
+<div class="max-w-7xl mx-auto px-6 py-12">
+
+  <!-- Back Button -->
+  <a href="/dashboard" class="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 mb-6 font-medium">
+    ← <span class="text-sm">이전으로</span>
+  </a>
+
+  <div class="grid grid-cols-12 gap-8">
+
+    <!-- Left Sidebar -->
+    <div class="col-span-3">
+      <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 sticky top-24">
+        <h2 class="text-xl font-black text-gray-900 mb-6">커뮤니티</h2>
+        <nav class="space-y-2">
+          <a href="/dashboard/community/qna" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-bold">
+            Q&A
+          </a>
+          <a href="/dashboard/community/free-board" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 font-medium">
+            자유게시판
+          </a>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-span-9">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-8">
+        <h1 class="text-4xl font-black text-gray-900">Q&A</h1>
+        <a href="/dashboard/community/qna/new"
+           class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-xl font-bold">
+          + 질문하기
+        </a>
+      </div>
+
+      <!-- Post List -->
+      <div class="space-y-4 mb-8">
+
+        <!-- 예시 게시글 1 -->
+        <a href="#" class="block bg-white border-2 border-gray-200 rounded-2xl p-6 hover:shadow-xl">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+
+              <div class="flex items-center gap-2 mb-3">
+                <span class="text-xl font-bold text-gray-900">QnA 질문 제목</span>
+              </div>
+
+              <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2">
+                  <img src="https://via.placeholder.com/24" class="w-6 h-6 rounded-full">
+                  <span class="text-sm text-gray-600 font-medium">작성자</span>
+                </div>
+
+                <span class="text-sm text-gray-500">2026-01-01</span>
+
+                <div class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm font-bold">
+                  답변 3
+                </div>
+
+                <div class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-bold">
+                  해결됨
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </a>
+
+      </div>
+
+      <!-- Pagination -->
+      <div class="flex items-center justify-center gap-2">
+
+        <button class="px-4 py-2 border-2 border-gray-200 rounded-xl font-bold text-gray-700">
+          &lt;
+        </button>
+
+        <button class="px-4 py-2 bg-blue-600 text-white rounded-xl font-bold">
+          1
+        </button>
+
+        <button class="px-4 py-2 border-2 border-gray-200 rounded-xl font-bold text-gray-700">
+          2
+        </button>
+
+        <button class="px-4 py-2 border-2 border-gray-200 rounded-xl font-bold text-gray-700">
+          &gt;
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

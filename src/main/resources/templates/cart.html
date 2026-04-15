@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>장바구니</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50">
+
+<div class="max-w-6xl mx-auto px-6 py-12">
+
+  <!-- 뒤로가기 -->
+  <a href="#" class="inline-flex items-center gap-2 text-gray-600 mb-6">
+    ← 이전으로
+  </a>
+
+  <h1 class="text-4xl font-black mb-6">장바구니</h1>
+
+  <div id="cartList" class="space-y-4"></div>
+
+  <!-- 결제 영역 -->
+  <div class="mt-10 p-6 bg-white rounded-xl border">
+    <p>선택 개수: <span id="count">0</span></p>
+    <p>총 금액: <span id="total">0</span></p>
+    <button onclick="checkout()" class="mt-4 px-6 py-3 bg-blue-600 text-white rounded">
+      결제하기
+    </button>
+  </div>
+
+</div>
+
+<script>
+  let cartItems = [
+    { id: "1", title: "React 강의", instructor: "홍길동", price: 30000 },
+    { id: "2", title: "Spring 강의", instructor: "김개발", price: 40000 }
+  ];
+
+  let selected = new Set(cartItems.map(i => i.id));
+
+  function render() {
+    const list = document.getElementById("cartList");
+    list.innerHTML = "";
+
+    cartItems.forEach(item => {
+      const isChecked = selected.has(item.id);
+
+      list.innerHTML += `
+      <div class="bg-white p-4 border rounded flex justify-between items-center">
+
+        <div>
+          <input type="checkbox" ${isChecked ? "checked" : ""}
+            onchange="toggle('${item.id}')">
+        </div>
+
+        <div class="flex-1 ml-4">
+          <p class="font-bold">${item.title}</p>
+          <p class="text-sm text-gray-500">${item.instructor}</p>
+          <p class="text-blue-600 font-bold">${item.price}</p>
+        </div>
+
+        <button onclick="removeItem('${item.id}')" class="text-red-500">
+          삭제
+        </button>
+
+      </div>
+    `;
+    });
+
+    updateSummary();
+  }
+
+  function toggle(id) {
+    if (selected.has(id)) selected.delete(id);
+    else selected.add(id);
+    render();
+  }
+
+  function removeItem(id) {
+    cartItems = cartItems.filter(i => i.id !== id);
+    selected.delete(id);
+    render();
+  }
+
+  function updateSummary() {
+    const count = selected.size;
+    const total = cartItems
+            .filter(i => selected.has(i.id))
+            .reduce((sum, i) => sum + i.price, 0);
+
+    document.getElementById("count").innerText = count;
+    document.getElementById("total").innerText = total;
+  }
+
+  function checkout() {
+    if (selected.size === 0) {
+      alert("선택된 상품 없음");
+      return;
+    }
+    alert("결제 페이지로 이동");
+  }
+
+  render();
+</script>
+
+</body>
+</html>
