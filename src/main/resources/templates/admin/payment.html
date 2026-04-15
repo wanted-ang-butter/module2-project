@@ -42,7 +42,7 @@
   const ids = params.get("courses")?.split(",") || [];
 
   // mock 데이터 (React꺼 대체)
-  const courses = [
+  let courses = [
     { id: "1", title: "React 강의", instructor: "홍길동", price: 30000 },
     { id: "2", title: "Spring 강의", instructor: "김개발", price: 40000 },
     { id: "3", title: "Node 강의", instructor: "이백엔드", price: 20000 }
