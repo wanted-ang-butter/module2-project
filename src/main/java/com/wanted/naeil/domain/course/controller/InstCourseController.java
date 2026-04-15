@@ -1,7 +1,7 @@
 package com.wanted.naeil.domain.course.controller;
 
-import com.wanted.naeil.domain.course.dto.CreateCourseRequest;
-import com.wanted.naeil.domain.course.dto.CreateCourseResponse;
+import com.wanted.naeil.domain.course.dto.request.CreateCourseRequest;
+import com.wanted.naeil.domain.course.dto.response.CreateCourseResponse;
 import com.wanted.naeil.domain.course.service.InstCourseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

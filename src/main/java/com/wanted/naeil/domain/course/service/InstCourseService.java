@@ -1,9 +1,13 @@
 package com.wanted.naeil.domain.course.service;
 
-import com.wanted.naeil.domain.course.dto.CreateCourseRequest;
-import com.wanted.naeil.domain.course.dto.CreateCourseResponse;
+import com.wanted.naeil.domain.course.dto.request.CreateCourseRequest;
+import com.wanted.naeil.domain.course.dto.response.CreateCourseResponse;
+import com.wanted.naeil.domain.course.entity.Category;
 import com.wanted.naeil.domain.course.entity.Course;
+import com.wanted.naeil.domain.course.repository.CategoryRepository;
 import com.wanted.naeil.domain.course.repository.CourseRepository;
+import com.wanted.naeil.domain.user.entity.User;
+import com.wanted.naeil.domain.user.repository.UserRepository;
 import com.wanted.naeil.global.util.file.LocalFileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,14 +22,18 @@ import org.springframework.web.multipart.MultipartFile;
 public class InstCourseService {
 
     private final CourseRepository courseRepository;
+    private final UserRepository userRepository;
     private final LocalFileService localFileService;
+    private final CategoryRepository categoryRepository;
     private final ModelMapper modelMapper;
 
     // 코스 생서 메서드
     @Transactional
     public CreateCourseResponse createCourse(CreateCourseRequest request) {
 
-        // TODO : 강사 권한 체크 및 예외 처리 로직 추가
+        // TODO : 추후 승재 병합 후, 세션에서 뽑아오기로 수정
+        User instructor = userRepository.findById(request.instructorId())
+                .orElseThrow(() -> new IllegalArgumentException("강사 정보를 찾을 수 없습니다. ID: " + request.instructorId()));
 
         // 제목 관련 검증 로직
         if (request.title().isEmpty()) {
@@ -36,10 +44,13 @@ public class InstCourseService {
             throw new IllegalArgumentException("동일한 이름의 강의가 존재합니다. 다시 작성해주세요.");
         }
 
+        // TODO : 추후 categoryRepo 에서 findById로 존재 여부 확인
         // 카테고리 검증
-        if (request.category() == null) {
+        if (request.categoryId() == null) {
             throw new IllegalArgumentException("잘못된 카테고리 입니다.");
         }
+        Category category = categoryRepository.findById(request.categoryId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 ID입니다."));
 
         // 코스 설명 검증
         if (request.description().isEmpty()) {
@@ -60,8 +71,9 @@ public class InstCourseService {
         String thumbnailUrl = localFileService.uploadSingleFile(thumbnailImage, "courses");
 
         Course course = Course.builder()
-//                .instructor() TODO : 추후 승재 구현되면 세션에서 뽑아 쓰기
-                .category(request.category())
+                // TODO : 추후 승재 구현되면 세션에서 뽑아 쓰기
+                .instructor(instructor)
+                .category(category)
                 .title(request.title())
                 .description(request.description())
                 .price(request.price())

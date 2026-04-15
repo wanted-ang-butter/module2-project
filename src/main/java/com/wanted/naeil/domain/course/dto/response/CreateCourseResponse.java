@@ -1,4 +1,4 @@
-package com.wanted.naeil.domain.course.dto;
+package com.wanted.naeil.domain.course.dto.response;
 
 import com.wanted.naeil.domain.course.entity.Course;
 import lombok.Builder;

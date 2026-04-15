@@ -52,7 +52,7 @@ public class LocalFileService {
 
         try {
             // 디렉토리 없으면 생성
-            Files.createDirectory(targetLocation.getParent());
+            Files.createDirectories(targetLocation.getParent());
 
             // 파일 저장
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
