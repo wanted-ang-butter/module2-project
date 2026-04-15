@@ -42,6 +42,7 @@ public class Course extends BaseTimeEntity {
     @Column(nullable = false)
     private int price;
 
+    @Column(nullable = false)
     private String thumbnail;
 
     @Enumerated(EnumType.STRING)
