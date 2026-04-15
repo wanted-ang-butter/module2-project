@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(
-        name = "enrollment",
+        name = "enrollments",
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "uk_enrollment_user_course",
@@ -39,19 +39,16 @@ public class Enrollment extends BaseTimeEntity {
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private EnrollmentStatus status;
 
     // 진도율 (%)
     @Column(name = "courses_rate", nullable = false)
-    private Integer coursesRate;
+    private double coursesRate;
 
     // 진도율 업데이트
-    public void updateProgress(Integer rate) {
+    public void updateProgress(double rate) {
         this.coursesRate = rate;
     }
 

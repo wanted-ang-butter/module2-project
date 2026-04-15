@@ -66,7 +66,7 @@ public class Subscription {
         this.autoRenew = autoRenew;
     }
 
-    public void updateRemainingFreeCount(Integer remainingFreeCount) {
+    public void updateRemainingFreeCount(int remainingFreeCount) {
         this.remainingFreeCount = remainingFreeCount;
     }
 
