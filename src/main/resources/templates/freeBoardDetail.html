@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>게시글 상세</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50">
+
+<div class="max-w-7xl mx-auto px-6 py-12">
+
+  <div class="grid grid-cols-12 gap-8">
+
+    <!-- Sidebar -->
+    <div class="col-span-12 lg:col-span-3">
+      <div class="bg-white border-2 rounded-2xl p-6 sticky top-24">
+        <h2 class="text-xl font-black mb-6">커뮤니티</h2>
+
+        <nav class="space-y-2">
+          <a href="#" class="flex gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50">
+            💬 <span>Q&A</span>
+          </a>
+          <a href="#" class="flex gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-bold">
+            📄 <span>자유게시판</span>
+          </a>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Main -->
+    <div class="col-span-12 lg:col-span-9">
+
+      <!-- Back -->
+      <a href="#" class="inline-flex items-center gap-2 text-gray-600 mb-6 hover:text-blue-600">
+        ← <span>목록으로</span>
+      </a>
+
+      <!-- Post -->
+      <div class="bg-white border-2 rounded-2xl p-8 mb-6">
+
+        <div class="flex justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <img src="https://via.placeholder.com/40" class="w-12 h-12 rounded-full">
+            <div>
+              <p class="font-bold">작성자</p>
+              <div class="text-sm text-gray-500">
+                2026-04-01 · 👁 123
+              </div>
+            </div>
+          </div>
+
+          <button class="p-2">⋮</button>
+        </div>
+
+        <h1 class="text-3xl font-black mb-6">게시글 제목</h1>
+
+        <div class="bg-gray-100 p-6 rounded-2xl mb-6">
+          <p>게시글 내용입니다.</p>
+        </div>
+
+        <!-- Like -->
+        <div class="pt-6 border-t">
+          <button class="px-6 py-3 border rounded-xl hover:bg-gray-50">
+            ❤️ 10
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Comments -->
+      <div class="bg-white border-2 rounded-2xl p-8 mb-6">
+        <h2 class="text-2xl font-black mb-6">
+          댓글 (2)
+        </h2>
+
+        <div class="space-y-4">
+
+          <!-- Comment -->
+          <div class="bg-gray-50 p-5 rounded-2xl border">
+            <div class="flex justify-between mb-3">
+              <div class="flex gap-3">
+                <img src="https://via.placeholder.com/30" class="w-10 h-10 rounded-full">
+                <div>
+                  <p class="font-bold">홍길동</p>
+                  <p class="text-sm text-gray-500">2026-04-01</p>
+                </div>
+              </div>
+              <button>⋮</button>
+            </div>
+
+            <p>댓글 내용입니다.</p>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Comment Input -->
+      <div class="bg-white border-2 rounded-2xl p-6">
+        <h3 class="font-bold mb-4">댓글 작성</h3>
+
+        <textarea
+                placeholder="댓글을 입력하세요"
+                class="w-full px-4 py-3 border-2 rounded-xl h-32 focus:outline-none focus:border-blue-500"
+        ></textarea>
+
+        <button class="mt-4 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700">
+          댓글 등록
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>

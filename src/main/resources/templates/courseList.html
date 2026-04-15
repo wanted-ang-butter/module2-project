@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>전체 강의</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50">
+
+<div class="max-w-7xl mx-auto px-6 py-12">
+
+    <!-- Back Button -->
+    <div class="mb-6">
+        <a href="#" class="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600">
+            ←
+            <span class="text-sm font-medium">이전으로</span>
+        </a>
+    </div>
+
+    <!-- Header -->
+    <div class="mb-12">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">전체 강의</h1>
+        <p class="text-gray-600 font-mono">// 원하는 분야의 강의를 선택하세요</p>
+    </div>
+
+    <!-- Search -->
+    <div class="mb-8">
+        <input
+                type="text"
+                placeholder="강의명, 강사명으로 검색하세요"
+                class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl"
+        />
+    </div>
+
+    <!-- Filters -->
+    <div class="mb-8 flex gap-2 flex-wrap">
+        <button class="px-4 py-2 bg-black text-white rounded-full">전체</button>
+        <button class="px-4 py-2 border rounded-full">Frontend</button>
+        <button class="px-4 py-2 border rounded-full">Backend</button>
+        <button class="px-4 py-2 border rounded-full">Programming</button>
+    </div>
+
+    <!-- Result -->
+    <div class="mb-6">
+        <p class="text-sm text-gray-600">
+            <span class="text-blue-600 font-bold">1</span>개의 강의
+        </p>
+    </div>
+
+    <!-- Courses -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <div class="bg-white p-4 rounded-xl shadow">
+            <h2 class="font-bold">React 입문</h2>
+            <p class="text-sm text-gray-500">홍길동</p>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl shadow">
+            <h2 class="font-bold">Spring Boot</h2>
+            <p class="text-sm text-gray-500">김개발</p>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

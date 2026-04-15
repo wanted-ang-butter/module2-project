@@ -56,7 +56,7 @@ public class User extends BaseTimeEntity {
     private UserStatus status;
 
     @Column(name = "warning_count", nullable = false)
-    private Integer warningCount;
+    private int warningCount;
 
     @Column(name = "birth_date")
     private LocalDate birthDate;

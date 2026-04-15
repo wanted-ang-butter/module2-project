@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(
-        name = "enrollment",
+        name = "enrollments",
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "uk_enrollment_user_course",
@@ -48,10 +48,10 @@ public class Enrollment extends BaseTimeEntity {
 
     // 진도율 (%)
     @Column(name = "courses_rate", nullable = false)
-    private Integer coursesRate;
+    private double coursesRate;
 
     // 진도율 업데이트
-    public void updateProgress(Integer rate) {
+    public void updateProgress(double rate) {
         this.coursesRate = rate;
     }
 
