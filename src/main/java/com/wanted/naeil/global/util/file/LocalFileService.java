@@ -23,6 +23,8 @@ public class LocalFileService {
     @Value("${file.upload-dir}")
     private String uploadDir;
 
+    private static final String URL_PREFIX = "/uploads/";
+
     /**
      * 단일 파일 업로드 기능
      * @param file : 업로드하려는 파일
@@ -57,7 +59,7 @@ public class LocalFileService {
             // 파일 저장
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
-            String fileUrl = "/upload/" + directory + "/" + savedName;
+            String fileUrl = URL_PREFIX + directory + "/" + savedName;
 
             log.info("[FileUpload] 파일 업로드 성공! 물리적 위치: {}, 접근 URL: {}", targetLocation.toString(), fileUrl);
 
@@ -74,12 +76,17 @@ public class LocalFileService {
     public void deleteFile(String fileUrl) {
         if (!StringUtils.hasText(fileUrl)) return;
 
-        // DB에 저장된 URL(/uploads/courses/...)을 실제 시스템 경로(./uploads/courses/...)로 변환
-        String filePath = fileUrl.replaceFirst("^/uploads/", uploadDir);
-        File file = new File(filePath);
+        // URL_PREFIX를 기준으로 실제 물리 경로 추출
+        String relativePath = fileUrl.replaceFirst("^" + URL_PREFIX, "");
+        Path filePath = Paths.get(uploadDir, relativePath).toAbsolutePath().normalize();
 
+        File file = filePath.toFile();
         if (file.exists()) {
-            file.delete();
+            if (file.delete()) {
+                log.info("[FileDelete] 성공: {}", filePath);
+            } else {
+                log.warn("[FileDelete] 실패 (권한 등): {}", filePath);
+            }
         }
     }
 }

@@ -1,9 +1,9 @@
 package com.wanted.naeil.domain.admin.service;
 
 import com.wanted.naeil.domain.admin.dto.response.ApprovalResponse;
+import com.wanted.naeil.domain.admin.entity.AdminApproval;
 import com.wanted.naeil.domain.admin.entity.ApprovalRequestType;
 import com.wanted.naeil.domain.admin.entity.ApprovalStatus;
-import com.wanted.naeil.domain.admin.entity.AdminApproval;
 import com.wanted.naeil.domain.admin.repository.AdminApprovalRepository;
 import com.wanted.naeil.domain.course.entity.Course;
 import com.wanted.naeil.domain.live.entity.LiveLecture;
@@ -109,8 +109,8 @@ public class AdminApprovalService {
     // 3. 반려 처리
     @Transactional
     public  void reject(Long approvalId , User admin , String rejectReason) {
-        // 1) 반려 건 찾아오기
-        AdminApproval approval = courseApprovalRepository.findById(approvalId)
+        // 1) 반려건 찾아오기
+        AdminApproval approval =  courseApprovalRepository.findById(approvalId)
                 .orElseThrow(() -> new RuntimeException("반려 건을 찾을수 없습니다"));
         // 2) 반려 처리
         approval.reject(admin, rejectReason);

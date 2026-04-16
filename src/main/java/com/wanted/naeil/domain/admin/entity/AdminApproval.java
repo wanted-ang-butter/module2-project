@@ -61,7 +61,6 @@ public class AdminApproval extends BaseTimeEntity {
     private String rejectReason;
 
     // 비지니스 로직
-
     public void approve(User admin) {
         this.status = ApprovalStatus.APPROVED;
         this.admin = admin;
