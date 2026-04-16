@@ -20,6 +20,17 @@ public class ApprovalResponse {
     private String thumbnail;
     private String categoryName;
     private String instuctorName;
+    private Long liveId;
+    private Long applicationId;
+    private String applicantName;
+    private String introduction;
+    private String career;
+    private String proofFileUrl;
+    private String faceImgUrl;
+    private String description;
+    private Integer maxCapacity;
+    private LocalDateTime startAt;
+
 
 
 }
