@@ -1,9 +1,9 @@
 package com.wanted.naeil.domain.admin.service;
 
 import com.wanted.naeil.domain.admin.dto.response.ApprovalResponse;
+import com.wanted.naeil.domain.admin.entity.AdminApproval;
 import com.wanted.naeil.domain.admin.entity.ApprovalRequestType;
 import com.wanted.naeil.domain.admin.entity.ApprovalStatus;
-import com.wanted.naeil.domain.admin.entity.CourseApproval;
 import com.wanted.naeil.domain.admin.repository.AdminApprovalRepository;
 import com.wanted.naeil.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class AdminApprovalService {
     // 1. 목록조회
     public List<ApprovalResponse> getApprovals(ApprovalRequestType type){
 
-        List<CourseApproval>approvals = courseApprovalRepository.findAllByRequestTypeAndStatus(type, ApprovalStatus.PENDING);
+        List<AdminApproval>approvals = courseApprovalRepository.findAllByRequestTypeAndStatus(type, ApprovalStatus.PENDING);
 
         return approvals.stream()
                 .map(approval -> ApprovalResponse.builder()
@@ -44,7 +44,7 @@ public class AdminApprovalService {
     // 2. 승인 처리
     public void approve(Long approvalId, User admin) {
         // 1) 승인건 찾아오기
-        CourseApproval approval = courseApprovalRepository.findById(approvalId)
+        AdminApproval approval = courseApprovalRepository.findById(approvalId)
                 .orElseThrow(() -> new RuntimeException("승인 건을 찾을수 없습니다"));
         // .orElseThrow = 값이 없으면 예외 던지라는거여
         // 2) 승인 처리
@@ -56,7 +56,7 @@ public class AdminApprovalService {
     // 3. 반려 처리
     public  void reject(Long approvalId , User admin , String rejectReason) {
         // 1) 반려건 찾아오기
-        CourseApproval approval =  courseApprovalRepository.findById(approvalId)
+        AdminApproval approval =  courseApprovalRepository.findById(approvalId)
                 .orElseThrow(() -> new RuntimeException("반려 건을 찾을수 없습니다"));
         // 2) 반려 처리
         approval.reject(admin , rejectReason);

@@ -2,6 +2,7 @@ package com.wanted.naeil.domain.payment.entity;
 
 import com.wanted.naeil.domain.user.entity.User;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -43,6 +44,9 @@ public class Payment {
     @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PaymentItem> paymentItems = new ArrayList<>();
 
+    // 비지니스 로직
+
+    @Builder
     public Payment(User user, int totalAmount, int discountAmount, int finalAmount) {
         this.user = user;
         this.totalAmount = totalAmount;

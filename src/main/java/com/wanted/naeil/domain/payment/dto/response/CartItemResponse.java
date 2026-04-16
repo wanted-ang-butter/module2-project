@@ -1,4 +1,4 @@
-package com.wanted.naeil.domain.payment.dto;
+package com.wanted.naeil.domain.payment.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
