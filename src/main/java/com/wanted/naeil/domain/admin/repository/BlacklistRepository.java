@@ -1,4 +1,7 @@
 package com.wanted.naeil.domain.admin.repository;
 
-public class BlacklistRepository {
+import com.wanted.naeil.domain.admin.entity.BlacklistHistory;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface BlacklistRepository extends JpaRepository<BlacklistHistory, Long> {
 }

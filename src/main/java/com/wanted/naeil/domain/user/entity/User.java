@@ -61,8 +61,27 @@ public class User extends BaseTimeEntity {
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
+
+    // 비밀번호 세팅용 체이닝 메서드
+    public User password(String password) {
+        this.password = password;
+        return this;
+    }
+
+    // 권한 세팅용 체이닝 메서드
+    public User role(Role role) {
+        this.role = role;
+        return this;
+    }
+
+    // 상태 세팅용 체이닝 메서드
+    public User status(UserStatus status) {
+        this.status = status;
+        return this;
+    }
+
     @Builder
-    public User(String username, String password, String name, String nickname, String email, String phone, LocalDate birthDate) {
+    public User(String username, String password, String name, String nickname, String email, String phone, LocalDate birthDate, String profileImg) {
         this.username = username;
         this.password = password;
         this.name = name;
@@ -73,6 +92,7 @@ public class User extends BaseTimeEntity {
         this.role = Role.USER;          // 기본 권한
         this.status = UserStatus.ACTIVE; // 기본 상태
         this.warningCount = 0;          // 경고 횟수 초기화
+        this.profileImg = profileImg;
     }
 
     // 경고 올리기

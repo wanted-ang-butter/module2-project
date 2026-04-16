@@ -4,10 +4,7 @@ import com.wanted.naeil.domain.course.entity.Course;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -39,7 +36,6 @@ public class Enrollment extends BaseTimeEntity {
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private EnrollmentStatus status;
@@ -47,7 +43,13 @@ public class Enrollment extends BaseTimeEntity {
     @Column(name = "courses_rate", nullable = false)
     private double coursesRate;
 
-    //created_at 컬럼 삭제
+    @Builder
+    public Enrollment(User user, Course course, EnrollmentStatus status, double coursesRate) {
+        this.user = user;
+        this.course = course;
+        this.status = status;
+        this.coursesRate = coursesRate;
+    }
 
     // 진도율 업데이트
     public void updateProgress(double rate) {

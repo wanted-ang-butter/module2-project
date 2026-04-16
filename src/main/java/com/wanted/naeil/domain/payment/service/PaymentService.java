@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -55,27 +54,33 @@ public class PaymentService {
 
         validateEnoughCredit(credit, finalAmount);
 
-        Payment payment = new Payment(user, totalAmount, discountAmount, finalAmount);
+        Payment payment = Payment.builder()
+                .user(user)
+                .totalAmount(totalAmount)
+                .discountAmount(discountAmount)
+                .finalAmount(finalAmount)
+                .build();
 
         for (CartItem cartItem : cartItems) {
             Course course = cartItem.getCourse();
 
-            PaymentItem paymentItem = new PaymentItem(
-                    course,
-                    PaymentItemType.COURSE,
-                    course.getPrice(),
-                    0,
-                    course.getPrice()
-            );
+            PaymentItem paymentItem = PaymentItem.builder()
+                    .course(course)
+                    .itemType(PaymentItemType.COURSE)
+                    .price(course.getPrice())
+                    .discountAmount(0)
+                    .finalPrice(course.getPrice())
+                    .build();
+
             payment.addPaymentItem(paymentItem);
 
-            Enrollment enrollment = new Enrollment(
-                    null,
-                    user,
-                    course,
-                    EnrollmentStatus.BEFORE_START,
-                    0
-            );
+            Enrollment enrollment = Enrollment.builder()
+                    .user(user)
+                    .course(course)
+                    .status(EnrollmentStatus.BEFORE_START)
+                    .coursesRate(0)
+                    .build();
+
             enrollmentRepository.save(enrollment);
         }
 
@@ -96,7 +101,9 @@ public class PaymentService {
 
     private void validateAlreadyPurchased(Long userId, List<CartItem> cartItems) {
         boolean alreadyPurchased = cartItems.stream()
-                .anyMatch(cartItem -> enrollmentRepository.existsByUserIdAndCourseId(userId, cartItem.getCourse().getId()));
+                .anyMatch(cartItem ->
+                        enrollmentRepository.existsByUserIdAndCourseId(userId, cartItem.getCourse().getId())
+                );
 
         if (alreadyPurchased) {
             throw new IllegalStateException("이미 구매한 강의가 포함되어 있습니다.");
