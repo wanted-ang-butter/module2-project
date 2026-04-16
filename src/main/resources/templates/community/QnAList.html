@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Q&A | Nae-Il</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body class="bg-white">
+<div class="max-w-7xl mx-auto px-6 py-12">
+
+  <a th:href="@{/}"
+     class="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors mb-6 font-medium">
+    <i class="fa-solid fa-arrow-left text-sm"></i>
+    <span class="text-sm">이전으로</span>
+  </a>
+
+  <div class="grid grid-cols-12 gap-8">
+
+    <!-- 사이드바 -->
+    <div class="col-span-3">
+      <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 sticky top-24">
+        <h2 class="text-xl font-black text-gray-900 mb-6">커뮤니티</h2>
+        <nav class="space-y-2">
+          <a th:href="@{/community/qna}"
+             class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all bg-blue-50 text-blue-600 font-bold">
+            <i class="fa-solid fa-comment text-sm"></i>
+            <span class="text-sm">Q&A</span>
+          </a>
+          <a th:href="@{/community/free}"
+             class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-gray-700 hover:bg-gray-50 font-medium">
+            <i class="fa-solid fa-file-lines text-sm"></i>
+            <span class="text-sm">자유게시판</span>
+          </a>
+        </nav>
+      </div>
+    </div>
+
+    <!-- 메인 -->
+    <div class="col-span-9">
+      <div class="flex items-center justify-between mb-8">
+        <h1 class="text-4xl font-black text-gray-900">Q&A</h1>
+        <a th:href="@{/community/qna/form}"
+           class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-xl hover:shadow-lg transition-all font-bold">
+          <i class="fa-solid fa-plus"></i> 질문하기
+        </a>
+      </div>
+
+      <!-- 게시글 목록 -->
+      <div class="space-y-4 mb-8">
+
+        <div th:if="${#lists.isEmpty(posts)}" class="text-center py-20">
+          <p class="text-gray-500 font-medium">등록된 질문이 없습니다</p>
+        </div>
+
+        <a th:each="post : ${posts}"
+           th:href="@{/community/qna/{postId}(postId=${post.postId})}"
+           class="block bg-white border-2 border-gray-200 rounded-2xl p-6 hover:shadow-xl hover:-translate-y-1 transition-all group">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-3">
+                <!-- 강의 배지 -->
+                <span th:if="${post.courseTitle != null}"
+                      class="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full text-xs font-bold border border-blue-200"
+                      th:text="${post.courseTitle}">강의명</span>
+                <h3 class="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors"
+                    th:text="${post.title}">제목</h3>
+              </div>
+              <div class="flex items-center gap-4">
+                <span class="text-sm text-gray-600 font-medium"
+                      th:text="${post.nickname}">작성자</span>
+                <span class="text-sm text-gray-500 font-mono"
+                      th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd')}">날짜</span>
+                <div class="flex items-center gap-1.5 text-red-500">
+                  <i class="fa-solid fa-heart text-sm"></i>
+                  <span class="text-sm font-mono" th:text="${post.likeCount}">0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

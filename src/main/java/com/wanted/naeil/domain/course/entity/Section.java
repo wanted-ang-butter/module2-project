@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import java.time.LocalTime;
+
 @Entity
 @Table(name = "sections")
 @Getter
@@ -32,7 +34,7 @@ public class Section extends BaseTimeEntity {
     private String videoUrl;
 
     @Column(name = "play_time")
-    private int playTime;
+    private LocalTime playTime;
 
     @Column(name = "attachment_url", length = 500)
     private String attachmentUrl;
@@ -48,7 +50,7 @@ public class Section extends BaseTimeEntity {
     private SectionStatus status;
 
     @Builder
-    public Section(Course course, String title, String videoUrl, int playTime, String attachmentUrl, int sequence, Boolean isFree) {
+    public Section(Course course, String title, String videoUrl, LocalTime playTime, String attachmentUrl, int sequence, Boolean isFree) {
         this.course = course;
         this.title = title;
         this.videoUrl = videoUrl;
