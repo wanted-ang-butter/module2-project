@@ -7,17 +7,16 @@ import com.wanted.naeil.domain.user.entity.InstructorApplications;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.AccessLevel;
+
 
 @Entity
 @Table(name = "admin_approvals")
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AdminApproval extends BaseTimeEntity {
 
     @Id
@@ -56,7 +55,6 @@ public class AdminApproval extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
-    @Builder.Default
     private ApprovalStatus status = ApprovalStatus.PENDING;
 
     @Column(name = "reject_reason", columnDefinition = "TEXT")
@@ -72,5 +70,30 @@ public class AdminApproval extends BaseTimeEntity {
         this.status = ApprovalStatus.REJECTED;
         this.admin = admin;
         this.rejectReason = rejectReason;
+    }
+
+    @Builder
+    public AdminApproval(Course course, ApprovalRequestType requestType) {
+        this.course = course;
+        this.requestType = requestType;
+        this.status = ApprovalStatus.PENDING;
+    }
+    @Builder
+    public AdminApproval(InstructorApplications applications) {
+        this.instructorApplications = applications;
+        this.requestType = ApprovalRequestType.INSTRUCTOR_REGISTER;
+        this.status = ApprovalStatus.PENDING;
+    }
+    @Builder
+    public AdminApproval(LiveLecture lecture) {
+        this.lecture = lecture;
+        this.requestType = ApprovalRequestType.LIVE_REGISTER;
+        this.status = ApprovalStatus.PENDING;
+    }
+    @Builder
+    public AdminApproval(Settlement settlement) {
+        this.settlement = settlement;
+        this.requestType = ApprovalRequestType.SETTLEMENT_REGISTER;
+        this.status = ApprovalStatus.PENDING;
     }
 }
