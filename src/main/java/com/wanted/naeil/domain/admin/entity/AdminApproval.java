@@ -10,13 +10,12 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.AccessLevel;
 
 
 @Entity
 @Table(name = "admin_approvals")
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class AdminApproval extends BaseTimeEntity {
 
     @Id
