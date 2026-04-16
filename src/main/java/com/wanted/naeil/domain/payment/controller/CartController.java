@@ -54,7 +54,7 @@ public class CartController {
     }
 
     // 장바구니 삭제 -> @deleteMapping 으로 변경 예정
-    @DeleteMapping("/{cartItemId}")
+    @DeleteMapping("/delete/{cartItemId}")
     public String removeCartItem(@PathVariable Long cartItemId, HttpSession session) {
         Long loginUserId = getLoginUserId(session);
 

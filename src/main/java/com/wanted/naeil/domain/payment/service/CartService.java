@@ -3,6 +3,7 @@ package com.wanted.naeil.domain.payment.service;
 import com.wanted.naeil.domain.course.entity.Course;
 import com.wanted.naeil.domain.course.repository.CourseRepository;
 import com.wanted.naeil.domain.learning.repository.EnrollmentRepository;
+import com.wanted.naeil.domain.payment.dto.response.CartItemResponse;
 import com.wanted.naeil.domain.payment.dto.response.CartPageResponse;
 import com.wanted.naeil.domain.payment.dto.response.CartPageResponse;
 import com.wanted.naeil.domain.payment.entity.CartItem;
@@ -81,7 +82,6 @@ public class CartService {
                 .orElseThrow(() -> new IllegalArgumentException("크레딧 정보가 존재하지 않습니다."));
 
         List<Long> selectedIds;
-
         if (selectedCartItemId != null) {
             selectedIds = List.of(selectedCartItemId);
         } else {
@@ -97,8 +97,19 @@ public class CartService {
 
         boolean canCheckout = credit.getBalance() >= totalAmount;
 
+        List<CartItemResponse> cartItemResponses = cartItems.stream()
+                .map(item -> CartItemResponse.builder()
+                        .cartItemId(item.getId())
+                        .courseId(item.getCourse().getId())
+                        .courseTitle(item.getCourse().getTitle())
+                        .instructorName(item.getCourse().getInstructor().getName())
+                        .price(item.getCourse().getPrice())
+                        .thumbnail(item.getCourse().getThumbnail())
+                        .build())
+                .toList();
+
         return CartPageResponse.builder()
-                .cartItems(cartItems)
+                .cartItems(cartItemResponses)
                 .selectedCartItemIds(selectedIds)
                 .totalAmount(totalAmount)
                 .creditBalance(credit.getBalance())

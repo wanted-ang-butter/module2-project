@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 public class CartPageResponse {
-    private List<CartItem> cartItems;
+    private List<CartItemResponse> cartItems;
     private List<Long> selectedCartItemIds;
     private int totalAmount;
     private int creditBalance;

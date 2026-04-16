@@ -20,6 +20,7 @@ public class PaymentController {
     private final CartService cartService;
     private final PaymentService paymentService;
 
+    // 코스 상세조회에서 '바로결제' 클릭
     @PostMapping("/courses/direct/{courseId}")
     public String directCoursePayment(@PathVariable Long courseId, HttpSession session) {
         Long loginUserId = getLoginUserId(session);
@@ -29,6 +30,7 @@ public class PaymentController {
         return "redirect:/cart?selectedCartItemId=" + cartItemId;
     }
 
+    // 선택 된 코스 결제하기
     @PostMapping("/courses")
     public String checkoutSelectedCourses(@RequestParam List<Long> selectedCartItemIds,
                                           HttpSession session) {
