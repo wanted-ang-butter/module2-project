@@ -17,6 +17,10 @@ spring:
     multipart:
       max-file-size: 500MB
       max-request-size: 2GB
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
 
 file:
  upload-dir: ./uploads/

@@ -10,7 +10,6 @@
 
 <div class="max-w-7xl mx-auto px-8 py-10">
 
-  <!-- 뒤로가기 -->
   <div class="mb-8">
     <a href="javascript:history.back()"
        class="inline-flex items-center gap-2 text-slate-500 text-sm mb-5 hover:text-slate-700">
@@ -26,7 +25,6 @@
 
   <div class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-10 items-start">
 
-    <!-- 장바구니 목록 -->
     <div>
       <div th:if="${#lists.isEmpty(cartPage.cartItems)}"
            class="bg-white rounded-[28px] border border-slate-200 p-10 text-center text-slate-500 text-xl font-semibold">
@@ -41,7 +39,6 @@
 
           <div class="flex items-center gap-6">
 
-            <!-- 체크박스 -->
             <div>
               <input type="checkbox"
                      class="cart-checkbox w-7 h-7 rounded border-slate-300 accent-blue-600"
@@ -49,12 +46,10 @@
                      checked>
             </div>
 
-            <!-- 썸네일 -->
             <img th:src="${item.thumbnail}"
                  alt="강의 썸네일"
                  class="w-44 h-28 rounded-2xl object-cover shrink-0"/>
 
-            <!-- 텍스트 -->
             <div class="flex-1 min-w-0">
               <p class="text-4xl font-black leading-snug mb-2"
                  th:text="${item.courseTitle}">
@@ -72,18 +67,20 @@
             </div>
 
             <!-- 삭제 -->
-            <form th:action="@{/cart/delete/{cartItemId}(cartItemId=${item.cartItemId})}" method="post">
+            <form th:action="@{/cart/{cartItemId}(cartItemId=${item.cartItemId})}" method="post">
+              <input type="hidden" name="_method" value="delete"/>
               <button type="submit"
+                      onclick="return confirm('정말 삭제하시겠습니까?')"
                       class="w-14 h-14 rounded-2xl border border-slate-300 text-slate-400 text-2xl hover:bg-slate-50">
                 🗑
               </button>
             </form>
+
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 결제 정보 -->
     <aside class="sticky top-8">
       <div class="bg-white rounded-[28px] border border-slate-200 shadow-sm p-8">
         <h2 class="text-3xl font-black mb-8">결제 정보</h2>
@@ -92,8 +89,8 @@
           <div class="flex justify-between items-center">
             <span class="text-slate-500 font-semibold">선택한 강의</span>
             <span class="font-black text-3xl">
-                            <span id="selectedCount">0</span>개
-                        </span>
+              <span id="selectedCount">0</span>개
+            </span>
           </div>
 
           <div class="border-t border-slate-200"></div>
@@ -109,9 +106,9 @@
             <span class="text-slate-500 font-semibold">보유 크레딧</span>
             <span id="currentCredit"
                   class="font-black text-3xl"
-                  th:text="${#numbers.formatInteger(cartPage.summary.currentCredit, 3, 'COMMA')}">
-                            0
-                        </span>
+                  th:text="${#numbers.formatInteger(cartPage.creditBalance, 3, 'COMMA')}">
+              0
+            </span>
           </div>
 
           <div class="border-t border-slate-200"></div>
@@ -120,12 +117,11 @@
             <span class="font-black text-slate-800">결제 후 잔액</span>
             <span id="remainingCredit"
                   class="font-black text-4xl text-blue-600">
-                            0
-                        </span>
+              0
+            </span>
           </div>
         </div>
 
-        <!-- 크레딧 부족 안내 -->
         <div id="creditWarningBox"
              class="hidden mt-8 rounded-2xl border border-red-200 bg-red-50 p-5">
           <div class="flex items-start gap-3">
@@ -140,7 +136,6 @@
           </div>
         </div>
 
-        <!-- 결제 버튼 -->
         <form id="checkoutForm" th:action="@{/cart/checkout}" method="post">
           <div id="selectedCartItemInputs"></div>
 
@@ -157,13 +152,12 @@
 </div>
 
 <script th:inline="javascript">
-  const currentCredit = Number([[${cartPage.summary.currentCredit}]]);
+  const currentCredit = Number([[${cartPage.creditBalance}]]);
+  const selectedCartItemIdsFromServer = [[${cartPage.selectedCartItemIds}]];
 </script>
 
 <script>
   const checkboxes = document.querySelectorAll('.cart-checkbox');
-  const cartCards = document.querySelectorAll('.cart-card');
-
   const selectedCountEl = document.getElementById('selectedCount');
   const totalRequiredCreditEl = document.getElementById('totalRequiredCredit');
   const remainingCreditEl = document.getElementById('remainingCredit');
@@ -186,6 +180,15 @@
     } else {
       card.classList.remove('border-blue-500');
       card.classList.add('border-slate-200');
+    }
+  }
+
+  function initializeCheckboxSelection() {
+    if (Array.isArray(selectedCartItemIdsFromServer) && selectedCartItemIdsFromServer.length > 0) {
+      checkboxes.forEach((checkbox) => {
+        const cartItemId = Number(checkbox.value);
+        checkbox.checked = selectedCartItemIdsFromServer.includes(cartItemId);
+      });
     }
   }
 
@@ -239,7 +242,6 @@
       checkoutBtn.className = 'mt-8 w-full h-16 rounded-2xl text-2xl font-black shadow-sm transition bg-blue-600 text-white hover:bg-blue-700';
     }
 
-    // hidden input 재생성
     selectedCartItemInputs.innerHTML = '';
     selectedIds.forEach((cartId) => {
       const input = document.createElement('input');
@@ -260,6 +262,7 @@
     }
   });
 
+  initializeCheckboxSelection();
   updateSummary();
 </script>
 
