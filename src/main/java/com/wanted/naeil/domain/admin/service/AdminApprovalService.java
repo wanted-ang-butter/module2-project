@@ -6,12 +6,13 @@ import com.wanted.naeil.domain.admin.entity.ApprovalStatus;
 import com.wanted.naeil.domain.admin.entity.AdminApproval;
 import com.wanted.naeil.domain.admin.repository.AdminApprovalRepository;
 import com.wanted.naeil.domain.course.entity.Course;
-import com.wanted.naeil.domain.learning.repository.EnrollmentRepository;
 import com.wanted.naeil.domain.live.entity.LiveLecture;
 import com.wanted.naeil.domain.live.entity.LiveLectureStatus;
+import com.wanted.naeil.domain.live.repository.LiveLectureRepository;
 import com.wanted.naeil.domain.user.entity.InstructorApplications;
 import com.wanted.naeil.domain.user.entity.Role;
 import com.wanted.naeil.domain.user.entity.User;
+import com.wanted.naeil.domain.user.repository.InsturctorApplicationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor //service에서 Repository 쓰야하니까 필드선언
 public class AdminApprovalService {
     private final AdminApprovalRepository courseApprovalRepository;
+    private final InsturctorApplicationRepository insturctorApplicationRepository;
+    private final LiveLectureRepository liveLectureRepository;
 
     // 1. 승인 목록조회
     @Transactional
@@ -93,17 +96,20 @@ public class AdminApprovalService {
             case INSTRUCTOR_REGISTER -> {
                 approval.getInstructorApplications().approve();
                 approval.getInstructorApplications().getUser().changeRole(Role.INSTRUCTOR);
+                insturctorApplicationRepository.save(approval.getInstructorApplications());
             }
             case LIVE_REGISTER -> {
                 approval.getLecture().changeStatus(LiveLectureStatus.APPROVED);
+                liveLectureRepository.save(approval.getLecture());
             }
 
         }
+        courseApprovalRepository.save(approval);
     }
     // 3. 반려 처리
     @Transactional
     public  void reject(Long approvalId , User admin , String rejectReason) {
-        // 1) 반려건 찾아오기
+        // 1) 반려 건 찾아오기
         AdminApproval approval = courseApprovalRepository.findById(approvalId)
                 .orElseThrow(() -> new RuntimeException("반려 건을 찾을수 없습니다"));
         // 2) 반려 처리
@@ -114,11 +120,14 @@ public class AdminApprovalService {
             }
             case INSTRUCTOR_REGISTER -> {
                 approval.getInstructorApplications().reject(rejectReason);
+                insturctorApplicationRepository.save(approval.getInstructorApplications());
             }
             case LIVE_REGISTER -> {
                 approval.getLecture().changeStatus(LiveLectureStatus.REJECTED);
+                liveLectureRepository.save(approval.getLecture());
             }
         }
+        courseApprovalRepository.save(approval);
 
     }
 }

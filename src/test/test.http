@@ -1,0 +1,11 @@
+### 코스 등록 승인 목록 조회
+GET http://localhost:8080/api/admin/course-approvals?type=COURSE_REGISTER
+### 코스 등록 승인
+PATCH http://localhost:8080/api/admin/course-approvals/3/approve
+### 코스 등록 반려
+PATCH http://localhost:8080/api/admin/course-approvals/3/reject
+Content-Type: application/json
+
+{
+  "rejectReason": "내용 부족"
+}
