@@ -53,6 +53,8 @@ public class Course extends BaseTimeEntity {
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
+    // 비지니스 로직
+
     @Builder
     public Course(User instructor, Category category, String title, String description, int price, String thumbnail) {
         this.instructor = instructor;
@@ -63,6 +65,8 @@ public class Course extends BaseTimeEntity {
         this.thumbnail = thumbnail;
         this.status = CourseStatus.PENDING; // 초기 생성 시 승인 대기 상태
     }
+
+
 
     // 비즈니스 로직
     public void activate() {

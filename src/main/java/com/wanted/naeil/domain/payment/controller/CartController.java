@@ -1,6 +1,6 @@
 package com.wanted.naeil.domain.payment.controller;
 
-import com.wanted.naeil.domain.payment.dto.CartPageResponse;
+import com.wanted.naeil.domain.payment.dto.response.CartPageResponse;
 import com.wanted.naeil.domain.payment.service.CartService;
 import com.wanted.naeil.domain.payment.service.PaymentService;
 import jakarta.servlet.http.HttpSession;
@@ -19,6 +19,17 @@ public class CartController {
     private final CartService cartService;
     private final PaymentService paymentService;
 
+
+    // 로그인 사용자 확인
+    private Long getLoginUserId(HttpSession session) {
+        Long loginUserId = (Long) session.getAttribute("loginUserId");
+        if (loginUserId == null) {
+            throw new IllegalStateException("로그인이 필요합니다.");
+        }
+        return loginUserId;
+    }
+
+    // 장바구니 담기
     @PostMapping("/add/{courseId}")
     public String addCartItem(@PathVariable Long courseId, HttpSession session) {
         Long loginUserId = getLoginUserId(session);
@@ -30,17 +41,20 @@ public class CartController {
         return "redirect:/courses/" + courseId;
     }
 
+    // 장바구니 조회(장바구니 메인)
     @GetMapping
-    public String getCartPage(HttpSession session, Model model) {
+    public String getCartPage(@RequestParam(required = false) Long selectedCartItemId, HttpSession session, Model model) {
+
         Long loginUserId = getLoginUserId(session);
 
-        CartPageResponse cartPage = cartService.getCartPage(loginUserId);
+        CartPageResponse cartPage = cartService.getCartPage(loginUserId, selectedCartItemId);
         model.addAttribute("cartPage", cartPage);
 
         return "payment/cart";
     }
 
-    @PostMapping("/delete/{cartItemId}")
+    // 장바구니 삭제 -> @deleteMapping 으로 변경 예정
+    @DeleteMapping("/delete/{cartItemId}")
     public String removeCartItem(@PathVariable Long cartItemId, HttpSession session) {
         Long loginUserId = getLoginUserId(session);
 
@@ -49,9 +63,9 @@ public class CartController {
         return "redirect:/cart";
     }
 
+    // 체크된 장바구니 항목 결제
     @PostMapping("/checkout")
-    public String checkoutCartItems(@RequestParam List<Long> selectedCartItemIds,
-                                    HttpSession session) {
+    public String checkoutCartItems(@RequestParam List<Long> selectedCartItemIds, HttpSession session) {
 
         Long loginUserId = getLoginUserId(session);
 
@@ -60,11 +74,4 @@ public class CartController {
         return "redirect:/my-courses";
     }
 
-    private Long getLoginUserId(HttpSession session) {
-        Long loginUserId = (Long) session.getAttribute("loginUserId");
-        if (loginUserId == null) {
-            throw new IllegalStateException("로그인이 필요합니다.");
-        }
-        return loginUserId;
-    }
 }

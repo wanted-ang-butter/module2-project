@@ -37,6 +37,8 @@ public class CartItem {
     @Column(name = "added_at", nullable = false)
     private LocalDateTime addedAt;
 
+    // 비지니스 로직
+
     public CartItem(User user, Course course) {
         this.user = user;
         this.course = course;

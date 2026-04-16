@@ -8,6 +8,6 @@ public class IndexController {
 
     @GetMapping(value = {"/", "/main"})
     public String mainPage() {
-        return "index";
+        return "dashboard/guestDashboard";
     }
 }
