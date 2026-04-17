@@ -80,6 +80,7 @@ public class Subscription {
         this.status = status;
     }
 
+    // 코스 무료 결제 3회
     public void renew(LocalDateTime newEndAt, LocalDateTime newNextResetAt) {
         this.endAt = newEndAt;
         this.nextResetAt = newNextResetAt;

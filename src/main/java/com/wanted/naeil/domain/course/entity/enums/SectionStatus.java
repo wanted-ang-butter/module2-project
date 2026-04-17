@@ -1,4 +1,4 @@
-package com.wanted.naeil.domain.course.entity;
+package com.wanted.naeil.domain.course.entity.enums;
 
 
 import lombok.Getter;

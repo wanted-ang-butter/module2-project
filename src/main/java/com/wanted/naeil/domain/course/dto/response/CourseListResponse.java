@@ -1,9 +1,6 @@
 package com.wanted.naeil.domain.course.dto.response;
 
 
-import com.wanted.naeil.domain.course.entity.Course;
-import com.wanted.naeil.domain.course.entity.CourseStatus;
-import lombok.Builder;
 import lombok.Getter;
 
 @Getter

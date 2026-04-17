@@ -1,5 +1,6 @@
 package com.wanted.naeil.domain.community.entity;
 
+import com.wanted.naeil.domain.community.entity.enums.PostCategory;
 import com.wanted.naeil.domain.course.entity.Course;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.global.common.entity.BaseTimeEntity;
