@@ -2,13 +2,13 @@ package com.wanted.naeil.domain.payment.service;
 
 import com.wanted.naeil.domain.course.entity.Course;
 import com.wanted.naeil.domain.learning.entity.Enrollment;
-import com.wanted.naeil.domain.learning.entity.EnrollmentStatus;
+import com.wanted.naeil.domain.learning.entity.enums.EnrollmentStatus;
 import com.wanted.naeil.domain.learning.repository.EnrollmentRepository;
 import com.wanted.naeil.domain.payment.entity.CartItem;
 import com.wanted.naeil.domain.payment.entity.Credit;
 import com.wanted.naeil.domain.payment.entity.Payment;
 import com.wanted.naeil.domain.payment.entity.PaymentItem;
-import com.wanted.naeil.domain.payment.entity.PaymentItemType;
+import com.wanted.naeil.domain.payment.entity.enums.PaymentItemType;
 import com.wanted.naeil.domain.payment.repository.CartItemRepository;
 import com.wanted.naeil.domain.payment.repository.CreditRepository;
 import com.wanted.naeil.domain.payment.repository.PaymentRepository;

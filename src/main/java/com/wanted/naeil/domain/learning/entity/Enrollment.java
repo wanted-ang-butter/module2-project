@@ -1,12 +1,11 @@
 package com.wanted.naeil.domain.learning.entity;
 
 import com.wanted.naeil.domain.course.entity.Course;
+import com.wanted.naeil.domain.learning.entity.enums.EnrollmentStatus;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(

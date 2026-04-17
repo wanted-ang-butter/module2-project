@@ -1,6 +1,5 @@
 package com.wanted.naeil.domain.course.dto.request;
 
-import com.wanted.naeil.domain.course.entity.SectionStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
