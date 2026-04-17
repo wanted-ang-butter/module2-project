@@ -7,10 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        /* 기본 time 인풋의 시계 아이콘 숨기기 (선택 사항) */
-        input[type="time"]::-webkit-calendar-picker-indicator {
-            cursor: pointer;
-        }
+        input[type="time"]::-webkit-calendar-picker-indicator { cursor: pointer; }
+        .field-error { border-color: #ef4444 !important; }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -29,47 +27,57 @@
         <h1 class="text-4xl font-black text-gray-900">새 강의 등록</h1>
     </div>
 
-    <form id="courseForm" th:action="@{/instructor/course}" method="post" enctype="multipart/form-data" class="space-y-8">
+    <form id="courseForm" th:action="@{/instructor/course}" th:object="${createCourseRequest}" method="post" enctype="multipart/form-data" class="space-y-8">
 
-        <input type="hidden" name="instructorId" value="2">
+        <input type="hidden" th:field="*{instructorId}">
 
         <div class="bg-white border-2 border-gray-200 rounded-2xl p-8 shadow-lg">
             <h2 class="text-2xl font-black text-gray-900 mb-6">기본 정보</h2>
-
             <div class="space-y-6">
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2">강의명 *</label>
-                    <input type="text" name="title" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none font-medium" placeholder="강의명을 입력하세요" required>
+                    <input type="text" th:field="*{title}" th:errorclass="field-error"
+                           class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none font-medium" placeholder="강의명을 입력하세요">
+                    <p th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="text-red-500 text-xs mt-1 font-bold"></p>
                 </div>
 
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2">카테고리 *</label>
-                    <select name="categoryId" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none font-medium" required>
+                    <select th:field="*{categoryId}" th:errorclass="field-error"
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none font-medium">
                         <option value="">카테고리 선택</option>
                         <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
                     </select>
+                    <p th:if="${#fields.hasErrors('categoryId')}" th:errors="*{categoryId}" class="text-red-500 text-xs mt-1 font-bold"></p>
                 </div>
 
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2">강의 설명 *</label>
-                    <textarea name="description" rows="4" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none resize-none font-medium" placeholder="강의 설명을 입력하세요" required></textarea>
+                    <textarea th:field="*{description}" th:errorclass="field-error" rows="4"
+                              class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none resize-none font-medium" placeholder="강의 설명을 입력하세요"></textarea>
+                    <p th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="text-red-500 text-xs mt-1 font-bold"></p>
                 </div>
 
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2">가격 (크레딧) *</label>
-                    <input type="number" name="price" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none font-medium" placeholder="무료인 경우 0 입력" required min="0">
+                    <input type="number" th:field="*{price}" th:errorclass="field-error"
+                           class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none font-medium" placeholder="무료인 경우 0 입력">
+                    <p th:if="${#fields.hasErrors('price')}" th:errors="*{price}" class="text-red-500 text-xs mt-1 font-bold"></p>
                 </div>
 
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2">썸네일 업로드 *</label>
                     <div class="flex items-center gap-4">
-                        <input type="file" name="thumbnail" id="thumbnailInput" accept="image/*" class="hidden" onchange="updateFileName(this, 'thumbnailName')" required>
-                        <button type="button" onclick="document.getElementById('thumbnailInput').click()" class="inline-flex items-center gap-2 px-6 py-3 border-2 border-gray-300 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all font-bold text-gray-700 hover:text-blue-600">
+                        <input type="file" name="thumbnail" id="thumbnailInput" accept="image/*" class="hidden" onchange="updateFileName(this, 'thumbnailName')">
+                        <button type="button" onclick="document.getElementById('thumbnailInput').click()"
+                                th:classappend="${#fields.hasErrors('thumbnail')} ? 'border-red-500' : ''"
+                                class="inline-flex items-center gap-2 px-6 py-3 border-2 border-gray-300 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all font-bold text-gray-700 hover:text-blue-600">
                             <i data-lucide="upload" class="w-5 h-5"></i>
                             <span>파일 선택</span>
                         </button>
                         <span id="thumbnailName" class="text-sm text-gray-500 font-medium">선택된 파일 없음</span>
                     </div>
+                    <p th:if="${#fields.hasErrors('thumbnail')}" th:errors="*{thumbnail}" class="text-red-500 text-xs mt-1 font-bold"></p>
                 </div>
             </div>
         </div>
@@ -84,38 +92,105 @@
             </div>
 
             <div class="space-y-4" id="sectionContainer">
+                <div th:each="section, stat : *{sections}" class="p-6 border-2 border-gray-200 rounded-xl hover:border-blue-300 transition-all section-item">
+                    <div class="flex items-start gap-4">
+                        <div class="flex-shrink-0">
+                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <span class="text-blue-600 font-bold section-number" th:text="${stat.count}">1</span>
+                            </div>
+                        </div>
+
+                        <div class="flex-1 space-y-4">
+                            <div>
+                                <input type="text" th:field="*{sections[__${stat.index}__].title}" th:errorclass="field-error"
+                                       class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none font-medium" placeholder="섹션 제목을 입력하세요">
+                                <p th:if="${#fields.hasErrors('sections[' + stat.index + '].title')}"
+                                   th:errors="*{sections[__${stat.index}__].title}" class="text-red-500 text-xs mt-1 font-bold"></p>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-2">영상 파일 *</label>
+                                <div class="flex items-center gap-3">
+                                    <input type="file" th:name="'sections[' + ${stat.index} + '].videoFile'" th:id="'videoInput_' + ${stat.index}" accept="video/*" class="hidden" th:onchange="|updateFileName(this, 'videoName_${stat.index}')|">
+                                    <button type="button" th:onclick="|document.getElementById('videoInput_${stat.index}').click()|"
+                                            th:classappend="${#fields.hasErrors('sections[' + stat.index + '].videoFile')} ? 'border-red-500' : ''"
+                                            class="inline-flex items-center gap-2 px-4 py-2 border-2 border-gray-300 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all font-bold text-sm text-gray-700 hover:text-blue-600">
+                                        <i data-lucide="upload" class="w-4 h-4"></i>
+                                        <span>영상 업로드</span>
+                                    </button>
+                                    <span th:id="'videoName_' + ${stat.index}" class="text-sm text-gray-500 font-medium">선택된 파일 없음</span>
+                                </div>
+                                <p th:if="${#fields.hasErrors('sections[' + stat.index + '].videoFile')}"
+                                   th:errors="*{sections[__${stat.index}__].videoFile}" class="text-red-500 text-xs mt-1 font-bold"></p>
+                            </div>
+
+                            <div class="flex items-center gap-8">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-600 mb-2">동영상 재생 시간 *</label>
+                                    <input type="text" th:field="*{sections[__${stat.index}__].playTime}" th:errorclass="field-error"
+                                           oninput="formatDuration(this)" maxlength="8" placeholder="00:00:00"
+                                           class="w-32 px-4 py-2.5 border-2 rounded-xl focus:outline-none font-mono font-bold text-center border-gray-200 focus:border-blue-500">
+                                    <p th:if="${#fields.hasErrors('sections[' + stat.index + '].playTime')}"
+                                       th:errors="*{sections[__${stat.index}__].playTime}" class="text-red-500 text-xs mt-1 font-bold"></p>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-600 mb-2">무료 공개 여부</label>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" th:field="*{sections[__${stat.index}__].isFree}" value="true" class="sr-only peer">
+                                        <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-7 peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all"></div>
+                                    </label>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-600 mb-2">활성화 여부</label>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" th:field="*{sections[__${stat.index}__].isActive}" value="true" class="sr-only peer">
+                                        <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-7 peer-checked:bg-green-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all"></div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-2">첨부파일 (선택)</label>
+                                <div class="flex items-center gap-3">
+                                    <input type="file" th:name="'sections[' + ${stat.index} + '].attachmentFile'" th:id="'attachInput_' + ${stat.index}" class="hidden" th:onchange="|updateFileName(this, 'attachName_${stat.index}')|">
+                                    <button type="button" th:onclick="|document.getElementById('attachInput_${stat.index}').click()|" class="inline-flex items-center gap-2 px-4 py-2 border-2 border-gray-300 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all font-bold text-sm text-gray-700 hover:text-blue-600">
+                                        <i data-lucide="upload" class="w-4 h-4"></i>
+                                        <span>첨부파일 업로드</span>
+                                    </button>
+                                    <span th:id="'attachName_' + ${stat.index}" class="text-sm text-gray-500 font-medium">업로드 대기</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="button" onclick="handleDeleteSection(this)" class="flex-shrink-0 p-2 border-2 border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-all">
+                            <i data-lucide="trash-2" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="flex gap-4 justify-end">
             <a href="/instructor/course-management">
-                <button type="button" class="px-8 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-all font-bold text-gray-700">
-                    취소
-                </button>
+                <button type="button" class="px-8 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-all font-bold text-gray-700">취소</button>
             </a>
-            <button type="button" onclick="handleSave()" class="px-8 py-3 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-xl hover:shadow-xl transition-all font-bold">
-                최종 등록
-            </button>
+            <button type="button" onclick="handleSave()" class="px-8 py-3 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-xl hover:shadow-xl transition-all font-bold">최종 등록</button>
         </div>
     </form>
 
-    <div id="alertModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-        <div class="bg-white rounded-2xl p-6 w-96 shadow-xl flex flex-col items-center">
-            <p id="alertMessage" class="text-lg font-bold text-gray-900 mb-6 text-center"></p>
-            <button type="button" onclick="closeModal()" class="w-full px-4 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-colors">
-                확인
-            </button>
-        </div>
-    </div>
 </div>
 
 <script>
     lucide.createIcons();
-    let sectionIndex = 0; // 섹션의 순서를 관리 인덱스
+    let sectionIndex = document.querySelectorAll('.section-item').length;
 
-    // 초기 화면 로드 시 섹션 1개 기본 추가
     window.onload = function() {
-        handleAddSection();
+        // 💡 서버에서 내려온 섹션이 하나도 없을 때만 기본 1개 추가
+        if (sectionIndex === 0) {
+            handleAddSection();
+        }
     }
 
     // 파일 업로드 시 옆에 파일명 띄워주는 함수
