@@ -2,6 +2,7 @@ package com.wanted.naeil.global.error;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -63,6 +64,17 @@ public class GlobalExceptionHandler {
         return mv;
     }
 
+    // 승재, 409 중복키 에러
+    @ExceptionHandler(DuplicateKeyException.class)
+    protected ModelAndView handleDuplicateKeyException(DuplicateKeyException e) {
+        log.warn("중복 데이터 : {}", e.getMessage());
+        ModelAndView mv = new ModelAndView();
+        mv.addObject("errorMessage", e.getMessage());
+        mv.addObject("status", 409);
+        mv.setViewName(DEFAULT_ERROR_VIEW);
+        return mv;
+    }
+
     // 409 에러, 중복 요청 성민(추가)
     @ExceptionHandler(IllegalStateException.class)
     protected ModelAndView handleIllegalStateException(IllegalStateException e) {
@@ -88,6 +100,8 @@ public class GlobalExceptionHandler {
         mv.setViewName(DEFAULT_ERROR_VIEW);
         return mv;
     }
+
+
 
 
 }
