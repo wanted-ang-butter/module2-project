@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>회원 관리</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+<div class="max-w-7xl mx-auto px-6 py-12">
+
+    <!-- Top Header -->
+    <div class="mb-12">
+        <div class="flex items-center justify-between mb-6">
+            <a href="/admin"
+               class="flex items-center gap-2 px-4 py-2 border-2 border-gray-200 rounded-xl hover:border-blue-600 hover:bg-blue-50 transition-all">
+                <span class="font-medium text-gray-700 hover:text-blue-600 text-sm">← 뒤로가기</span>
+            </a>
+        </div>
+
+        <!-- Admin Hero Banner -->
+        <div class="relative overflow-hidden mb-8">
+            <div class="relative bg-gradient-to-br from-purple-50 via-white to-blue-50 rounded-3xl p-12 border-2 border-gray-200 shadow-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-200 rounded-full mb-6 shadow-sm">
+                            <div class="w-2.5 h-2.5 bg-purple-500 rounded-full"></div>
+                            <span class="text-sm font-bold text-gray-700">시스템 정상</span>
+                        </div>
+                        <h2 class="text-4xl font-black text-gray-900 mb-4 leading-tight">
+                            안녕하세요,<br />
+                            <span class="text-purple-600">관리자</span>님
+                        </h2>
+                        <p class="text-xl text-gray-700 font-semibold">
+                            플랫폼 운영 상태를 확인하고 관리하세요
+                        </p>
+                    </div>
+                    <div class="hidden lg:block">
+                        <div class="w-48 h-48 bg-gradient-to-br from-purple-400 to-blue-400 rounded-3xl flex items-center justify-center shadow-2xl">
+                            <span class="text-white text-7xl">👥</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Header -->
+        <h1 class="text-4xl font-black text-gray-900 mb-2">회원 관리</h1>
+        <p class="text-gray-600 font-medium">플랫폼에 가입된 회원을 관리합니다</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-3 gap-6 mb-10">
+        <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 shadow-sm">
+            <p class="text-sm font-bold text-gray-500 mb-1">신규 가입</p>
+            <p class="text-3xl font-black text-gray-900" id="stat-new">-</p>
+        </div>
+        <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 shadow-sm">
+            <p class="text-sm font-bold text-gray-500 mb-1">활성 회원</p>
+            <p class="text-3xl font-black text-green-600" id="stat-active">-</p>
+        </div>
+        <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 shadow-sm">
+            <p class="text-sm font-bold text-gray-500 mb-1">탈퇴 회원</p>
+            <p class="text-3xl font-black text-red-500" id="stat-inactive">-</p>
+        </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 mb-6 shadow-sm">
+        <div class="flex gap-3">
+            <input
+                type="text"
+                id="search-input"
+                placeholder="이름 또는 닉네임으로 검색"
+                class="flex-1 px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400 text-sm"
+            />
+            <button
+                onclick="applySearch()"
+                class="px-6 py-2 bg-gray-900 text-white rounded-xl font-bold text-sm hover:bg-gray-700 transition-colors"
+            >검색</button>
+        </div>
+    </div>
+
+    <!-- User Table -->
+    <div class="bg-white border-2 border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <table class="w-full text-sm">
+            <thead class="bg-gray-50 border-b-2 border-gray-200">
+                <tr>
+                    <th class="px-4 py-3 text-left font-bold text-gray-600">No</th>
+                    <th class="px-4 py-3 text-left font-bold text-gray-600">아이디</th>
+                    <th class="px-4 py-3 text-left font-bold text-gray-600">본명</th>
+                    <th class="px-4 py-3 text-left font-bold text-gray-600">전화번호</th>
+                    <th class="px-4 py-3 text-left font-bold text-gray-600">생년월일</th>
+                    <th class="px-4 py-3 text-left font-bold text-gray-600">닉네임</th>
+                    <th class="px-4 py-3 text-left font-bold text-gray-600">가입일</th>
+                    <th class="px-4 py-3 text-left font-bold text-gray-600">상태</th>
+                    <th class="px-4 py-3 text-left font-bold text-gray-600">경고</th>
+                    <th class="px-4 py-3 text-left font-bold text-gray-600">관리</th>
+                </tr>
+            </thead>
+            <tbody id="user-table-body">
+                <tr>
+                    <td colspan="10" class="px-4 py-8 text-center text-gray-400">불러오는 중...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Reset Warning Modal -->
+<div id="reset-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl border-2 border-gray-200">
+        <h3 class="text-xl font-black text-gray-900 mb-4">경고 횟수 초기화</h3>
+        <p class="text-sm text-gray-600 mb-4">
+            <span id="reset-user-name" class="font-bold text-gray-900"></span> 님의 경고 횟수를 초기화합니다.
+        </p>
+        <div class="flex justify-end gap-3">
+            <button onclick="closeResetModal()"
+                    class="px-6 py-2 border-2 border-gray-200 rounded-xl font-bold text-gray-600 hover:bg-gray-50 text-sm">
+                취소
+            </button>
+            <button onclick="confirmReset()"
+                    class="px-6 py-2 bg-yellow-500 text-white rounded-xl font-bold hover:bg-yellow-600 text-sm">
+                초기화
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Blacklist Modal -->
+<div id="blacklist-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl border-2 border-gray-200">
+        <h3 class="text-xl font-black text-gray-900 mb-4">블랙리스트 등록</h3>
+        <p class="text-sm text-gray-600 mb-4">
+            <span id="blacklist-user-name" class="font-bold text-gray-900"></span> 님을 블랙리스트에 등록합니다.
+        </p>
+        <div class="mb-4">
+            <label class="block text-sm font-bold text-gray-700 mb-2">등록 사유</label>
+            <textarea id="blacklist-reason" rows="3"
+                      placeholder="블랙리스트 등록 사유를 입력하세요"
+                      class="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-red-400 text-sm resize-none"></textarea>
+        </div>
+        <div class="flex justify-end gap-3">
+            <button onclick="closeBlacklistModal()"
+                    class="px-6 py-2 border-2 border-gray-200 rounded-xl font-bold text-gray-600 hover:bg-gray-50 text-sm">
+                취소
+            </button>
+            <button onclick="confirmBlacklist()"
+                    class="px-6 py-2 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 text-sm">
+                등록
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div id="delete-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl border-2 border-gray-200">
+        <h3 class="text-xl font-black text-gray-900 mb-4">회원 삭제</h3>
+        <p class="text-sm text-gray-600 mb-6">
+            <span id="delete-user-name" class="font-bold text-gray-900"></span> 님을 삭제합니다. 이 작업은 되돌릴 수 없습니다.
+        </p>
+        <div class="flex justify-end gap-3">
+            <button onclick="closeDeleteModal()"
+                    class="px-6 py-2 border-2 border-gray-200 rounded-xl font-bold text-gray-600 hover:bg-gray-50 text-sm">
+                취소
+            </button>
+            <button onclick="confirmDelete()"
+                    class="px-6 py-2 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 text-sm">
+                삭제
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let allUsers = [];
+    let selectedUserId = null;
+    let selectedUserName = '';
+
+    async function loadUsers() {
+        try {
+            const res = await fetch('/api/admin/User');
+            if (!res.ok) throw new Error('API 오류');
+            allUsers = await res.json();
+            updateStats(allUsers);
+            renderTable(allUsers);
+        } catch (e) {
+            document.getElementById('user-table-body').innerHTML =
+                '<tr><td colspan="10" class="px-4 py-8 text-center text-red-400">데이터를 불러올 수 없습니다.</td></tr>';
+        }
+    }
+
+    function updateStats(users) {
+        const active = users.filter(u => u.status === 'ACTIVE').length;
+        const inactive = users.filter(u => u.status === 'INACTIVE' || u.status === 'DELETED').length;
+        // 신규 가입: 최근 30일 이내 (createdAt 필드 없으므로 전체 수로 표시)
+        document.getElementById('stat-new').textContent = users.length;
+        document.getElementById('stat-active').textContent = active;
+        document.getElementById('stat-inactive').textContent = inactive;
+    }
+
+    function renderTable(users) {
+        const tbody = document.getElementById('user-table-body');
+        if (users.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="10" class="px-4 py-8 text-center text-gray-400">회원이 없습니다.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = users.map((u, idx) => {
+            const isActive = u.status === 'ACTIVE';
+            const isInactive = u.status === 'INACTIVE' || u.status === 'DELETED';
+
+            const statusBadge = isActive
+                ? '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">활성</span>'
+                : '<span class="px-2 py-1 bg-red-100 text-red-600 rounded-full text-xs font-bold">비활성</span>';
+
+            const warningBadge = u.warningCount > 0
+                ? `<span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold">${u.warningCount}회</span>`
+                : `<span class="text-gray-400 text-xs">없음</span>`;
+
+            return `
+            <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                <td class="px-4 py-3 text-gray-500">${idx + 1}</td>
+                <td class="px-4 py-3 font-medium text-gray-900">${u.username || '-'}</td>
+                <td class="px-4 py-3 text-gray-700">${u.name || '-'}</td>
+                <td class="px-4 py-3 text-gray-600">${u.phone || '-'}</td>
+                <td class="px-4 py-3 text-gray-600">${u.birthDate || '-'}</td>
+                <td class="px-4 py-3 text-gray-600">${u.nickname || '-'}</td>
+                <td class="px-4 py-3 text-gray-500 text-xs">${u.createdAt ? u.createdAt.substring(0, 10) : '-'}</td>
+                <td class="px-4 py-3">${statusBadge}</td>
+                <td class="px-4 py-3">${warningBadge}</td>
+                <td class="px-4 py-3">
+                    <div class="flex gap-1 flex-wrap">
+                        ${isActive
+                            ? `<button onclick="deactivateUser(${u.id}, '${escapeQuote(u.name)}')"
+                                class="px-2 py-1 bg-gray-200 text-gray-700 rounded-lg text-xs font-bold hover:bg-gray-300 transition-colors">비활성화</button>`
+                            : `<button onclick="activateUser(${u.id}, '${escapeQuote(u.name)}')"
+                                class="px-2 py-1 bg-green-100 text-green-700 rounded-lg text-xs font-bold hover:bg-green-200 transition-colors">활성화</button>`
+                        }
+                        <button onclick="openBlacklistModal(${u.id}, '${escapeQuote(u.name)}')"
+                            class="px-2 py-1 bg-red-100 text-red-600 rounded-lg text-xs font-bold hover:bg-red-200 transition-colors">블랙</button>
+                        <button onclick="openResetModal(${u.id}, '${escapeQuote(u.name)}')"
+                            class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-lg text-xs font-bold hover:bg-yellow-200 transition-colors">경고초기화</button>
+                        ${isInactive
+                            ? `<button onclick="openDeleteModal(${u.id}, '${escapeQuote(u.name)}')"
+                                class="px-2 py-1 bg-gray-100 text-gray-500 rounded-lg text-xs font-bold hover:bg-gray-200 transition-colors">삭제</button>`
+                            : ''
+                        }
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    function escapeQuote(str) {
+        return (str || '').replace(/'/g, "\\'");
+    }
+
+    function applySearch() {
+        const keyword = document.getElementById('search-input').value.trim().toLowerCase();
+        if (!keyword) {
+            renderTable(allUsers);
+            return;
+        }
+        const filtered = allUsers.filter(u =>
+            (u.name && u.name.toLowerCase().includes(keyword)) ||
+            (u.nickname && u.nickname.toLowerCase().includes(keyword))
+        );
+        renderTable(filtered);
+    }
+
+    document.getElementById('search-input').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') applySearch();
+    });
+
+    async function activateUser(userId, name) {
+        if (!confirm(`${name} 님을 활성화하시겠습니까?`)) return;
+        try {
+            const res = await fetch(`/api/admin/User/${userId}/activate`, { method: 'PATCH' });
+            if (!res.ok) throw new Error();
+            alert('활성화되었습니다.');
+            loadUsers();
+        } catch {
+            alert('처리 중 오류가 발생했습니다.');
+        }
+    }
+
+    async function deactivateUser(userId, name) {
+        if (!confirm(`${name} 님을 비활성화하시겠습니까?`)) return;
+        try {
+            const res = await fetch(`/api/admin/User/${userId}/deactivate`, { method: 'PATCH' });
+            if (!res.ok) throw new Error();
+            alert('비활성화되었습니다.');
+            loadUsers();
+        } catch {
+            alert('처리 중 오류가 발생했습니다.');
+        }
+    }
+
+    // Reset Warning Modal
+    function openResetModal(userId, name) {
+        selectedUserId = userId;
+        selectedUserName = name;
+        document.getElementById('reset-user-name').textContent = name;
+        document.getElementById('reset-modal').classList.remove('hidden');
+    }
+
+    function closeResetModal() {
+        document.getElementById('reset-modal').classList.add('hidden');
+        selectedUserId = null;
+    }
+
+    async function confirmReset() {
+        try {
+            // 주의: 백엔드 URL에 오타 있음 /{userId/ → 수정 필요할 수 있음
+            const res = await fetch(`/api/admin/User/${selectedUserId}/reset-warning`, { method: 'PATCH' });
+            if (!res.ok) throw new Error();
+            alert('경고 횟수가 초기화되었습니다.');
+            closeResetModal();
+            loadUsers();
+        } catch {
+            alert('처리 중 오류가 발생했습니다.');
+            closeResetModal();
+        }
+    }
+
+    // Blacklist Modal
+    function openBlacklistModal(userId, name) {
+        selectedUserId = userId;
+        selectedUserName = name;
+        document.getElementById('blacklist-user-name').textContent = name;
+        document.getElementById('blacklist-reason').value = '';
+        document.getElementById('blacklist-modal').classList.remove('hidden');
+    }
+
+    function closeBlacklistModal() {
+        document.getElementById('blacklist-modal').classList.add('hidden');
+        selectedUserId = null;
+    }
+
+    async function confirmBlacklist() {
+        const reason = document.getElementById('blacklist-reason').value.trim();
+        if (!reason) {
+            alert('등록 사유를 입력해주세요.');
+            return;
+        }
+        try {
+            const res = await fetch('/api/admin/blacklist', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: selectedUserId, reason })
+            });
+            if (!res.ok) throw new Error();
+            alert('블랙리스트에 등록되었습니다.');
+            closeBlacklistModal();
+            loadUsers();
+        } catch {
+            alert('처리 중 오류가 발생했습니다.');
+        }
+    }
+
+    // Delete Modal
+    function openDeleteModal(userId, name) {
+        selectedUserId = userId;
+        selectedUserName = name;
+        document.getElementById('delete-user-name').textContent = name;
+        document.getElementById('delete-modal').classList.remove('hidden');
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('delete-modal').classList.add('hidden');
+        selectedUserId = null;
+    }
+
+    async function confirmDelete() {
+        try {
+            const res = await fetch(`/api/admin/User/${selectedUserId}`, { method: 'DELETE' });
+            if (!res.ok) throw new Error();
+            alert('삭제되었습니다.');
+            closeDeleteModal();
+            loadUsers();
+        } catch {
+            alert('처리 중 오류가 발생했습니다.');
+        }
+    }
+
+    // Close modals on backdrop click
+    ['reset-modal', 'blacklist-modal', 'delete-modal'].forEach(id => {
+        document.getElementById(id).addEventListener('click', function(e) {
+            if (e.target === this) this.classList.add('hidden');
+        });
+    });
+
+    loadUsers();
+</script>
+</body>
+</html>

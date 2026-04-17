@@ -22,11 +22,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // 사용자 ID로 사용자 찾기(username 이 id 임)
     Optional<User> findByUsername(String username);
 
-    List<User> findAllByRole(Role role);
+    // 역할 목록으로 사용자 조회 성민 추가
+    List<User> findAllByRoleIn(List<Role> roles);
 
-    Long Id(Long id);
-
-    Long id(Long id);
-
-    Long id(Long id);
 }

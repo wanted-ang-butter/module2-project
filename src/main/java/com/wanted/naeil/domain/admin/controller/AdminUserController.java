@@ -31,7 +31,7 @@ public class AdminUserController {
     public void deactivate(@PathVariable Long userId){
         adminUserService.deactivateUser(userId);
     }
-    @PatchMapping("/{userId/reset-warning")
+    @PatchMapping("/{userId}/reset-warning")
     public void resetWarning(@PathVariable Long userId) {
         adminUserService.resetWarnigUser(userId);
     }

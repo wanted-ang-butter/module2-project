@@ -20,7 +20,7 @@ public class AdminUserService {
     @Transactional(readOnly = true)
     public List<UserResponse> getUser() {
         List<User> users =
-                userRepository.findAllByRole(Role.USER);
+                userRepository.findAllByRoleIn(List.of(Role.USER, Role.INSTRUCTOR));
         return users.stream()
                 .map(u ->UserResponse.builder()
                         .id(u.getId())
