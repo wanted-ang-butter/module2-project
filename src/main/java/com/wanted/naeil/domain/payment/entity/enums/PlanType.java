@@ -1,13 +1,14 @@
-package com.wanted.naeil.domain.community.entity;
+package com.wanted.naeil.domain.payment.entity.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum LikeTargetType {
-    POST("게시글"),
-    COURSE("코스");
+public enum PlanType {
+
+    MONTHLY("한달권"),
+    YEARLY("일년권");
 
     private final String description;
 }

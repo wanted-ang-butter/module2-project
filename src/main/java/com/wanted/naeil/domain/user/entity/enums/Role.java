@@ -1,4 +1,4 @@
-package com.wanted.naeil.domain.user.entity;
+package com.wanted.naeil.domain.user.entity.enums;
 
 public enum Role {
     GUEST("게스트"),

@@ -6,12 +6,12 @@ import com.wanted.naeil.domain.community.dto.response.PostDetailResponse;
 import com.wanted.naeil.domain.community.dto.response.PostListResponse;
 import com.wanted.naeil.domain.community.entity.Like;
 import com.wanted.naeil.domain.community.entity.Post;
-import com.wanted.naeil.domain.community.entity.PostCategory;
+import com.wanted.naeil.domain.community.entity.enums.PostCategory;
 import com.wanted.naeil.domain.community.repository.LikeRepository;
 import com.wanted.naeil.domain.community.repository.PostRepository;
 import com.wanted.naeil.domain.course.entity.Course;
 import com.wanted.naeil.domain.course.repository.CourseRepository;
-import com.wanted.naeil.domain.user.entity.Role;
+import com.wanted.naeil.domain.user.entity.enums.Role;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.global.common.exception.ErrorCode; // 메시지 참조용
 import lombok.RequiredArgsConstructor;

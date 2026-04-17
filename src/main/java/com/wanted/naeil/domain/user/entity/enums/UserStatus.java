@@ -1,4 +1,4 @@
-package com.wanted.naeil.domain.user.entity;
+package com.wanted.naeil.domain.user.entity.enums;
 
 public enum UserStatus {
     ACTIVE("활성화"),

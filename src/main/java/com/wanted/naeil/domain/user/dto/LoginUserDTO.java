@@ -1,7 +1,7 @@
 package com.wanted.naeil.domain.user.dto;
 
-import com.wanted.naeil.domain.user.entity.Role;
-import com.wanted.naeil.domain.user.entity.UserStatus;
+import com.wanted.naeil.domain.user.entity.enums.Role;
+import com.wanted.naeil.domain.user.entity.enums.UserStatus;
 
 public class LoginUserDTO {
 

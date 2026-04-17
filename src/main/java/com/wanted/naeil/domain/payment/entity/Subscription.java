@@ -1,8 +1,9 @@
 package com.wanted.naeil.domain.payment.entity;
 
+import com.wanted.naeil.domain.payment.entity.enums.PlanType;
+import com.wanted.naeil.domain.payment.entity.enums.SubscriptionStatus;
 import com.wanted.naeil.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,6 +47,10 @@ public class Subscription {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private SubscriptionStatus status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "plan_type", nullable = false, length = 20)
+    private PlanType planType;
 
     @Builder
     public Subscription(Payment payment, User user, LocalDateTime startAt,

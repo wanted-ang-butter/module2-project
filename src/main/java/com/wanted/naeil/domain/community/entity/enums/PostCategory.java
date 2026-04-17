@@ -1,15 +1,12 @@
-package com.wanted.naeil.domain.course.entity;
-
+package com.wanted.naeil.domain.community.entity.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum SectionStatus {
-    ACTIVE("활성화"),
-    INACTIVE("비활성화");
+public enum PostCategory {
+    FREE("자유"), QNA("QnA");
 
     private final String description;
-
 }

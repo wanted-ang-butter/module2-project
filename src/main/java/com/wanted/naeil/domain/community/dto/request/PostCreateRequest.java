@@ -1,6 +1,6 @@
 package com.wanted.naeil.domain.community.dto.request;
 
-import com.wanted.naeil.domain.community.entity.PostCategory;
+import com.wanted.naeil.domain.community.entity.enums.PostCategory;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
