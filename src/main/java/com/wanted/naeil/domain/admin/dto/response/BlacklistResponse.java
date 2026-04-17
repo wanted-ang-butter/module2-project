@@ -1,7 +1,15 @@
 package com.wanted.naeil.domain.admin.dto.response;
 
-import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class BlacklistResponse {
 
     Long blacklistID;

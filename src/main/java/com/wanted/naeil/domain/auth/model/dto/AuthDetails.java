@@ -1,6 +1,7 @@
 package com.wanted.naeil.domain.auth.model.dto;
 
 import com.wanted.naeil.domain.user.dto.LoginUserDTO;
+import com.wanted.naeil.domain.user.entity.Role;
 import com.wanted.naeil.domain.user.entity.UserStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,6 +26,10 @@ public class AuthDetails implements UserDetails {
 
     public void setLoginUserDTO(LoginUserDTO loginUserDTO) {
         this.loginUserDTO = loginUserDTO;
+    }
+
+    public Role getRole() {
+        return loginUserDTO.getRole();
     }
 
     @Override
