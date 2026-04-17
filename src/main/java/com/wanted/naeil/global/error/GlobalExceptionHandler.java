@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
@@ -90,12 +91,12 @@ public class GlobalExceptionHandler {
 
 
     // 403 에러, 권한 없음 (글 수정/삭제 시 본인이 아닌 경우)
-    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
-    protected ModelAndView handleAccessDeniedException(org.springframework.security.access.AccessDeniedException e) {
+    @ExceptionHandler(AccessDeniedException.class)
+    protected ModelAndView handleAccessDeniedException(AccessDeniedException e) {
         log.warn("권한 없음 : {}", e.getMessage());
 
         ModelAndView mv = new ModelAndView();
-        mv.addObject("errorMessage", "해당 동작에 대한 권한이 없습니다.");
+        mv.addObject("errorMessage", e.getMessage());
         mv.addObject("status", 403);
         mv.setViewName(DEFAULT_ERROR_VIEW);
         return mv;
