@@ -37,10 +37,13 @@ public class UserCourseController {
     }
 
     @GetMapping("/{course_id}")
-    public ModelAndView showCourseDetails(ModelAndView mv, @PathVariable("course_id") Long courseId) {
+    public ModelAndView getCourseDetails(ModelAndView mv, @PathVariable("course_id") Long courseId) {
 
         log.info("[Course] 코스 상세 페이지 조회");
 
-        List<CourseDetailsResponse> course = courseService.findCourseById(courseId);
+        CourseDetailsResponse course = courseService.getCourseDetail(courseId);
+        mv.addObject("course", course);
+        mv.setViewName("course/courseDetail");
+        return mv;
     }
 }

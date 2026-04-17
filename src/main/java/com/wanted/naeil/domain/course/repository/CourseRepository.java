@@ -3,6 +3,7 @@ package com.wanted.naeil.domain.course.repository;
 import com.wanted.naeil.domain.course.dto.response.CourseDetailsResponse;
 import com.wanted.naeil.domain.course.dto.response.CourseListResponse;
 import com.wanted.naeil.domain.course.entity.Course;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -29,14 +30,15 @@ public interface CourseRepository extends JpaRepository <Course, Long> {
     List<CourseListResponse> findAllWithStatus();
 
 
-    @Query("SELECT new com.wanted.naeil.domain.course.dto.response.CourseDetailsResponse(" +
-            "c.id, cat.name, c.title, u.name, c.thumbnail, c.price, c.description, " +
-            "(SELECT COUNT(l) FROM Like l WHERE l.course = c AND l.targetType = 'COURSE'), " +
-            "SIZE(c.sections)," +
-            "(SELECT COUNT(e) FROM Enrollment e WHERE e.course = c))" +
-            "FROM Course c " +
-            "JOIN c.category cat " +
-            "JOIN c.instructor u " +
-            "WHERE c.id = :couserId")
-    Optional<CourseDetailsResponse> findCourseDetailsDtoById(@Param("courseId") Long courseId);
+    @EntityGraph(attributePaths = {"category", "instructor", "sections"})
+    Optional<Course> findCourseDetailsById(@Param("courseId") Long courseId);
+
+    @Query("SELECT COUNT(l) FROM Like l where l.course.id = :courseId")
+    long countLikesByCourseId(@Param("courseId") Long courseId);
+
+    @Query("select count(e) from Enrollment e where e.course.id = :courseId")
+    long countStudentsByCourseId(@Param("courseId") Long courseId);
+
+    @Query("select avg(r.rating) from Review r where r.course.id = :courseId")
+    Double getAverageRatingByCourseId(@Param("courseId") Long courseId);
 }

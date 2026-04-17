@@ -10,11 +10,9 @@ import com.wanted.naeil.domain.community.service.PostService;
 import com.wanted.naeil.domain.course.entity.Course;
 import com.wanted.naeil.domain.learning.entity.Enrollment;
 import com.wanted.naeil.domain.learning.repository.EnrollmentRepository;
-import com.wanted.naeil.domain.user.entity.Role;
+import com.wanted.naeil.domain.user.entity.enums.Role;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.domain.user.repository.UserRepository;
-import com.wanted.naeil.global.common.exception.CustomException;
-import com.wanted.naeil.global.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Controller
@@ -224,10 +223,11 @@ public class PostController {
         return mv;
     }
 
-    // 공통 메서드 (로그인 유저 꺼내는)
+//     공통 메서드 (로그인 유저 꺼내는)
+    // TODO : 현지 이거, 나중에 예외처리 로직 수정하기
     private User getLoginUser(AuthDetails authDetails) {
         if (authDetails == null) return null;
         return userRepository.findByUsername(authDetails.getLoginUserDTO().getUsername())
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new NoSuchElementException("유저를 찾을 수 없습니다."));
     }
 }

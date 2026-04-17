@@ -103,22 +103,34 @@ public class CourseService {
         return CreateCourseResponse.from(savedCourse, "강의 등록 신청이 완료되었습니다. 관리자 승인 후 강의가 활성화됩니다.");
     }
 
+    // 강의 전체 조회
     @Transactional(readOnly = true)
     public List<CourseListResponse> findAllCourses() {
         return courseRepository.findAllWithStatus();
     }
 
+    // 코스 단일 조회
     @Transactional(readOnly = true)
-    public List<CourseDetailsResponse> findCourseById(Long courseId) {
+    public CourseDetailsResponse getCourseDetail(Long courseId) {
         
-        // 좋아요 수, 수강생 수 포함한 강의 상세 데이터 조회
-        CourseDetailsResponse response = courseRepository.findCourseDetailsDtoById(courseId)
+        // 강의,카테고리,강사,섹션 한 번에 조회
+        Course course = courseRepository.findCourseDetailsById(courseId)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 코스입니다. 관리자에게 문의해주세요."));
 
-        // TODO : 추후 구현
-        // 섹션 리스트 조회
-        List<SectionResponse> sections = sectionRepository.findByCourseId(courseId);
+        long likeCount = courseRepository.countLikesByCourseId(courseId);
+        long studentCount = courseRepository.countStudentsByCourseId(courseId);
+        Double avgRating = courseRepository.getAverageRatingByCourseId(courseId);
 
-        return null;
+        // 섹션 리스트 조회
+        List<SectionResponse> sectionsResponses = course.getSections().stream()
+                .map(SectionResponse::from)
+                .collect(Collectors.toList());
+
+        return CourseDetailsResponse.of(
+                course,
+                studentCount,
+                likeCount,
+                avgRating,
+                sectionsResponses);
     }
 }
