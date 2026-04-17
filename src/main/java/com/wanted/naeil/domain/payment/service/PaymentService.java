@@ -31,12 +31,15 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final EnrollmentRepository enrollmentRepository;
 
+    // 장바구니에서 선택한 코스만 결제로 이동!
     public Long checkoutSelectedCartItems(Long userId, List<Long> selectedCartItemIds) {
 
+        // 아무것도 선택하지 않았을 때
         if (selectedCartItemIds == null || selectedCartItemIds.isEmpty()) {
             throw new IllegalArgumentException("선택된 장바구니 항목이 없습니다.");
         }
 
+        //
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
