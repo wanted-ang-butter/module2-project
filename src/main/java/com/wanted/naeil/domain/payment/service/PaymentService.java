@@ -39,10 +39,11 @@ public class PaymentService {
             throw new IllegalArgumentException("선택된 장바구니 항목이 없습니다.");
         }
 
-        //
+        // 로그인한 사용자가 존재하는지 -> check 예정!
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
+        // 로그인한 사용자의 크레딧 존재??
         Credit credit = creditRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("크레딧 정보가 존재하지 않습니다."));
 
