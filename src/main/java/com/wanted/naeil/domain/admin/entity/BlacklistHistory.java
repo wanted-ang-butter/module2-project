@@ -34,4 +34,10 @@ public class BlacklistHistory extends BaseTimeEntity {
 
     @Column(name = "release_reason", columnDefinition = "TEXT")
     private String releaseReason;
+
+// 블랙리스트 해제
+public void release(String releaseReason) {
+    this.releaseReason = releaseReason;
 }
+}
+
