@@ -6,12 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 @Slf4j
 public class IndexController {
 
-    @GetMapping(value = {"/", "/main", "/dashboard"})
+    @GetMapping(value = {"/", "/dashboard"})
     public String mainPage(@AuthenticationPrincipal AuthDetails authDetails) {
 
         if (authDetails == null) {

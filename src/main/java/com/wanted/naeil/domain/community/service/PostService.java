@@ -116,7 +116,7 @@ public class PostService {
         boolean isAdmin = loginUser.getRole() == Role.ADMIN;
 
         if (!isOwner && !isAdmin) {
-            throw new AccessDeniedException("본인이 작성한 글이나 관리자만 삭제할 수 있습니다.");
+            throw new AccessDeniedException("해당 게시물에 삭제 권한이 없습니다.");
         }
 
         postRepository.delete(post); // 엔티티의 @SQLDelete가 작동함
@@ -135,7 +135,7 @@ public class PostService {
     // 권한 검증 공통 메서드
     private void validateOwner(Post post, User loginUser) {
         if (!post.getUser().getId().equals(loginUser.getId())) {
-            throw new AccessDeniedException("해당 게시글의 접근 권한이 없습니다.");
+            throw new AccessDeniedException("해당 기능에 대한 접속 권한이 없습니다.");
         }
     }
 }

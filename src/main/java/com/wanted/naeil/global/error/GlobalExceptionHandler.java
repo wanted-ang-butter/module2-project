@@ -53,18 +53,6 @@ public class GlobalExceptionHandler {
         mv.setViewName(DEFAULT_ERROR_VIEW);
         return mv;
     }
-
-    @ExceptionHandler(Exception.class)
-    protected ModelAndView handleException(Exception e) {
-        log.warn("서버 내부 에러 : ", e);
-
-        ModelAndView mv = new ModelAndView();
-        mv.addObject("errorMessage", "시스템 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
-        mv.addObject("status", 500);
-        mv.setViewName(DEFAULT_ERROR_VIEW);
-        return mv;
-    }
-
     // 승재, 409 중복키 에러
     @ExceptionHandler(DuplicateKeyException.class)
     protected ModelAndView handleDuplicateKeyException(DuplicateKeyException e) {
@@ -88,8 +76,6 @@ public class GlobalExceptionHandler {
         return mv;
     }
 
-
-
     // 403 에러, 권한 없음 (글 수정/삭제 시 본인이 아닌 경우)
     @ExceptionHandler(AccessDeniedException.class)
     protected ModelAndView handleAccessDeniedException(AccessDeniedException e) {
@@ -102,6 +88,17 @@ public class GlobalExceptionHandler {
         return mv;
     }
 
+    // 최상위 500 에러, 알 수 없는 에러
+    @ExceptionHandler(Exception.class)
+    protected ModelAndView handleException(Exception e) {
+        log.warn("서버 내부 에러 : ", e);
+
+        ModelAndView mv = new ModelAndView();
+        mv.addObject("errorMessage", "시스템 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+        mv.addObject("status", 500);
+        mv.setViewName(DEFAULT_ERROR_VIEW);
+        return mv;
+    }
 
 
 

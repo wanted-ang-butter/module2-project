@@ -13,8 +13,6 @@ import com.wanted.naeil.domain.learning.repository.EnrollmentRepository;
 import com.wanted.naeil.domain.user.entity.enums.Role;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.domain.user.repository.UserRepository;
-import com.wanted.naeil.global.common.exception.CustomException;
-import com.wanted.naeil.global.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Controller
@@ -228,6 +227,6 @@ public class PostController {
     private User getLoginUser(AuthDetails authDetails) {
         if (authDetails == null) return null;
         return userRepository.findByUsername(authDetails.getLoginUserDTO().getUsername())
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new NoSuchElementException("유저를 찾을 수 없습니다."));
     }
 }
