@@ -1,6 +1,6 @@
 package com.wanted.naeil.domain.live.entity;
 
-import com.wanted.naeil.domain.live.entity.eums.LiveReservationStatus;
+import com.wanted.naeil.domain.live.entity.enums.LiveReservationStatus;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;

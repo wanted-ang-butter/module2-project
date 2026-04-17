@@ -7,7 +7,7 @@ import com.wanted.naeil.domain.admin.entity.enums.ApprovalStatus;
 import com.wanted.naeil.domain.admin.repository.AdminApprovalRepository;
 import com.wanted.naeil.domain.course.entity.Course;
 import com.wanted.naeil.domain.live.entity.LiveLecture;
-import com.wanted.naeil.domain.live.entity.eums.LiveLectureStatus;
+import com.wanted.naeil.domain.live.entity.enums.LiveLectureStatus;
 import com.wanted.naeil.domain.live.repository.LiveLectureRepository;
 import com.wanted.naeil.domain.user.entity.InstructorApplications;
 import com.wanted.naeil.domain.user.entity.enums.Role;
