@@ -30,14 +30,14 @@ public class UserController {
     private final MemberService memberService;
 
     // 회원가입 매핑
-@GetMapping("/signup")
-public String signupPage() {
+    @GetMapping("/signup")
+    public String signupPage() {
 
-    return "guest/signup"; // templates/user/signup.html 을 찾아감
+        return "guest/signup"; // templates/user/signup.html 을 찾아감
 
-}
+    }
 
-// 로그인 매핑
+    // 로그인 매핑
     @GetMapping("/login")
     public void login(){
     }
@@ -66,18 +66,6 @@ public String signupPage() {
         mv.setViewName("auth/login");
         return mv;
     }
-
-    // 역할 별 대시보드
-    @GetMapping("/dashboard")
-    public String dashboard(@AuthenticationPrincipal AuthDetails authDetails, Model model) {
-        if (authDetails != null) {
-            model.addAttribute("name", authDetails.getLoginUserDTO().getName());
-            model.addAttribute("role", authDetails.getLoginUserDTO().getRole());
-            model.addAttribute("nickname", authDetails.getLoginUserDTO().getNickname());
-        }
-        return "dashboard/userDashboard";
-    }
-
 
 
 }

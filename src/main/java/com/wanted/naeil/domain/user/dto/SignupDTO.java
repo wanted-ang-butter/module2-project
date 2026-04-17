@@ -18,7 +18,7 @@ import java.time.LocalDate;
 public class SignupDTO {
 
     @NotBlank(message = "아이디는 필수 입력 값입니다.")
-    @Pattern(regexp = "^[a-zA-Z0-9]{4,15}$", message = "아이디는 영문, 숫자 조합 4~15자여야 합니다.")
+    @Pattern(regexp = "^[a-zA-Z0-9]{4,15}$", message = "영문, 숫자 혹은 언더바(_) 조합 4자 이상 입력해 주세요.")
     private String username;
 
     @NotBlank(message = "비밀번호는 필수 입력 값입니다.")
