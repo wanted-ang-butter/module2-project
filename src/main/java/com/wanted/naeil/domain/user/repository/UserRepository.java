@@ -1,5 +1,7 @@
 package com.wanted.naeil.domain.user.repository;
 
+import com.wanted.naeil.domain.user.entity.enums.Role;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.wanted.naeil.domain.user.entity.User;
 
@@ -20,4 +22,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // 사용자 ID로 사용자 찾기(username 이 id 임)
     Optional<User> findByUsername(String username);
 
+    List<User> findAllByRole(Role role);
+
+    Long Id(Long id);
+
+    Long id(Long id);
+
+    Long id(Long id);
 }
