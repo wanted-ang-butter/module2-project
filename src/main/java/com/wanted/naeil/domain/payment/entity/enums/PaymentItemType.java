@@ -1,4 +1,4 @@
-package com.wanted.naeil.domain.payment.entity;
+package com.wanted.naeil.domain.payment.entity.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

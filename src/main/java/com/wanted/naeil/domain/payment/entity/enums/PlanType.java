@@ -1,12 +1,14 @@
-package com.wanted.naeil.domain.community.entity;
+package com.wanted.naeil.domain.payment.entity.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum PostCategory {
-    FREE("자유"), QNA("QnA");
+public enum PlanType {
+
+    MONTHLY("한달권"),
+    YEARLY("일년권");
 
     private final String description;
 }

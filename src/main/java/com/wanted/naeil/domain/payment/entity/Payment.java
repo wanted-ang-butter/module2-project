@@ -1,5 +1,6 @@
 package com.wanted.naeil.domain.payment.entity;
 
+import com.wanted.naeil.domain.payment.entity.enums.PaymentStatus;
 import com.wanted.naeil.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Builder;

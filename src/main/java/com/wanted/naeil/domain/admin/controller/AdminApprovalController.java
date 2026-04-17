@@ -2,7 +2,7 @@ package com.wanted.naeil.domain.admin.controller;
 
 import com.wanted.naeil.domain.admin.dto.request.RejectRequest;
 import com.wanted.naeil.domain.admin.dto.response.ApprovalResponse;
-import com.wanted.naeil.domain.admin.entity.ApprovalRequestType;
+import com.wanted.naeil.domain.admin.entity.enums.ApprovalRequestType;
 import com.wanted.naeil.domain.admin.service.AdminApprovalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

@@ -3,7 +3,7 @@ package com.wanted.naeil.domain.course.service;
 import com.wanted.naeil.domain.course.dto.request.UploadSectionRequest;
 import com.wanted.naeil.domain.course.entity.Course;
 import com.wanted.naeil.domain.course.entity.Section;
-import com.wanted.naeil.domain.course.entity.SectionStatus;
+import com.wanted.naeil.domain.course.entity.enums.SectionStatus;
 import com.wanted.naeil.domain.course.repository.SectionRepository;
 import com.wanted.naeil.global.util.file.LocalFileService;
 import lombok.RequiredArgsConstructor;
