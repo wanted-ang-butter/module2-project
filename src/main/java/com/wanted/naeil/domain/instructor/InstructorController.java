@@ -7,19 +7,23 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 @RequestMapping("/instructor")
 @RequiredArgsConstructor
 public class InstructorController {
 
+
     @GetMapping("/dashboard")
-    public String dashboard(@AuthenticationPrincipal AuthDetails authDetails, Model model) {
+    public ModelAndView dashboard(@AuthenticationPrincipal AuthDetails authDetails) {
+        ModelAndView mv = new ModelAndView("dashboard/instructorDashboard");
+
         if (authDetails != null) {
-            model.addAttribute("name", authDetails.getLoginUserDTO().getName());
-            model.addAttribute("role", authDetails.getLoginUserDTO().getRole());
-            model.addAttribute("nickname", authDetails.getLoginUserDTO().getNickname());
+            // 개별 필드가 아닌 LoginUserDTO 객체 자체를 "user"라는 이름으로 넘김
+            mv.addObject("user", authDetails.getLoginUserDTO());
         }
-        return "dashboard/instructorDashboard";
+
+        return mv;
     }
 }

@@ -4,7 +4,6 @@ package com.wanted.naeil.domain.user.controller;
 import com.wanted.naeil.domain.auth.model.dto.AuthDetails;
 import com.wanted.naeil.domain.user.dto.SignupDTO;
 import com.wanted.naeil.domain.user.service.MemberService;
-import com.wanted.naeil.global.common.exception.CustomException;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,14 +30,14 @@ public class UserController {
     private final MemberService memberService;
 
     // 회원가입 매핑
-@GetMapping("/signup")
-public String signupPage() {
+    @GetMapping("/signup")
+    public String signupPage() {
 
-    return "guest/signup"; // templates/user/signup.html 을 찾아감
+        return "guest/signup"; // templates/user/signup.html 을 찾아감
 
-}
+    }
 
-// 로그인 매핑
+    // 로그인 매핑
     @GetMapping("/login")
     public void login(){
     }
@@ -59,33 +58,14 @@ public String signupPage() {
         }
 
 
-        try {
-            memberService.regist(signupDTO);
-            mv.addObject("message", "회원가입이 완료되었습니다.");
-            mv.setViewName("auth/login");
+        // 여기서 발생하는 중복 아이디, 이미지 형식 에러 등은 GlobalExceptionHandler가 처리
+        memberService.regist(signupDTO);
 
-        }
-        // 예외 처리 ErrorCode 클래스 활용
-        catch (CustomException e) {
-            // MemberService에서 던진 ErrorCode의 메시지를 그대로 화면에 전달
-            mv.addObject("message", e.getErrorCode().getMessage());
-            mv.setViewName("guest/signup");
-        }
-
+        // 3. 성공 시 처리
+        mv.addObject("message", "회원가입이 완료되었습니다.");
+        mv.setViewName("auth/login");
         return mv;
     }
-
-    // 역할 별 대시보드
-    @GetMapping("/dashboard")
-    public String dashboard(@AuthenticationPrincipal AuthDetails authDetails, Model model) {
-        if (authDetails != null) {
-            model.addAttribute("name", authDetails.getLoginUserDTO().getName());
-            model.addAttribute("role", authDetails.getLoginUserDTO().getRole());
-            model.addAttribute("nickname", authDetails.getLoginUserDTO().getNickname());
-        }
-        return "dashboard/userDashboard";
-    }
-
 
 
 }

@@ -56,7 +56,7 @@ public class Subscription {
     public Subscription(Payment payment, User user, LocalDateTime startAt,
                         LocalDateTime endAt, LocalDateTime nextResetAt,
                         int remainingFreeCount, Boolean autoRenew,
-                        SubscriptionStatus status) {
+                        SubscriptionStatus status, PlanType planType) {
         this.payment = payment;
         this.user = user;
         this.startAt = startAt;
@@ -80,6 +80,7 @@ public class Subscription {
         this.status = status;
     }
 
+    // 코스 무료 결제 3회
     public void renew(LocalDateTime newEndAt, LocalDateTime newNextResetAt) {
         this.endAt = newEndAt;
         this.nextResetAt = newNextResetAt;

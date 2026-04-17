@@ -5,11 +5,10 @@ import com.wanted.naeil.domain.user.dto.LoginUserDTO;
 import com.wanted.naeil.domain.user.dto.SignupDTO;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.domain.user.repository.UserRepository;
-import com.wanted.naeil.global.common.exception.CustomException;
-import com.wanted.naeil.global.common.exception.ErrorCode;
 import com.wanted.naeil.global.util.file.LocalFileService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,20 +29,18 @@ private final LocalFileService localFileService;
 
         // 비밀번호 일치 여부
         if (!signupDTO.getPassword().equals(signupDTO.getPasswordConfirm())) {
-            // ErrorCode의 INVALID_PASSWORD 활용
-            throw new CustomException(ErrorCode.INVALID_PASSWORD);
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-
-        // 중복 체크 - null 반환 대신 ErrorCode로 예외를 던진다
+        // 중복 정보 검증
         if (userRepository.existsByUsername(signupDTO.getUsername())) {
-            throw new CustomException(ErrorCode.DUPLICATE_USERNAME); // 유저 네임 중복
+            throw new DuplicateKeyException("이미 사용 중인 아이디입니다.");
         }
         if (userRepository.existsByEmail(signupDTO.getEmail())) {
-            throw new CustomException(ErrorCode.DUPLICATE_EMAIL); // 이메일 중복
+            throw new DuplicateKeyException("이미 사용 중인 아이디입니다.");
         }
         if (userRepository.existsByNickname(signupDTO.getNickname())) {
-            throw new CustomException(ErrorCode.DUPLICATE_NICKNAME); // 닉네임 중복
+            throw new DuplicateKeyException("이미 사용 중인 아이디입니다.");
         }
 
       //파일 업로드 로직을 한 줄로 대체
@@ -53,7 +50,7 @@ private final LocalFileService localFileService;
         if (profileImg != null && !profileImg.isEmpty()) {
             validateProfileImg(profileImg); // 기존 검증 로직은 유지하는 게 안전합니다.
 
-            // 팀원분이 만든 유틸 사용: (파일, 저장할폴더명)
+            // 유틸 사용: (파일, 저장할폴더명)
             // directory 매개변수에 "profiles"를 전달하면 실제 경로는 /upload/profiles/... 가 됩니다.
             profileImgPath = localFileService.uploadSingleFile(profileImg, "profiles");
         }
@@ -87,15 +84,14 @@ private final LocalFileService localFileService;
         // 1. 파일 형식(MIME Type) 체크: jpg, jpeg, png 만 허용
         String contentType = file.getContentType();
         if (contentType == null || !(contentType.equals("image/jpeg") || contentType.equals("image/png"))) {
-            // ErrorCode에 적절한 게 없다면 INVALID_INPUT 활용
-            throw new CustomException(ErrorCode.INVALID_INPUT);
+            throw new IllegalArgumentException("jpg, jpeg, png 형식만 가능합니다.");
         }
 
         // 2. 용량 제한 체크: 5MB (5 * 1024 * 1024 bytes)
         long maxSize = 5 * 1024 * 1024;
         if (file.getSize() > maxSize) {
             // 용량 초과 시 예외 발생
-            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR); // 상황에 맞는 ErrorCode 선택
+            throw new IllegalArgumentException("이미지 크기는 5MB 이하여야 합니다.");
         }
     }
 

@@ -50,9 +50,4 @@ public class Like extends BaseTimeEntity {
         this.post = post;
         this.course = course;
     }
-
-    public boolean isCanceled() {
-        return this.getDeletedAt() != null;
-    }
-
 }
