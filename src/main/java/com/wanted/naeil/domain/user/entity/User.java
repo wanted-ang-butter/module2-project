@@ -1,8 +1,9 @@
 package com.wanted.naeil.domain.user.entity;
 
+import com.wanted.naeil.domain.user.entity.enums.Role;
+import com.wanted.naeil.domain.user.entity.enums.UserStatus;
 import com.wanted.naeil.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -95,6 +96,7 @@ public class User extends BaseTimeEntity {
         this.profileImg = profileImg;
     }
 
+    // 비즈니스 로직
     // 경고 올리기
     public void addWarning() {
         this.warningCount++;
@@ -107,4 +109,16 @@ public class User extends BaseTimeEntity {
     public void changeRole(Role newRole) {
         this.role = newRole;
     }
+
+
+    // 블랙리스트 등록 성민 수정
+    public void ban() {
+        this.status = UserStatus.BANNED;
+    }
+
+    // 블랙리스트 해제 성민 수정
+    public void unban() {
+        this.status = UserStatus.ACTIVE;
+    }
 }
+
