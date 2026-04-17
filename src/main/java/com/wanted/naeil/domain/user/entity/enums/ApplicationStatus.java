@@ -1,11 +1,11 @@
-package com.wanted.naeil.domain.admin.entity;
+package com.wanted.naeil.domain.user.entity.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum ApprovalStatus {
+public enum ApplicationStatus {
     PENDING("승인 대기"),
     APPROVED("승인 완료"),
     REJECTED("반려");

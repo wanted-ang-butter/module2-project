@@ -1,5 +1,7 @@
 package com.wanted.naeil.domain.admin.entity;
 
+import com.wanted.naeil.domain.admin.entity.enums.ApprovalRequestType;
+import com.wanted.naeil.domain.admin.entity.enums.ApprovalStatus;
 import com.wanted.naeil.domain.course.entity.Course;
 import com.wanted.naeil.domain.live.entity.LiveLecture;
 import com.wanted.naeil.domain.settlement.entity.Settlement;

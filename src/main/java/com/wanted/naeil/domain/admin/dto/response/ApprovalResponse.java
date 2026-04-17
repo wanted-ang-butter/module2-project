@@ -1,7 +1,7 @@
 package com.wanted.naeil.domain.admin.dto.response;
 
-import com.wanted.naeil.domain.admin.entity.ApprovalRequestType;
-import com.wanted.naeil.domain.admin.entity.ApprovalStatus;
+import com.wanted.naeil.domain.admin.entity.enums.ApprovalRequestType;
+import com.wanted.naeil.domain.admin.entity.enums.ApprovalStatus;
 import lombok.Builder;
 import lombok.Getter;
 

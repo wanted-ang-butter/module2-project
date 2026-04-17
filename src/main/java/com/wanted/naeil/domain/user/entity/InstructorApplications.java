@@ -1,6 +1,7 @@
 package com.wanted.naeil.domain.user.entity;
 
 import com.wanted.naeil.domain.course.entity.Category;
+import com.wanted.naeil.domain.user.entity.enums.ApplicationStatus;
 import com.wanted.naeil.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Builder;

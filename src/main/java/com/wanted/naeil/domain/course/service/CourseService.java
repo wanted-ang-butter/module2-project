@@ -1,12 +1,15 @@
 package com.wanted.naeil.domain.course.service;
 
 import com.wanted.naeil.domain.course.dto.request.CreateCourseRequest;
+import com.wanted.naeil.domain.course.dto.response.CourseDetailsResponse;
 import com.wanted.naeil.domain.course.dto.response.CourseListResponse;
 import com.wanted.naeil.domain.course.dto.response.CreateCourseResponse;
+import com.wanted.naeil.domain.course.dto.response.SectionResponse;
 import com.wanted.naeil.domain.course.entity.Category;
 import com.wanted.naeil.domain.course.entity.Course;
 import com.wanted.naeil.domain.course.repository.CategoryRepository;
 import com.wanted.naeil.domain.course.repository.CourseRepository;
+import com.wanted.naeil.domain.course.repository.SectionRepository;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.domain.user.repository.UserRepository;
 import com.wanted.naeil.global.util.file.LocalFileService;
@@ -18,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,6 +35,7 @@ public class CourseService {
     private final CategoryRepository categoryRepository;
     private final SectionService sectionService;
     private final ModelMapper modelMapper;
+    private final SectionRepository sectionRepository;
 
     // 코스 생서 메서드
     @Transactional
@@ -101,5 +106,19 @@ public class CourseService {
     @Transactional(readOnly = true)
     public List<CourseListResponse> findAllCourses() {
         return courseRepository.findAllWithStatus();
+    }
+
+    @Transactional(readOnly = true)
+    public List<CourseDetailsResponse> findCourseById(Long courseId) {
+        
+        // 좋아요 수, 수강생 수 포함한 강의 상세 데이터 조회
+        CourseDetailsResponse response = courseRepository.findCourseDetailsDtoById(courseId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 코스입니다. 관리자에게 문의해주세요."));
+
+        // TODO : 추후 구현
+        // 섹션 리스트 조회
+        List<SectionResponse> sections = sectionRepository.findByCourseId(courseId);
+
+        return null;
     }
 }

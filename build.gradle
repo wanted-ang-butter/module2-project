@@ -36,6 +36,12 @@ dependencies {
     // Source: https://mvnrepository.com/artifact/org.modelmapper/modelmapper
     implementation("org.modelmapper:modelmapper:3.1.1")
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    // Source: https://mvnrepository.com/artifact/org.mapstruct/mapstruct
+    implementation("org.mapstruct:mapstruct:1.6.3")
+    // Lombok과 MapStruct가 함께 작동하도록 돕는 바인딩 플러그인
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+    // MapStruct 컴파일러 (반드시 Lombok 다음에 위치해야 함)
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 }
 
 tasks.named('test') {
