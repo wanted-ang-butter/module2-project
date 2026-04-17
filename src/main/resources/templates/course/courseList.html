@@ -38,7 +38,7 @@
 </header>
 
 <main class="max-w-7xl mx-auto px-6 py-12">
-    <a href="#" class="inline-flex items-center gap-2 text-gray-500 hover:text-blue-600 transition-colors mb-6 group">
+    <a th:href="@{/dashboard}" class="inline-flex items-center gap-2 text-gray-500 hover:text-blue-600 transition-colors mb-6 group">
         <i data-lucide="chevron-left" class="w-4 h-4"></i>
         <span class="text-sm font-bold">이전으로</span>
     </a>
@@ -68,60 +68,36 @@
         </select>
     </div>
 
-    <p class="text-sm font-bold text-gray-500 mb-6"><span class="text-blue-600 text-lg">18</span>개의 강의</p>
+    <p class="text-sm font-bold text-gray-500 mb-6">
+        <span th:text="${courses.size()}" class="text-blue-600 text-lg">0</span>개의 강의
+    </p>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-        <div class="group bg-white border-2 border-gray-100 rounded-2xl overflow-hidden hover:shadow-2xl hover:border-blue-200 transition-all duration-300">
+        <div th:each="course : ${courses}" class="group bg-white border-2 border-gray-100 rounded-2xl overflow-hidden hover:shadow-2xl hover:border-blue-200 transition-all duration-300">
             <div class="aspect-video relative overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1544383835-bda2bc66a55d?q=80&w=800" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                <img th:src="${course.thumbnail}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                 <div class="absolute top-4 left-4">
-                    <span class="bg-blue-50 text-blue-600 text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wider border border-blue-100">백엔드</span>
+                    <span th:text="${course.category}" class="bg-blue-50 text-blue-600 text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wider border border-blue-100">카테고리</span>
                 </div>
             </div>
             <div class="p-6">
-                <h3 class="text-xl font-black text-gray-900 mb-2 line-clamp-1">PostgreSQL 데이터베이스 설계</h3>
-                <p class="text-gray-500 text-sm font-medium mb-4 line-clamp-2">관계형 데이터베이스 설계와 쿼리 최적화의 모든 것</p>
-                <p class="text-sm font-bold text-gray-700 mb-4">이디비 강사</p>
-                <div class="flex items-center justify-between pt-4 border-t border-gray-50">
-                    <div class="flex items-center gap-3">
-                        <div class="flex items-center gap-1">
-                            <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
-                            <span class="text-sm font-black">4.5</span>
-                        </div>
-                        <div class="flex items-center gap-1 text-gray-400">
-                            <i data-lucide="users" class="w-4 h-4"></i>
-                            <span class="text-sm font-bold">876</span>
-                        </div>
-                    </div>
-                    <span class="text-lg font-black text-gray-900">₩47,000</span>
-                </div>
-            </div>
-        </div>
+                <h3 th:text="${course.title}" class="text-xl font-black text-gray-900 mb-2 line-clamp-1">강의 제목</h3>
+                <p th:text="${course.description}" class="text-gray-500 text-sm font-medium mb-4 line-clamp-2">강의 설명</p>
+                <p th:text="${course.instructorName}" class="text-sm font-bold text-gray-700 mb-4">강사명</p>
 
-        <div class="group bg-white border-2 border-gray-100 rounded-2xl overflow-hidden hover:shadow-2xl hover:border-blue-200 transition-all duration-300">
-            <div class="aspect-video relative overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1618477388954-7852f32655ec?q=80&w=800" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                <div class="absolute top-4 left-4">
-                    <span class="bg-blue-50 text-blue-600 text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wider border border-blue-100">프론트엔드</span>
-                </div>
-            </div>
-            <div class="p-6">
-                <h3 class="text-xl font-black text-gray-900 mb-2 line-clamp-1">Next.js 풀스택 개발</h3>
-                <p class="text-gray-500 text-sm font-medium mb-4 line-clamp-2">Next.js로 서버사이드 렌더링과 API 라우트 완벽 구현</p>
-                <p class="text-sm font-bold text-gray-700 mb-4">박넥스트 강사</p>
                 <div class="flex items-center justify-between pt-4 border-t border-gray-50">
                     <div class="flex items-center gap-3">
                         <div class="flex items-center gap-1">
                             <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
-                            <span class="text-sm font-black">4.8</span>
+                            <span th:text="${course.rating}" class="text-sm font-black">0.0</span>
                         </div>
                         <div class="flex items-center gap-1 text-gray-400">
                             <i data-lucide="users" class="w-4 h-4"></i>
-                            <span class="text-sm font-bold">1,234</span>
+                            <span th:text="${#numbers.formatInteger(course.studentCount, 0, 'COMMA')}" class="text-sm font-bold">0</span>
                         </div>
                     </div>
-                    <span class="text-lg font-black text-gray-900">₩54,000</span>
+                    <span th:text="|₩${#numbers.formatInteger(course.price, 3, 'COMMA')}|" class="text-lg font-black text-gray-900">₩0</span>
                 </div>
             </div>
         </div>
