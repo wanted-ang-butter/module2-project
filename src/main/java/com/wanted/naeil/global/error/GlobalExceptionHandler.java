@@ -2,6 +2,7 @@ package com.wanted.naeil.global.error;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -59,6 +60,17 @@ public class GlobalExceptionHandler {
         ModelAndView mv = new ModelAndView();
         mv.addObject("errorMessage", "시스템 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
         mv.addObject("status", 500);
+        mv.setViewName(DEFAULT_ERROR_VIEW);
+        return mv;
+    }
+
+    // 승재, 409 중복키 에러
+    @ExceptionHandler(DuplicateKeyException.class)
+    protected ModelAndView handleDuplicateKeyException(DuplicateKeyException e) {
+        log.warn("중복 데이터 : {}", e.getMessage());
+        ModelAndView mv = new ModelAndView();
+        mv.addObject("errorMessage", e.getMessage());
+        mv.addObject("status", 409);
         mv.setViewName(DEFAULT_ERROR_VIEW);
         return mv;
     }

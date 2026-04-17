@@ -1,4 +1,3 @@
-
 package com.wanted.naeil.global.common.exception;
 
 import lombok.Getter;

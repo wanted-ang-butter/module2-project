@@ -24,7 +24,7 @@
         <div class="flex items-center justify-between">
 
             <!-- Logo -->
-            <a th:href="@{/instructor/dashboard}" href="/instructor/dashboard" class="flex items-center gap-3 group">
+            <a th:href="@{/instructor/Dashboard.html}" href="/" class="flex items-center gap-3 group">
                 <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-green-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
                     <i class="fa-solid fa-terminal text-white text-sm"></i>
                 </div>
@@ -75,9 +75,9 @@
                 </a>
 
                 <!-- 사용자 정보 -->
-                <div class="text-right">
-                    <p class="text-sm font-medium text-gray-900" th:text="${name}">사용자</p>
-                    <p class="text-xs font-mono text-gray-500" th:text="${role}">ROLE</p>
+                <div class="text-right" th:if="${user}" th:object="${user}">
+                    <p class="text-sm font-medium text-gray-900" th:text="*{name}">사용자</p>
+                    <p class="text-xs font-mono text-gray-500" th:text="*{role}">ROLE</p>
                 </div>
 
                 <!-- 공지 드롭다운 -->

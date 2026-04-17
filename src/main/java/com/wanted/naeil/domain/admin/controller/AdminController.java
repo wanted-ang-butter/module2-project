@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 @RequestMapping("/admin")
@@ -14,12 +15,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class AdminController {
 
     @GetMapping("/dashboard")
-    public String dashboard(@AuthenticationPrincipal AuthDetails authDetails, Model model) {
+    public ModelAndView dashboard(@AuthenticationPrincipal AuthDetails authDetails) {
+        // 1. 반환할 뷰의 경로를 생성자 인자로 전달
+        ModelAndView mv = new ModelAndView("dashboard/adminDashboard");
+
         if (authDetails != null) {
-            model.addAttribute("name", authDetails.getLoginUserDTO().getName());
-            model.addAttribute("role", authDetails.getLoginUserDTO().getRole());
-            model.addAttribute("nickname", authDetails.getLoginUserDTO().getNickname());
+            mv.addObject("user", authDetails.getLoginUserDTO());
         }
-        return "dashboard/adminDashboard";
+
+        return mv;
     }
 }
