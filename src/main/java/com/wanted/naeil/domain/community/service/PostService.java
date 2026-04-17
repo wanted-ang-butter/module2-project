@@ -11,9 +11,8 @@ import com.wanted.naeil.domain.community.repository.LikeRepository;
 import com.wanted.naeil.domain.community.repository.PostRepository;
 import com.wanted.naeil.domain.course.entity.Course;
 import com.wanted.naeil.domain.course.repository.CourseRepository;
-import com.wanted.naeil.domain.user.entity.Role;
+import com.wanted.naeil.domain.user.entity.enums.Role;
 import com.wanted.naeil.domain.user.entity.User;
-import com.wanted.naeil.global.common.exception.ErrorCode; // 메시지 참조용
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
@@ -55,7 +54,7 @@ public class PostService {
     @Transactional
     public PostDetailResponse getPost(Long postId, User loginUser) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new NoSuchElementException(ErrorCode.POST_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new NoSuchElementException("게시글이 존재하지 않습니다."));
 
         post.increaseViewCount();
 
@@ -80,7 +79,7 @@ public class PostService {
         Course course = null;
         if (request.getCourseId() != null) {
             course = courseRepository.findById(request.getCourseId())
-                    .orElseThrow(() -> new NoSuchElementException(ErrorCode.COURSE_NOT_FOUND.getMessage()));
+                    .orElseThrow(() -> new NoSuchElementException("해당 코스가 존재하지 않습니다."));
         }
 
         Post post = Post.builder()
@@ -99,7 +98,7 @@ public class PostService {
     @Transactional
     public void updatePost(Long postId, PostUpdateRequest request, User loginUser) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new NoSuchElementException(ErrorCode.POST_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new NoSuchElementException("해당 게시글이 존재하지 않습니다."));
 
         validateOwner(post, loginUser);
 
@@ -111,13 +110,14 @@ public class PostService {
     @Transactional
     public void deletePost(Long postId, User loginUser) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new NoSuchElementException(ErrorCode.POST_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new NoSuchElementException("해당 게시글이 존재하지 않습니다."));
 
         boolean isOwner = post.getUser().getId().equals(loginUser.getId());
         boolean isAdmin = loginUser.getRole() == Role.ADMIN;
 
         if (!isOwner && !isAdmin) {
-            throw new AccessDeniedException(ErrorCode.FORBIDDEN.getMessage());
+            // TODO : 현지야 이거 멘트 알맞게 수정해줘. 임시로 해놨어, 전체적인 에러 메시지 다 수정해줘
+            throw new AccessDeniedException("해당 기능에 대한 접속 권한이 없습니다.");
         }
 
         postRepository.delete(post); // 엔티티의 @SQLDelete가 작동함
@@ -127,7 +127,7 @@ public class PostService {
     @Transactional
     public void toggleResolved(Long postId, User loginUser) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new NoSuchElementException(ErrorCode.POST_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new NoSuchElementException("게시글을 조회할 수 없습니다."));
 
         validateOwner(post, loginUser);
         post.toggleResolved();
@@ -136,7 +136,7 @@ public class PostService {
     // 권한 검증 공통 메서드
     private void validateOwner(Post post, User loginUser) {
         if (!post.getUser().getId().equals(loginUser.getId())) {
-            throw new AccessDeniedException(ErrorCode.FORBIDDEN.getMessage());
+            throw new AccessDeniedException("해당 기능에 대한 접속 권한이 없습니다.");
         }
     }
 }
