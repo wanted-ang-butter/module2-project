@@ -11,12 +11,9 @@ import java.util.Optional;
 @Repository
 public interface LikeRepository extends JpaRepository<Like, Long> {
 
-    // 좋아요 존재 여부 확인
-    Optional<Like> findByUserAndPostAndDeletedAtIsNull(User user, Post post);
+    Optional<Like> findByUserAndPost(User user, Post post);
 
-    // post 좋아요 수 카운트
-    long countByPostAndDeletedAtIsNull(Post post);
+    long countByPost(Post post);
 
-    // likeId 단건 조회 -> 좋아요 취소 시 사용
-    Optional<Like> findByLikeIdAndDeletedAtIsNull(Long likeId);
+    Optional<Like> findByLikeId(Long likeId);
 }

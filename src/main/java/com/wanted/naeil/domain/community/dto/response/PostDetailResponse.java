@@ -30,8 +30,8 @@ public class PostDetailResponse {
     private String courseTitle;
 
     public static PostDetailResponse from(Post post, long likeCount,
-                                          boolean isLiked, Long likeId,
-                                          List<CommentResponse> comments) {
+                                          boolean isLiked, Long likeId
+                                          ) {
         return PostDetailResponse.builder()
                 .postId(post.getPostId())
                 .title(post.getTitle())
@@ -46,7 +46,6 @@ public class PostDetailResponse {
                 .isPublic(post.isPublic())
                 .isLiked(isLiked)
                 .likeId(likeId)
-                .comments(comments)
                 .courseId(post.getCourse() != null ? post.getCourse().getId() : null)
                 .courseTitle(post.getCourse() != null ? post.getCourse().getTitle() : null)
                 .build();

@@ -7,11 +7,16 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = "posts")
 @Getter
 @NoArgsConstructor
+// Soft Delete 설정
+@SQLDelete(sql = "UPDATE posts SET deleted_at = CURRENT_TIMESTAMP WHERE post_id = ?")
+@Where(clause = "deleted_at IS NULL")
 public class Post extends BaseTimeEntity {
 
     @Id
