@@ -1,6 +1,7 @@
 package com.wanted.naeil.domain.course.service;
 
 import com.wanted.naeil.domain.course.dto.request.CreateCourseRequest;
+import com.wanted.naeil.domain.course.dto.response.CourseListResponse;
 import com.wanted.naeil.domain.course.dto.response.CreateCourseResponse;
 import com.wanted.naeil.domain.course.entity.Category;
 import com.wanted.naeil.domain.course.entity.Course;
@@ -15,6 +16,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -92,5 +96,10 @@ public class CourseService {
         }
 
         return CreateCourseResponse.from(savedCourse, "강의 등록 신청이 완료되었습니다. 관리자 승인 후 강의가 활성화됩니다.");
+    }
+
+    @Transactional(readOnly = true)
+    public List<CourseListResponse> findAllCourses() {
+        return courseRepository.findAllWithStatus();
     }
 }
