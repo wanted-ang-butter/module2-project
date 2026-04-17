@@ -1,5 +1,6 @@
 package com.wanted.naeil.domain.community.controller;
 
+import com.wanted.naeil.domain.auth.model.dto.AuthDetails;
 import com.wanted.naeil.domain.community.dto.request.PostCreateRequest;
 import com.wanted.naeil.domain.community.dto.request.PostUpdateRequest;
 import com.wanted.naeil.domain.community.dto.response.PostDetailResponse;
@@ -7,14 +8,22 @@ import com.wanted.naeil.domain.community.dto.response.PostListResponse;
 import com.wanted.naeil.domain.community.entity.PostCategory;
 import com.wanted.naeil.domain.community.service.PostService;
 import com.wanted.naeil.domain.course.entity.Course;
-import com.wanted.naeil.domain.course.repository.CourseRepository;
+import com.wanted.naeil.domain.learning.entity.Enrollment;
+import com.wanted.naeil.domain.learning.repository.EnrollmentRepository;
+import com.wanted.naeil.domain.user.entity.Role;
+import com.wanted.naeil.domain.user.entity.User;
+import com.wanted.naeil.domain.user.repository.UserRepository;
+import com.wanted.naeil.global.common.exception.CustomException;
+import com.wanted.naeil.global.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/community")
@@ -23,13 +32,15 @@ import java.util.List;
 public class PostController {
 
     private final PostService postService;
-    private final CourseRepository courseRepository;
+    private final EnrollmentRepository enrollmentRepository;
+    private final UserRepository userRepository;
 
     // 글 목록 조회
     @GetMapping("/{category}")
     public ModelAndView postList(@PathVariable String category,
                                  @RequestParam(defaultValue = "latest") String sortType,
                                  ModelAndView mv) {
+
         log.info("[게시글 목록] 조회 시작. category: {}, sortType: {}", category, sortType);
 
         PostCategory postCategory = PostCategory.valueOf(category.toUpperCase());
@@ -51,12 +62,28 @@ public class PostController {
     @GetMapping("/{category}/{postId}")
     public ModelAndView postDetail(@PathVariable String category,
                                    @PathVariable Long postId,
+                                   @AuthenticationPrincipal AuthDetails authDetails,
                                    ModelAndView mv) {
+
         log.info("[게시글 상세] 조회 시작. postId: {}", postId);
 
-        PostDetailResponse post = postService.getPost(postId, null);
+        User loginUser = getLoginUser(authDetails);
+        PostDetailResponse post = postService.getPost(postId, loginUser);
+
+        // 본인 여부, 관리자 여부 판단
+        boolean isOwner = false;
+        boolean isAdmin = false;
+
+        if (loginUser != null){
+            isOwner = post.getNickname().equals(loginUser.getNickname());
+            isAdmin = loginUser.getRole() == Role.ADMIN;
+        }
+
         mv.addObject("post", post);
         mv.addObject("category", category);
+        mv.addObject("isOwner", isOwner);
+        mv.addObject("isAdmin", isAdmin);
+        mv.addObject("loginUser", loginUser);
 
         PostCategory postCategory = PostCategory.valueOf(category.toUpperCase());
         if (postCategory == PostCategory.FREE) {
@@ -70,14 +97,19 @@ public class PostController {
     // 글 작성 폼
     @GetMapping("/{category}/form")
     public ModelAndView postForm(@PathVariable String category,
+                                 @AuthenticationPrincipal AuthDetails authDetails,
                                  ModelAndView mv) {
+
         log.info("[게시글 작성 폼] category: {}", category);
 
         mv.addObject("category", category);
 
         if (category.equalsIgnoreCase("qna")) {
-            // TODO: Security 완성 후 수강 중인 강의로 교체
-            List<Course> courses = courseRepository.findAllByOrderByTitleAsc();
+            User loginUser = getLoginUser(authDetails);
+            List<Course> courses = enrollmentRepository.findByUser(loginUser)
+                    .stream()
+                    .map(Enrollment::getCourse)
+                    .collect(Collectors.toList());
             mv.addObject("courses", courses);
             mv.setViewName("community/QnAWrite");
         } else {
@@ -90,6 +122,7 @@ public class PostController {
     @GetMapping("/{category}/{postId}/form")
     public ModelAndView postEditForm(@PathVariable String category,
                                      @PathVariable Long postId,
+                                     @AuthenticationPrincipal AuthDetails authDetails,
                                      ModelAndView mv) {
         log.info("[게시글 수정 폼] postId: {}", postId);
 
@@ -98,8 +131,11 @@ public class PostController {
         mv.addObject("category", category);
 
         if (category.equalsIgnoreCase("qna")) {
-            // TODO: Security 완성 후 수강 중인 강의로 교체
-            List<Course> courses = courseRepository.findAllByOrderByTitleAsc();
+            User loginUser = getLoginUser(authDetails);
+            List<Course> courses = enrollmentRepository.findByUser(loginUser)
+                    .stream()
+                    .map(Enrollment::getCourse)
+                    .collect(Collectors.toList());
             mv.addObject("courses", courses);
             mv.setViewName("community/QnAWrite");
         } else {
@@ -112,11 +148,14 @@ public class PostController {
     @PostMapping("/{category}")
     public ModelAndView createPost(@PathVariable String category,
                                    @ModelAttribute PostCreateRequest request,
+                                   @AuthenticationPrincipal AuthDetails authDetails,
                                    ModelAndView mv) {
+
         log.info("[게시글 작성] 시작. category: {}", category);
 
         try {
-            postService.createPost(request, null);
+            User loginUser = getLoginUser(authDetails);
+            postService.createPost(request, loginUser);
             mv.setViewName("redirect:/community/" + category);
         } catch (Exception e) {
             log.error("[게시글 작성] 오류 발생: ", e);
@@ -135,11 +174,13 @@ public class PostController {
     public ModelAndView updatePost(@PathVariable String category,
                                    @PathVariable Long postId,
                                    @ModelAttribute PostUpdateRequest request,
+                                   @AuthenticationPrincipal AuthDetails authDetails,
                                    ModelAndView mv) {
         log.info("[게시글 수정] 시작. postId: {}", postId);
 
         try {
-            postService.updatePost(postId, request, null);
+            User loginUser = getLoginUser(authDetails);
+            postService.updatePost(postId, request, loginUser);
             mv.setViewName("redirect:/community/" + category + "/" + postId);
         } catch (Exception e) {
             log.error("[게시글 수정] 오류 발생: ", e);
@@ -154,26 +195,39 @@ public class PostController {
     }
 
     // 글 삭제
-    @DeleteMapping("/{category}/{postId}")
+    @PostMapping("/{category}/{postId}/delete")
     public ModelAndView deletePost(@PathVariable String category,
                                    @PathVariable Long postId,
+                                   @AuthenticationPrincipal AuthDetails authDetails,
                                    ModelAndView mv) {
+
         log.info("[게시글 삭제] 시작. postId: {}", postId);
 
-        postService.deletePost(postId, null);
+        User loginUser = getLoginUser(authDetails);
+        postService.deletePost(postId, loginUser);
         mv.setViewName("redirect:/community/" + category);
         return mv;
     }
 
     // Q&A 해결 상태 변경
-    @PatchMapping("/{category}/{postId}")
+    @PostMapping("/{category}/{postId}/resolve")
     public ModelAndView toggleResolved(@PathVariable String category,
                                        @PathVariable Long postId,
+                                       @AuthenticationPrincipal AuthDetails authDetails,
                                        ModelAndView mv) {
+
         log.info("[Q&A 해결 상태] 변경 시작. postId: {}", postId);
 
-        postService.toggleResolved(postId, null);
+        User loginUser = getLoginUser(authDetails);
+        postService.toggleResolved(postId, loginUser);
         mv.setViewName("redirect:/community/" + category + "/" + postId);
         return mv;
+    }
+
+    // 공통 메서드 (로그인 유저 꺼내는)
+    private User getLoginUser(AuthDetails authDetails) {
+        if (authDetails == null) return null;
+        return userRepository.findByUsername(authDetails.getLoginUserDTO().getUsername())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 }

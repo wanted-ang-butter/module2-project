@@ -16,6 +16,8 @@ public class PostListResponse {
     private LocalDateTime createdAt;
     private int viewCount;
     private long likeCount;
+    private String courseTitle;
+    private boolean isResolved;
 
     public static PostListResponse from(Post post, long likeCount) {
         return PostListResponse.builder()
@@ -25,6 +27,8 @@ public class PostListResponse {
                 .createdAt(post.getCreatedAt())
                 .viewCount(post.getViewCount())
                 .likeCount(likeCount)
+                .courseTitle(post.getCourse() != null ? post.getCourse().getTitle() : null)
+                .isResolved(post.isResolved())
                 .build();
     }
 }

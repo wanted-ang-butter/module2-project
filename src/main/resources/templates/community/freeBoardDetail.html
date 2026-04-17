@@ -22,7 +22,6 @@
 
   <div class="grid grid-cols-12 gap-8">
 
-    <!-- 사이드바 -->
     <div class="col-span-3">
       <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 sticky top-24">
         <h2 class="text-xl font-black text-gray-900 mb-6">커뮤니티</h2>
@@ -41,10 +40,8 @@
       </div>
     </div>
 
-    <!-- 메인 -->
     <div class="col-span-9 space-y-6">
 
-      <!-- 게시글 본문 -->
       <div class="bg-white border-2 border-gray-200 rounded-2xl p-8">
         <div class="flex items-center justify-between mb-6">
           <div>
@@ -53,23 +50,25 @@
                th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd')}">날짜</p>
           </div>
 
-          <!-- 수정/삭제 메뉴 -->
-          <div class="relative">
+          <div class="relative" th:if="${isOwner or isAdmin}">
             <button onclick="this.nextElementSibling.classList.toggle('open')"
                     class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
               <i class="fa-solid fa-ellipsis-vertical text-gray-600"></i>
             </button>
             <div class="dropdown-menu w-48 bg-white border-2 border-gray-200 rounded-xl shadow-lg">
-              <a th:href="@{/community/free/{postId}/form(postId=${post.postId})}"
+
+              <a th:if="${isOwner}"
+                 th:href="@{/community/free/{postId}/form(postId=${post.postId})}"
                  class="flex items-center gap-2 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
                 <i class="fa-solid fa-pen text-xs"></i> 수정
               </a>
-              <form th:action="@{/community/free/{postId}(postId=${post.postId})}"
-                    method="post">
-                <input type="hidden" name="_method" value="DELETE">
+
+              <form th:action="@{/community/free/{postId}/delete(postId=${post.postId})}"
+                    method="post"
+                    onsubmit="return confirm('게시글을 삭제하시겠습니까?')">
                 <button type="submit"
-                        onclick="return confirm('게시글을 삭제하시겠습니까?')"
-                        class="w-full px-4 py-3 text-left text-sm font-medium text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2 rounded-b-xl">
+                        class="w-full px-4 py-3 text-left text-sm font-medium text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
+                        th:classappend="${isOwner} ? 'rounded-b-xl' : 'rounded-xl'">
                   <i class="fa-solid fa-trash text-xs"></i> 삭제
                 </button>
               </form>
@@ -85,7 +84,6 @@
              th:text="${post.content}">내용</p>
         </div>
 
-        <!-- 좋아요 -->
         <div class="flex items-center gap-3 pt-6 border-t-2 border-gray-200">
           <form th:action="@{/likes}" method="post">
             <input type="hidden" name="targetType" value="POST">
@@ -100,7 +98,6 @@
         </div>
       </div>
 
-      <!-- 댓글 목록 -->
       <div class="bg-white border-2 border-gray-200 rounded-2xl p-8">
         <h2 class="text-2xl font-black text-gray-900 mb-6">
           댓글 <span class="text-blue-600">(<span th:text="${#lists.size(post.comments)}">0</span>)</span>
@@ -121,17 +118,16 @@
                 <p class="text-sm text-gray-500 font-mono"
                    th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd')}">날짜</p>
               </div>
-              <div class="relative">
+              <div class="relative" th:if="${(loginUser != null and comment.nickname == loginUser.nickname) or isAdmin}">
                 <button onclick="this.nextElementSibling.classList.toggle('open')"
                         class="p-2 hover:bg-gray-200 rounded-lg transition-colors">
                   <i class="fa-solid fa-ellipsis-vertical text-gray-600"></i>
                 </button>
                 <div class="dropdown-menu w-48 bg-white border-2 border-gray-200 rounded-xl shadow-lg">
-                  <form th:action="@{/comments/{commentId}(commentId=${comment.commentId})}"
-                        method="post">
-                    <input type="hidden" name="_method" value="DELETE">
+                  <form th:action="@{/comments/{commentId}/delete(commentId=${comment.commentId})}"
+                        method="post"
+                        onsubmit="return confirm('댓글을 삭제하시겠습니까?')">
                     <button type="submit"
-                            onclick="return confirm('댓글을 삭제하시겠습니까?')"
                             class="w-full px-4 py-3 text-left text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 rounded-xl">
                       <i class="fa-solid fa-trash text-xs"></i> 삭제
                     </button>
@@ -145,7 +141,6 @@
         </div>
       </div>
 
-      <!-- 댓글 작성 -->
       <div class="bg-white border-2 border-gray-200 rounded-2xl p-6">
         <h3 class="text-lg font-bold text-gray-900 mb-4">댓글 작성</h3>
         <form th:action="@{/community/free/{postId}/comments(postId=${post.postId})}"
