@@ -1,5 +1,6 @@
 package com.wanted.naeil.domain.live.entity;
 
+import com.wanted.naeil.domain.live.entity.enums.LiveLectureStatus;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;

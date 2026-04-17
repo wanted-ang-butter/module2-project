@@ -1,8 +1,9 @@
 package com.wanted.naeil.domain.user.entity;
 
+import com.wanted.naeil.domain.user.entity.enums.Role;
+import com.wanted.naeil.domain.user.entity.enums.UserStatus;
 import com.wanted.naeil.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

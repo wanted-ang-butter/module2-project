@@ -1,5 +1,6 @@
 package com.wanted.naeil.domain.admin.controller;
 
+import com.wanted.naeil.domain.admin.service.AdminCategoryService;
 import com.wanted.naeil.domain.auth.model.dto.AuthDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/admin")
 @RequiredArgsConstructor
 public class AdminController {
+    private final AdminCategoryService adminCategoryService;
 
     @GetMapping("/dashboard")
     public String dashboard(@AuthenticationPrincipal AuthDetails authDetails, Model model) {
@@ -21,5 +23,10 @@ public class AdminController {
             model.addAttribute("nickname", authDetails.getLoginUserDTO().getNickname());
         }
         return "dashboard/adminDashboard";
+    }
+    @GetMapping("/categories")
+    public String categories(Model model) {
+        model.addAttribute("categories", adminCategoryService.getCategories());
+        return "admin/category";
     }
 }

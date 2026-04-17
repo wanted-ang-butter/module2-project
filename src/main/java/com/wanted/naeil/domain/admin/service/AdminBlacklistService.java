@@ -1,7 +1,7 @@
 package com.wanted.naeil.domain.admin.service;
 
 import com.wanted.naeil.domain.admin.dto.response.BlacklistResponse;
-import com.wanted.naeil.domain.user.entity.UserStatus;
+import com.wanted.naeil.domain.user.entity.enums.UserStatus;
 import com.wanted.naeil.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
