@@ -1,6 +1,8 @@
 package com.wanted.naeil.global.error;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -58,6 +60,43 @@ public class GlobalExceptionHandler {
         ModelAndView mv = new ModelAndView();
         mv.addObject("errorMessage", "시스템 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
         mv.addObject("status", 500);
+        mv.setViewName(DEFAULT_ERROR_VIEW);
+        return mv;
+    }
+
+    // 승재, 409 중복키 에러
+    @ExceptionHandler(DuplicateKeyException.class)
+    protected ModelAndView handleDuplicateKeyException(DuplicateKeyException e) {
+        log.warn("중복 데이터 : {}", e.getMessage());
+        ModelAndView mv = new ModelAndView();
+        mv.addObject("errorMessage", e.getMessage());
+        mv.addObject("status", 409);
+        mv.setViewName(DEFAULT_ERROR_VIEW);
+        return mv;
+    }
+
+    // 409 에러, 중복 요청 성민(추가)
+    @ExceptionHandler(IllegalStateException.class)
+    protected ModelAndView handleIllegalStateException(IllegalStateException e) {
+        log.warn("중복 요청 : {}", e.getMessage());
+
+        ModelAndView mv = new ModelAndView();
+        mv.addObject("errorMessage", e.getMessage());
+        mv.addObject("status", 409);
+        mv.setViewName(DEFAULT_ERROR_VIEW);
+        return mv;
+    }
+
+
+
+    // 403 에러, 권한 없음 (글 수정/삭제 시 본인이 아닌 경우)
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    protected ModelAndView handleAccessDeniedException(org.springframework.security.access.AccessDeniedException e) {
+        log.warn("권한 없음 : {}", e.getMessage());
+
+        ModelAndView mv = new ModelAndView();
+        mv.addObject("errorMessage", "해당 동작에 대한 권한이 없습니다.");
+        mv.addObject("status", 403);
         mv.setViewName(DEFAULT_ERROR_VIEW);
         return mv;
     }

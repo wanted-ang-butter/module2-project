@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service   // 스프링한테 서비스 클래스라고 알려줘야쥐잉
@@ -82,7 +83,7 @@ public class AdminApprovalService {
     public void approve(Long approvalId, User admin) {
         // 1) 승인건 찾아오기
         AdminApproval approval = courseApprovalRepository.findById(approvalId)
-                .orElseThrow(() -> new RuntimeException("승인 건을 찾을수 없습니다"));
+                .orElseThrow(() -> new NoSuchElementException("승인 건을 찾을수 없습니다"));
         // 2) 승인 처리
         approval.approve(admin);
         // 3) type별 후속 처리
@@ -111,7 +112,7 @@ public class AdminApprovalService {
     public  void reject(Long approvalId , User admin , String rejectReason) {
         // 1) 반려건 찾아오기
         AdminApproval approval =  courseApprovalRepository.findById(approvalId)
-                .orElseThrow(() -> new RuntimeException("반려 건을 찾을수 없습니다"));
+                .orElseThrow(() -> new NoSuchElementException("반려 건을 찾을수 없습니다"));
         // 2) 반려 처리
         approval.reject(admin, rejectReason);
 

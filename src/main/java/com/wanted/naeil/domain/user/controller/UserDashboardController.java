@@ -1,4 +1,4 @@
-package com.wanted.naeil.domain.admin.controller;
+package com.wanted.naeil.domain.user.controller;
 
 import com.wanted.naeil.domain.auth.model.dto.AuthDetails;
 import lombok.RequiredArgsConstructor;
@@ -10,19 +10,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
-@RequestMapping("/admin")
+@RequestMapping("/user")
 @RequiredArgsConstructor
-public class AdminController {
+public class UserDashboardController {
 
     @GetMapping("/dashboard")
     public ModelAndView dashboard(@AuthenticationPrincipal AuthDetails authDetails) {
-        // 1. 반환할 뷰의 경로를 생성자 인자로 전달
-        ModelAndView mv = new ModelAndView("dashboard/adminDashboard");
-
+        ModelAndView mv = new ModelAndView("dashboard/userDashboard");
         if (authDetails != null) {
             mv.addObject("user", authDetails.getLoginUserDTO());
         }
-
         return mv;
     }
 }
