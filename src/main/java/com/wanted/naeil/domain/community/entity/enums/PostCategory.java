@@ -1,4 +1,4 @@
-package com.wanted.naeil.domain.community.entity;
+package com.wanted.naeil.domain.community.entity.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

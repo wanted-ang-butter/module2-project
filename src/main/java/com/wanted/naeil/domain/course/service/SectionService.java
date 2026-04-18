@@ -7,7 +7,7 @@ import com.wanted.naeil.domain.course.dto.response.SectionResponse;
 import com.wanted.naeil.domain.course.dto.response.SectionStudyResponse;
 import com.wanted.naeil.domain.course.entity.Course;
 import com.wanted.naeil.domain.course.entity.Section;
-import com.wanted.naeil.domain.course.entity.SectionStatus;
+import com.wanted.naeil.domain.course.entity.enums.SectionStatus;
 import com.wanted.naeil.domain.course.repository.SectionRepository;
 import com.wanted.naeil.domain.learning.entity.enums.EnrollmentStatus;
 import com.wanted.naeil.domain.learning.entity.enums.ProgressStatus;

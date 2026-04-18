@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CourseRepository extends JpaRepository <Course, Long> {
-
+    boolean existsByCategoryId(Long categoryId);
     Optional<Course>findByTitle(String title);
 
     //group by에는 select 문에 있는 일반 컬럼들은 모두 들어가야함

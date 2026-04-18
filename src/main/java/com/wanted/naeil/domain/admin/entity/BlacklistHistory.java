@@ -3,7 +3,6 @@ package com.wanted.naeil.domain.admin.entity;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,8 +11,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "blacklist_history")
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
+
 public class BlacklistHistory extends BaseTimeEntity {
 
     @Id
@@ -39,5 +37,11 @@ public class BlacklistHistory extends BaseTimeEntity {
 public void release(String releaseReason) {
     this.releaseReason = releaseReason;
 }
+    @Builder
+    public BlacklistHistory(User user, User admin, String reason) {
+        this.user = user;
+        this.admin = admin;
+        this.reason = reason;
+    }
 }
 
