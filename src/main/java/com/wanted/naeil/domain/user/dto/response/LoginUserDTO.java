@@ -1,4 +1,5 @@
-package com.wanted.naeil.domain.user.dto;
+package com.wanted.naeil.domain.user.dto.response;
+
 
 import com.wanted.naeil.domain.user.entity.enums.Role;
 import com.wanted.naeil.domain.user.entity.enums.UserStatus;

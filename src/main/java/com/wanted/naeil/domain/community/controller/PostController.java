@@ -1,6 +1,6 @@
 package com.wanted.naeil.domain.community.controller;
 
-import com.wanted.naeil.domain.auth.model.dto.AuthDetails;
+import com.wanted.naeil.global.auth.model.dto.AuthDetails;
 import com.wanted.naeil.domain.community.dto.request.PostCreateRequest;
 import com.wanted.naeil.domain.community.dto.request.PostUpdateRequest;
 import com.wanted.naeil.domain.community.dto.response.PostDetailResponse;
@@ -223,8 +223,7 @@ public class PostController {
         return mv;
     }
 
-//     공통 메서드 (로그인 유저 꺼내는)
-    // TODO : 현지 이거, 나중에 예외처리 로직 수정하기
+    // 공통 메서드 (로그인 유저 꺼내는)
     private User getLoginUser(AuthDetails authDetails) {
         if (authDetails == null) return null;
         return userRepository.findByUsername(authDetails.getLoginUserDTO().getUsername())
