@@ -1,8 +1,9 @@
 package com.wanted.naeil.domain.course.controller;
 
-import com.wanted.naeil.domain.auth.model.dto.AuthDetails;
+
 import com.wanted.naeil.domain.course.dto.response.SectionStudyResponse;
 import com.wanted.naeil.domain.course.service.SectionService;
+import com.wanted.naeil.global.auth.model.dto.AuthDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

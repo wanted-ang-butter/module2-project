@@ -1,6 +1,6 @@
 package com.wanted.naeil.domain.course.controller;
 
-import com.wanted.naeil.domain.auth.model.dto.AuthDetails;
+import com.wanted.naeil.global.auth.model.dto.AuthDetails;
 import com.wanted.naeil.domain.course.dto.request.CourseCreateRequest;
 import com.wanted.naeil.domain.course.dto.response.CourseEditResponse;
 import com.wanted.naeil.domain.course.dto.response.CreateCourseResponse;

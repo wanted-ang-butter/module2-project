@@ -1,4 +1,4 @@
-package com.wanted.naeil.domain.user.dto;
+package com.wanted.naeil.domain.user.dto.request;
 
 
 import jakarta.validation.constraints.NotBlank;

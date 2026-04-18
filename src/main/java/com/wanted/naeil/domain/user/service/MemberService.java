@@ -1,8 +1,14 @@
 package com.wanted.naeil.domain.user.service;
 
 
-import com.wanted.naeil.domain.user.dto.LoginUserDTO;
-import com.wanted.naeil.domain.user.dto.SignupDTO;
+import com.wanted.naeil.domain.payment.entity.Credit;
+import com.wanted.naeil.domain.payment.repository.CreditRepository;
+import com.wanted.naeil.domain.user.dto.request.FindIdRequest;
+import com.wanted.naeil.domain.user.dto.request.FindPasswordRequest;
+import com.wanted.naeil.domain.user.dto.response.FindIdResponse;
+import com.wanted.naeil.domain.user.dto.response.FindPasswordResponse;
+import com.wanted.naeil.domain.user.dto.response.LoginUserDTO;
+import com.wanted.naeil.domain.user.dto.request.SignupDTO;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.domain.user.repository.UserRepository;
 import com.wanted.naeil.global.util.file.LocalFileService;
@@ -14,6 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.NoSuchElementException;
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class MemberService {
@@ -21,9 +30,11 @@ public class MemberService {
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
     private final ModelMapper modelMapper;
+    private final CreditRepository creditRepository;
 //    private final ResourceLoader resourceLoader;
 private final LocalFileService localFileService;
 
+    // 회원가입
     @Transactional
     public Long regist(SignupDTO signupDTO) {
 
@@ -37,13 +48,13 @@ private final LocalFileService localFileService;
             throw new DuplicateKeyException("이미 사용 중인 아이디입니다.");
         }
         if (userRepository.existsByEmail(signupDTO.getEmail())) {
-            throw new DuplicateKeyException("이미 사용 중인 아이디입니다.");
+            throw new DuplicateKeyException("이미 사용 중인 이메일입니다.");
         }
         if (userRepository.existsByNickname(signupDTO.getNickname())) {
-            throw new DuplicateKeyException("이미 사용 중인 아이디입니다.");
+            throw new DuplicateKeyException("이미 사용 중인 닉네임입니다.");
         }
 
-      //파일 업로드 로직을 한 줄로 대체
+      //파일 업로드 로직
         String profileImgPath = null;
         MultipartFile profileImg = signupDTO.getProfileImg();
 
@@ -69,8 +80,18 @@ private final LocalFileService localFileService;
 
 
 
-        //4. DB 저장
-        return userRepository.save(user).getId();
+        // 4. DB 저장
+        User savedUser = userRepository.save(user);
+
+
+        // 5. 크레딧 0으로 초기화
+        Credit credit = Credit.builder()
+                .user(savedUser)
+                .balance(0)
+                .build();
+        creditRepository.save(credit);
+
+        return savedUser.getId();
     }
 
 
@@ -110,6 +131,32 @@ private final LocalFileService localFileService;
 
                 ))
                 .orElse(null);
+    }
+
+    // 이메일, 전화번호로 아이디 찾기
+    public FindIdResponse findUsernameByEmailAndPhone(FindIdRequest request) {
+        User user = userRepository.findByEmailAndPhone(request.getEmail(), request.getPhone())
+                .orElseThrow(() -> new NoSuchElementException("일치하는 회원 정보가 없습니다."));
+        return FindIdResponse.builder()
+                .username(user.getUsername())
+                .build();
+    }
+
+    // 아이디, 전화번호 일치하면 임시 비밀번호 발급
+    @Transactional
+    public FindPasswordResponse resetPassword(FindPasswordRequest request) {
+        User user = userRepository.findByUsernameAndPhone(request.getUsername(), request.getPhone())
+                .orElseThrow(() -> new NoSuchElementException("일치하는 회원 정보가 없습니다."));
+
+        // 임시 비밀번호 생성 (8자리 랜덤)
+        String tempPassword = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+
+        // 해싱 후 DB 업데이트
+        user.password(encoder.encode(tempPassword));
+
+        return FindPasswordResponse.builder()
+                .tempPassword(tempPassword)
+                .build();
     }
 
 
