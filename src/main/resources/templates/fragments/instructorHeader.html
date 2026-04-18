@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<header th:fragment="instructorHeader"
+        class="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <div class="w-full px-6 h-[74px] flex items-center justify-between gap-6">
+
+        <div class="flex items-center gap-4 shrink-0">
+            <a th:href="@{/instructor/dashboard}"
+               href="/instructor/dashboard"
+               class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-blue-600 to-green-600 rounded-xl flex items-center justify-center text-white shadow-md">
+                    <i class="fa-solid fa-arrow-trend-up text-lg"></i>
+                </div>
+
+                <div class="leading-tight">
+                    <div class="flex items-center gap-2">
+                        <span class="text-2xl font-black text-gray-900">내일</span>
+                        <span class="text-2xl font-semibold text-gray-500">Nae-il</span>
+                        <span class="px-3 py-1 bg-green-50 text-green-700 border border-green-200 rounded-full text-xs font-bold">
+                            강사 모드
+                        </span>
+                    </div>
+
+                    <p class="text-xs font-bold text-gray-500 mt-1">
+                        내일의 일, My Work
+                    </p>
+
+                    <span onclick="alert('학생 모드 전환 기능은 준비 중입니다.'); return false;"
+                          class="text-xs font-bold text-blue-600 hover:text-blue-700 cursor-pointer">
+                        클릭하여 학생 모드로 전환 →
+                    </span>
+                </div>
+            </a>
+        </div>
+
+        <nav class="hidden xl:flex items-center gap-4 flex-1 justify-center">
+            <a th:href="@{/course}"
+               href="/course"
+               class="inline-flex items-center gap-2 px-5 py-2.5 border-2 border-gray-200 rounded-xl text-gray-700 font-bold hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-all text-sm">
+                <i class="fa-solid fa-book-open text-base"></i>
+                <span>전체 강의</span>
+            </a>
+
+            <a th:href="@{/instructor/course-management}"
+               href="/instructor/course-management"
+               class="inline-flex items-center gap-2 px-5 py-2.5 border-2 border-gray-200 rounded-xl text-gray-700 font-bold hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-all text-sm">
+                <i class="fa-solid fa-video text-base"></i>
+                <span>내 강의 관리</span>
+            </a>
+
+            <a th:href="@{/instructor/settlement}"
+               href="/instructor/settlement"
+               class="inline-flex items-center gap-2 px-5 py-2.5 border-2 border-gray-200 rounded-xl text-gray-700 font-bold hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-all text-sm">
+                <i class="fa-solid fa-wallet text-base"></i>
+                <span>정산 관리</span>
+            </a>
+
+            <a th:href="@{/community}"
+               href="/community"
+               class="inline-flex items-center gap-2 px-5 py-2.5 border-2 border-gray-200 rounded-xl text-gray-700 font-bold hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-all text-sm">
+                <i class="fa-solid fa-message text-base"></i>
+                <span>커뮤니티</span>
+            </a>
+        </nav>
+
+        <div class="flex items-center gap-4 shrink-0">
+            <a th:href="@{/logout}"
+               href="/logout"
+               class="hidden lg:inline-flex items-center gap-2 px-3 py-2 text-gray-700 font-bold hover:text-red-600 transition-colors text-sm">
+                <i class="fa-solid fa-arrow-right-from-bracket text-base"></i>
+                <span>로그아웃</span>
+            </a>
+
+            <div class="hidden md:block text-right leading-tight min-w-[150px]">
+                <p class="text-sm font-black text-gray-900"
+                   th:text="${user != null ? user.name + ' 강사님' : '강사님'}">
+                    김개발 강사님
+                </p>
+
+                <p class="text-xs font-mono text-gray-500 mt-1"
+                   th:text="${user != null ? user.email : 'instructor@naeil.io'}">
+                    instructor@naeil.io
+                </p>
+            </div>
+
+            <button type="button"
+                    class="w-11 h-11 bg-orange-600 text-white rounded-xl flex items-center justify-center shadow-md hover:bg-orange-700 transition-all">
+                <i class="fa-regular fa-paper-plane text-lg"></i>
+            </button>
+
+            <button type="button"
+                    class="w-11 h-11 bg-gradient-to-br from-green-500 to-blue-500 text-white rounded-xl flex items-center justify-center shadow-md">
+                <span class="font-black text-sm">{ }</span>
+            </button>
+        </div>
+    </div>
+
+    <nav class="xl:hidden border-t border-gray-100 px-4 py-3 bg-white">
+        <div class="grid grid-cols-4 gap-2">
+            <a th:href="@{/course}"
+               href="/course"
+               class="flex flex-col items-center gap-1 px-2 py-2 border border-gray-200 rounded-xl text-gray-700 font-bold hover:text-blue-600 hover:bg-blue-50 transition-all text-xs">
+                <i class="fa-solid fa-book-open"></i>
+                <span>전체 강의</span>
+            </a>
+
+            <a th:href="@{/instructor/course-management}"
+               href="/instructor/course-management"
+               class="flex flex-col items-center gap-1 px-2 py-2 border border-gray-200 rounded-xl text-gray-700 font-bold hover:text-blue-600 hover:bg-blue-50 transition-all text-xs">
+                <i class="fa-solid fa-video"></i>
+                <span>내 강의</span>
+            </a>
+
+            <a th:href="@{/instructor/settlement}"
+               href="/instructor/settlement"
+               class="flex flex-col items-center gap-1 px-2 py-2 border border-gray-200 rounded-xl text-gray-700 font-bold hover:text-blue-600 hover:bg-blue-50 transition-all text-xs">
+                <i class="fa-solid fa-wallet"></i>
+                <span>정산</span>
+            </a>
+
+            <a th:href="@{/community}"
+               href="/community"
+               class="flex flex-col items-center gap-1 px-2 py-2 border border-gray-200 rounded-xl text-gray-700 font-bold hover:text-blue-600 hover:bg-blue-50 transition-all text-xs">
+                <i class="fa-solid fa-message"></i>
+                <span>커뮤니티</span>
+            </a>
+        </div>
+    </nav>
+</header>
+
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>코스 신청 검토</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+<!-- Header -->
+<header class="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+            <a th:href="@{/admin/dashboard}" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="fa-solid fa-terminal text-white text-sm"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-900">내일 <span class="text-gray-500 font-normal">Nae-il</span></h1>
+                    <p class="text-[10px] font-semibold text-gray-500">관리자 패널</p>
+                </div>
+            </a>
+            <nav class="flex items-center gap-2">
+                <a th:href="@{/community/qna}" class="flex items-center gap-2 px-4 py-2 border-2 border-gray-200 rounded-xl text-gray-700 hover:border-blue-600 hover:bg-blue-50 transition-all font-medium text-sm">
+                    <i class="fa-solid fa-comment text-sm"></i><span>커뮤니티</span>
+                </a>
+                <div class="relative" id="adminMenuWrapper">
+                    <button onclick="toggleAdminMenu()" class="flex items-center gap-2 px-4 py-2 border-2 border-gray-200 rounded-xl text-gray-700 hover:border-blue-600 hover:bg-blue-50 transition-all font-medium text-sm">
+                        <i class="fa-solid fa-shield text-sm"></i><span>관리</span><i class="fa-solid fa-chevron-down text-xs"></i>
+                    </button>
+                    <div id="adminMenu" class="hidden absolute left-0 mt-2 w-64 bg-white border-2 border-gray-200 rounded-xl shadow-xl z-50">
+                        <div class="py-2">
+                            <div>
+                                <button onclick="toggleMemberMenu()" class="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50">
+                                    <div class="flex items-center gap-3"><i class="fa-solid fa-users text-gray-600"></i><span class="text-sm font-bold">회원 관리</span></div>
+                                    <i class="fa-solid fa-chevron-down text-xs text-gray-500"></i>
+                                </button>
+                                <div id="memberSubMenu" class="hidden px-4 pb-2">
+                                    <a th:href="@{/admin/user-management}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">회원 조회</a>
+                                    <a th:href="@{/admin/instructor-approval}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">강사 승인</a>
+                                    <a th:href="@{/admin/blacklist}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">블랙리스트 관리</a>
+                                </div>
+                            </div>
+                            <div class="border-t border-gray-100"></div>
+                            <div>
+                                <button onclick="toggleCourseMenu()" class="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50">
+                                    <div class="flex items-center gap-3"><i class="fa-solid fa-book-open text-gray-600"></i><span class="text-sm font-bold">코스 관리</span></div>
+                                    <i class="fa-solid fa-chevron-down text-xs text-gray-500"></i>
+                                </button>
+                                <div id="courseSubMenu" class="hidden px-4 pb-2">
+                                    <a th:href="@{/admin/course-management/approval}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">코스 승인 관리</a>
+                                    <a th:href="@{/admin/live-management}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">실시간 강의 승인 관리</a>
+                                    <a th:href="@{/admin/category-management}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">카테고리 관리</a>
+                                </div>
+                            </div>
+                            <div class="border-t border-gray-100"></div>
+                            <a th:href="@{/admin/settlement}" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50">
+                                <i class="fa-solid fa-wallet text-gray-600"></i><span class="text-sm font-bold">정산 관리</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            <a th:href="@{/auth/logout}" class="flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-red-50 transition-all group">
+                <i class="fa-solid fa-right-from-bracket text-gray-600 group-hover:text-red-600 text-sm"></i>
+                <span class="font-medium text-gray-700 group-hover:text-red-600 text-sm">로그아웃</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- Layout -->
+<div class="max-w-7xl mx-auto px-6 py-10 flex gap-8">
+
+    <!-- Sidebar -->
+    <aside class="w-56 shrink-0">
+        <div class="bg-white border-2 border-gray-200 rounded-2xl p-4">
+            <p class="text-sm font-black text-gray-900 px-3 py-2 mb-1">코스 관리</p>
+            <nav class="space-y-1">
+                <a th:href="@{/admin/course-management/approval}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-purple-700 bg-purple-50">
+                    <i class="fa-solid fa-book-open text-purple-500 w-4"></i>코스 승인 관리
+                </a>
+                <a th:href="@{/admin/live-management}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    <i class="fa-solid fa-video text-gray-400 w-4"></i>실시간 강의 승인 관리
+                </a>
+                <a th:href="@{/admin/category-management}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    <i class="fa-solid fa-tags text-gray-400 w-4"></i>카테고리 관리
+                </a>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="flex-1">
+        <div class="mb-8">
+            <h1 class="text-4xl font-black text-gray-900 mb-2">코스 신청 검토</h1>
+            <p class="text-lg text-gray-600 font-medium">강사가 신청한 강의를 검토하고 승인 여부를 결정합니다</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-3 gap-6 mb-8">
+            <div class="bg-white border-2 border-yellow-200 rounded-2xl p-6">
+                <p class="text-sm font-bold text-gray-600 mb-2">검토 대기 중</p>
+                <p class="text-4xl font-black text-yellow-600" th:text="${pendingCount} + '건'">0건</p>
+                <p class="text-xs text-gray-500 mt-2 font-medium">신규 신청</p>
+            </div>
+            <div class="bg-white border-2 border-green-200 rounded-2xl p-6">
+                <p class="text-sm font-bold text-gray-600 mb-2">승인 완료</p>
+                <p class="text-4xl font-black text-green-600" th:text="${approvedCount} + '건'">0건</p>
+                <p class="text-xs text-gray-500 mt-2 font-medium">운영 중</p>
+            </div>
+            <div class="bg-white border-2 border-red-200 rounded-2xl p-6">
+                <p class="text-sm font-bold text-gray-600 mb-2">반려</p>
+                <p class="text-4xl font-black text-red-600" th:text="${rejectedCount} + '건'">0건</p>
+                <p class="text-xs text-gray-500 mt-2 font-medium">재신청 필요</p>
+            </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="flex gap-3 mb-6">
+            <button onclick="filterRows('ALL')" id="tab-ALL"
+                    class="px-4 py-2 rounded-full font-bold text-sm bg-blue-600 text-white shadow-md">전체</button>
+            <button onclick="filterRows('PENDING')" id="tab-PENDING"
+                    class="px-4 py-2 rounded-full font-bold text-sm bg-white border-2 border-gray-200 text-gray-700 hover:border-blue-300">승인 대기</button>
+            <button onclick="filterRows('APPROVED')" id="tab-APPROVED"
+                    class="px-4 py-2 rounded-full font-bold text-sm bg-white border-2 border-gray-200 text-gray-700 hover:border-blue-300">승인 완료</button>
+            <button onclick="filterRows('REJECTED')" id="tab-REJECTED"
+                    class="px-4 py-2 rounded-full font-bold text-sm bg-white border-2 border-gray-200 text-gray-700 hover:border-blue-300">반려</button>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden overflow-x-auto">
+            <table class="w-full min-w-max">
+                <thead class="bg-gray-50 border-b-2 border-gray-200">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-sm font-black text-gray-900">코스명</th>
+                        <th class="px-4 py-3 text-left text-sm font-black text-gray-900">강사명</th>
+                        <th class="px-4 py-3 text-left text-sm font-black text-gray-900">카테고리</th>
+                        <th class="px-4 py-3 text-left text-sm font-black text-gray-900">신청일</th>
+                        <th class="px-4 py-3 text-left text-sm font-black text-gray-900">상태</th>
+                        <th class="px-4 py-3 text-left text-sm font-black text-gray-900">액션</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(approvals)}">
+                        <td colspan="6" class="px-6 py-16 text-center text-gray-400">검토할 강의 신청이 없습니다</td>
+                    </tr>
+                    <tr th:each="approval : ${approvals}"
+                        th:attr="data-status=${approval.status.name()}"
+                        th:classappend="${approval.status.name() == 'PENDING'} ? 'border-l-4 border-l-yellow-400' : ''"
+                        class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                        <td class="px-4 py-3 font-medium text-gray-900 text-sm max-w-xs truncate" th:text="${approval.title ?: '-'}"></td>
+                        <td class="px-4 py-3 text-gray-700 text-sm whitespace-nowrap" th:text="${approval.instuctorName ?: '-'}"></td>
+                        <td class="px-4 py-3 text-gray-700 text-sm whitespace-nowrap" th:text="${approval.categoryName ?: '-'}"></td>
+                        <td class="px-4 py-3 text-gray-600 font-mono text-sm whitespace-nowrap"
+                            th:text="${approval.createdAt != null ? #temporals.format(approval.createdAt, 'yyyy-MM-dd') : '-'}"></td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <span th:classappend="${approval.status.name() == 'PENDING'} ? 'bg-yellow-100 text-yellow-700' : (${approval.status.name() == 'APPROVED'} ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700')"
+                                  class="px-3 py-1 rounded-full text-sm font-bold"
+                                  th:text="${approval.status.name() == 'PENDING'} ? '승인 대기' : (${approval.status.name() == 'APPROVED'} ? '승인 완료' : '반려')"></span>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <div class="flex gap-1.5" th:if="${approval.status.name() == 'PENDING'}">
+                                <form method="post" th:action="@{/admin/approvals/{id}/approve(id=${approval.approvalId})}">
+                                    <input type="hidden" name="redirect" value="/admin/course-management/approval"/>
+                                    <button type="submit" class="px-2.5 py-1.5 border-2 border-green-300 text-green-600 rounded-lg hover:bg-green-50 font-bold text-xs">승인</button>
+                                </form>
+                                <button type="button"
+                                        th:attr="data-id=${approval.approvalId}, data-title=${approval.title}"
+                                        onclick="openRejectModal(this.dataset.id, this.dataset.title)"
+                                        class="px-2.5 py-1.5 border-2 border-red-300 text-red-600 rounded-lg hover:bg-red-50 font-bold text-xs">반려</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+
+<!-- Reject Modal -->
+<div id="reject-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" style="display:none">
+    <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-xl">
+        <h3 class="text-2xl font-black text-gray-900 mb-4">강의 신청 반려</h3>
+        <p id="reject-title" class="text-gray-600 mb-4 font-medium"></p>
+        <form id="reject-form" method="post">
+            <input type="hidden" name="redirect" value="/admin/course-management/approval"/>
+            <textarea name="rejectReason" rows="4" placeholder="강사에게 전달될 반려 사유를 입력하세요"
+                      class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none resize-none font-medium"></textarea>
+            <div class="flex gap-3 mt-6">
+                <button type="submit" class="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 font-bold">반려 처리</button>
+                <button type="button" onclick="closeRejectModal()" class="flex-1 px-6 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 font-bold text-gray-700">취소</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function filterRows(status) {
+        document.querySelectorAll('tbody tr[data-status]').forEach(tr => {
+            tr.style.display = (status === 'ALL' || tr.dataset.status === status) ? '' : 'none';
+        });
+        document.querySelectorAll('[id^="tab-"]').forEach(btn => {
+            btn.className = btn.id === 'tab-' + status
+                ? 'px-4 py-2 rounded-full font-bold text-sm bg-blue-600 text-white shadow-md'
+                : 'px-4 py-2 rounded-full font-bold text-sm bg-white border-2 border-gray-200 text-gray-700 hover:border-blue-300';
+        });
+    }
+    function openRejectModal(id, title) {
+        document.getElementById('reject-title').textContent = '"' + title + '" 신청을 반려하시겠습니까?';
+        document.getElementById('reject-form').action = '/admin/approvals/' + id + '/reject';
+        document.getElementById('reject-modal').classList.remove('hidden');
+    }
+    function closeRejectModal() { document.getElementById('reject-modal').classList.add('hidden'); }
+    function toggleAdminMenu() { document.getElementById('adminMenu').classList.toggle('hidden'); }
+    function toggleMemberMenu() { document.getElementById('memberSubMenu').classList.toggle('hidden'); }
+    function toggleCourseMenu() { document.getElementById('courseSubMenu').classList.toggle('hidden'); }
+    document.addEventListener('click', e => {
+        if (!document.getElementById('adminMenuWrapper').contains(e.target))
+            document.getElementById('adminMenu').classList.add('hidden');
+    });
+</script>
+
+</body>
+</html>

@@ -1,10 +1,189 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>카테고리 관리</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 </head>
-<body>
+<body class="bg-gray-50 min-h-screen">
+
+<!-- Header -->
+<header class="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+            <a th:href="@{/admin/dashboard}" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="fa-solid fa-terminal text-white text-sm"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-900 tracking-tight">
+                        내일 <span class="text-gray-500 font-normal">Nae-il</span>
+                    </h1>
+                    <p class="text-[10px] font-semibold text-gray-500 tracking-wide">관리자 패널</p>
+                </div>
+            </a>
+            <nav class="flex items-center gap-2">
+                <a th:href="@{/community/qna}"
+                   class="flex items-center gap-2 px-4 py-2 border-2 border-gray-200 rounded-xl text-gray-700 hover:border-blue-600 hover:bg-blue-50 hover:text-blue-600 transition-all font-medium text-sm">
+                    <i class="fa-solid fa-comment text-sm"></i>
+                    <span>커뮤니티</span>
+                </a>
+                <div class="relative" id="adminMenuWrapper">
+                    <button onclick="toggleAdminMenu()"
+                            class="flex items-center gap-2 px-4 py-2 border-2 border-gray-200 rounded-xl text-gray-700 hover:border-blue-600 hover:bg-blue-50 hover:text-blue-600 transition-all font-medium text-sm">
+                        <i class="fa-solid fa-shield text-sm"></i>
+                        <span>관리</span>
+                        <i class="fa-solid fa-chevron-down text-xs"></i>
+                    </button>
+                    <div id="adminMenu" class="hidden absolute left-0 mt-2 w-64 bg-white border-2 border-gray-200 rounded-xl shadow-xl z-50">
+                        <div class="py-2">
+                            <div>
+                                <button onclick="toggleMemberMenu()" class="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fa-solid fa-users text-gray-600"></i>
+                                        <span class="text-sm font-bold text-gray-900">회원 관리</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-down text-xs text-gray-500"></i>
+                                </button>
+                                <div id="memberSubMenu" class="hidden px-4 pb-2">
+                                    <a th:href="@{/admin/user-management}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">회원 조회</a>
+                                    <a th:href="@{/admin/instructor-approval}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">강사 승인</a>
+                                    <a th:href="@{/admin/blacklist}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">블랙리스트 관리</a>
+                                </div>
+                            </div>
+                            <div class="border-t border-gray-100"></div>
+                            <div>
+                                <button onclick="toggleCourseMenu()" class="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fa-solid fa-book-open text-gray-600"></i>
+                                        <span class="text-sm font-bold text-gray-900">코스 관리</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-down text-xs text-gray-500"></i>
+                                </button>
+                                <div id="courseSubMenu" class="hidden px-4 pb-2">
+                                    <a th:href="@{/admin/course-management/approval}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">코스 승인 관리</a>
+                                    <a th:href="@{/admin/live-management}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">실시간 강의 승인 관리</a>
+                                    <a th:href="@{/admin/category-management}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">카테고리 관리</a>
+                                </div>
+                            </div>
+                            <div class="border-t border-gray-100"></div>
+                            <a th:href="@{/admin/settlement}" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                                <i class="fa-solid fa-wallet text-gray-600"></i>
+                                <span class="text-sm font-bold text-gray-900">정산 관리</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            <a th:href="@{/auth/logout}"
+               class="flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-red-50 transition-all group">
+                <i class="fa-solid fa-right-from-bracket text-gray-600 group-hover:text-red-600 text-sm"></i>
+                <span class="font-medium text-gray-700 group-hover:text-red-600 text-sm">로그아웃</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<div class="max-w-7xl mx-auto px-6 py-12">
+
+    <div class="mb-8">
+        <h1 class="text-4xl font-black text-gray-900 mb-2">카테고리 관리</h1>
+        <p class="text-lg text-gray-600 font-medium">코스 카테고리를 추가하고 관리합니다</p>
+    </div>
+
+    <!-- Add Category -->
+    <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 mb-6 shadow-sm">
+        <h2 class="text-lg font-black text-gray-900 mb-4">카테고리 추가</h2>
+        <form method="post" th:action="@{/admin/category-management}" class="flex gap-3">
+            <input type="text" name="name" placeholder="카테고리명을 입력하세요"
+                   class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none font-medium" />
+            <button type="submit"
+                    class="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all font-bold flex items-center gap-2">
+                <i class="fa-solid fa-plus"></i>등록
+            </button>
+        </form>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-white border-2 border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <table class="w-full text-sm">
+            <thead class="bg-gray-50 border-b-2 border-gray-200">
+                <tr>
+                    <th class="px-6 py-4 text-left font-bold text-gray-600">No</th>
+                    <th class="px-6 py-4 text-left font-bold text-gray-600">카테고리명</th>
+                    <th class="px-6 py-4 text-left font-bold text-gray-600">관리</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:if="${#lists.isEmpty(categories)}">
+                    <td colspan="3" class="px-6 py-16 text-center text-gray-400">등록된 카테고리가 없습니다</td>
+                </tr>
+                <tr th:each="cat, stat : ${categories}" class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-gray-500" th:text="${stat.count}"></td>
+                    <td class="px-6 py-4 font-medium text-gray-900" th:text="${cat.name}"></td>
+                    <td class="px-6 py-4">
+                        <div class="flex gap-2">
+                            <button type="button"
+                                    th:attr="data-id=${cat.id}, data-name=${cat.name}"
+                                    onclick="openEditModal(this.dataset.id, this.dataset.name)"
+                                    class="px-3 py-1.5 border-2 border-blue-300 text-blue-600 rounded-lg hover:bg-blue-50 font-bold text-xs">
+                                수정
+                            </button>
+                            <form method="post" th:action="@{/admin/category-management/{id}/delete(id=${cat.id})}"
+                                  onsubmit="return confirm('삭제하시겠습니까?')">
+                                <button type="submit"
+                                        class="px-3 py-1.5 border-2 border-red-300 text-red-600 rounded-lg hover:bg-red-50 font-bold text-xs">
+                                    삭제
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" style="display:none">
+    <div class="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 border-2 border-gray-200 shadow-xl">
+        <h3 class="text-lg font-black text-gray-900 mb-4">카테고리 수정</h3>
+        <form id="edit-form" method="post">
+            <input type="text" id="edit-name-input" name="name"
+                   class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none font-medium mb-4" />
+            <div class="flex gap-3">
+                <button type="button" onclick="closeEditModal()"
+                        class="flex-1 px-4 py-2 border-2 border-gray-200 rounded-xl text-gray-700 font-bold hover:bg-gray-50 transition-colors">
+                    취소
+                </button>
+                <button type="submit"
+                        class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-colors">
+                    저장
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openEditModal(id, name) {
+        document.getElementById('edit-name-input').value = name;
+        document.getElementById('edit-form').action = '/admin/category-management/' + id + '/edit';
+        document.getElementById('edit-modal').classList.remove('hidden');
+    }
+    function closeEditModal() {
+        document.getElementById('edit-modal').classList.add('hidden');
+    }
+    function toggleAdminMenu() { document.getElementById('adminMenu').classList.toggle('hidden'); }
+    function toggleMemberMenu() { document.getElementById('memberSubMenu').classList.toggle('hidden'); }
+    function toggleCourseMenu() { document.getElementById('courseSubMenu').classList.toggle('hidden'); }
+    document.addEventListener('click', function(e) {
+        if (!document.getElementById('adminMenuWrapper').contains(e.target)) {
+            document.getElementById('adminMenu').classList.add('hidden');
+        }
+    });
+</script>
 
 </body>
 </html>

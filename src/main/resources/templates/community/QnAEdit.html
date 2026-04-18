@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>질문 수정 | Nae-Il</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body class="bg-white">
+<div class="max-w-7xl mx-auto px-6 py-12">
+    <div class="grid grid-cols-12 gap-8">
+
+        <!-- 사이드바 -->
+        <div class="col-span-3">
+            <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 sticky top-24">
+                <h2 class="text-xl font-black text-gray-900 mb-6">커뮤니티</h2>
+                <nav class="space-y-2">
+                    <a th:href="@{/community/qna}" href="/community/qna"
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all bg-blue-50 text-blue-600 font-bold">
+                        <i class="fa-solid fa-comment text-sm"></i>
+                        <span class="text-sm">Q&A</span>
+                    </a>
+                    <a th:href="@{/community/free-board}" href="/community/free-board"
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-gray-700 hover:bg-gray-50 font-medium">
+                        <i class="fa-solid fa-file-lines text-sm"></i>
+                        <span class="text-sm">자유게시판</span>
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- 메인 -->
+        <div class="col-span-9">
+            <div class="bg-white border-2 border-gray-200 rounded-2xl p-8">
+                <h1 class="text-3xl font-black text-gray-900 mb-8">질문 수정</h1>
+
+                <form th:action="@{/community/qna/{id}/edit(id=${post.id})}" method="post">
+                    <div class="space-y-6">
+
+                        <!-- 강의 선택 드롭다운 (수정 시에도 재선택 가능) -->
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">강의 선택</label>
+                            <select name="courseId"
+                                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600 focus:outline-none transition-colors font-medium appearance-none bg-white"
+                                    style="background-image: url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%2216%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236b7280%22 stroke-width=%222%22%3E%3Cpath d=%22M6 9l6 6 6-6%22/%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 1rem center;">
+                                <!-- 기본 (공통 질문) -->
+                                <option value="" th:selected="${post.courseId == null}">기본 (공통 질문)</option>
+                                <!-- 수강 중인 강의 목록 ㄱㄴㄷ순 -->
+                                <option th:each="course : ${enrolledCourses}"
+                                        th:value="${course.id}"
+                                        th:selected="${course.id == post.courseId}"
+                                        th:text="${course.title}">강의명</option>
+                            </select>
+                        </div>
+
+                        <!-- 제목 -->
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">제목</label>
+                            <input type="text" name="title" th:value="${post.title}" required
+                                   placeholder="제목을 입력하세요"
+                                   class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600 focus:outline-none transition-colors font-medium"/>
+                        </div>
+
+                        <!-- 내용 -->
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">내용</label>
+                            <textarea name="content" required
+                                      placeholder="질문 내용을 입력하세요"
+                                      class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600 focus:outline-none transition-colors resize-none h-96 font-medium"
+                                      th:text="${post.content}"></textarea>
+                        </div>
+
+                        <!-- 버튼 -->
+                        <div class="flex gap-3 justify-end pt-6 border-t-2 border-gray-200">
+                            <a th:href="@{/community/qna/{id}(id=${post.id})}" href="/community/qna"
+                               class="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:border-gray-400 transition-all font-bold">
+                                취소
+                            </a>
+                            <button type="submit"
+                                    class="px-6 py-3 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-xl hover:shadow-lg transition-all font-bold">
+                                수정 완료
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

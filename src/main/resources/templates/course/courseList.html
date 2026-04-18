@@ -74,7 +74,9 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-        <div th:each="course : ${courses}" class="group bg-white border-2 border-gray-100 rounded-2xl overflow-hidden hover:shadow-2xl hover:border-blue-200 transition-all duration-300">
+        <a th:each="course : ${courses}"
+             th:href="@{/course/{id}(id=${course.courseId})}"
+             class="group bg-white border-2 border-gray-100 rounded-2xl overflow-hidden hover:shadow-2xl hover:border-blue-200 transition-all duration-300">
             <div class="aspect-video relative overflow-hidden">
                 <img th:src="${course.thumbnail}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                 <div class="absolute top-4 left-4">
@@ -82,7 +84,7 @@
                 </div>
             </div>
             <div class="p-6">
-                <h3 th:text="${course.title}" class="text-xl font-black text-gray-900 mb-2 line-clamp-1">강의 제목</h3>
+                <h3 th:text="${course.title}" class="text-xl font-black text-gray-900 mb-2 line-clamp-1 group-hover:text-blue-600 transition-colors">강의 제목</h3>
                 <p th:text="${course.description}" class="text-gray-500 text-sm font-medium mb-4 line-clamp-2">강의 설명</p>
                 <p th:text="${course.instructorName}" class="text-sm font-bold text-gray-700 mb-4">강사명</p>
 
@@ -100,7 +102,7 @@
                     <span th:text="|₩${#numbers.formatInteger(course.price, 3, 'COMMA')}|" class="text-lg font-black text-gray-900">₩0</span>
                 </div>
             </div>
-        </div>
+        </a>
 
     </div>
 </main>

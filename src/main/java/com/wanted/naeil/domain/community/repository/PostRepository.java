@@ -12,18 +12,15 @@ import java.util.Optional;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    // 게시글 상세 조회
-    Optional<Post> findByPostIdAndDeletedAtIsNull(Long postId);
+    // 목록 조회 - 최신순 (기본)
+    List<Post> findByCategoryAndIsPublicTrueOrderByCreatedAtDesc(PostCategory category);
 
-    // 목록 조회 - 최신순 (자유게시판 기본 + Q&A)
-    List<Post> findByCategoryAndIsPublicTrueAndDeletedAtIsNullOrderByCreatedAtDesc(PostCategory category);
+    // 목록 조회 - 오래된순
+    List<Post> findByCategoryAndIsPublicTrueOrderByCreatedAtAsc(PostCategory category);
 
-    // 자유게시판 - 오래된순
-    List<Post> findByCategoryAndIsPublicTrueAndDeletedAtIsNullOrderByCreatedAtAsc(PostCategory category);
-
-    // 자유게시판 - 조회순 (조회수 기준)
-    List<Post> findByCategoryAndIsPublicTrueAndDeletedAtIsNullOrderByViewCountDesc(PostCategory category);
+    // 목록 조회 - 조회순
+    List<Post> findByCategoryAndIsPublicTrueOrderByViewCountDesc(PostCategory category);
 
     // Q&A - 특정 강의 필터 + 최신순
-    List<Post> findByCategoryAndCourseAndIsPublicTrueAndDeletedAtIsNullOrderByCreatedAtDesc(PostCategory category, Course course);
+    List<Post> findByCategoryAndCourseAndIsPublicTrueOrderByCreatedAtDesc(PostCategory category, Course course);
 }

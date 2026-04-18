@@ -1,10 +1,253 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>강사 승인</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 </head>
-<body>
+<body class="bg-gray-50 min-h-screen">
+
+<!-- Header -->
+<header class="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+            <a th:href="@{/admin/dashboard}" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="fa-solid fa-terminal text-white text-sm"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-900">내일 <span class="text-gray-500 font-normal">Nae-il</span></h1>
+                    <p class="text-[10px] font-semibold text-gray-500">관리자 패널</p>
+                </div>
+            </a>
+            <nav class="flex items-center gap-2">
+                <a th:href="@{/community/qna}" class="flex items-center gap-2 px-4 py-2 border-2 border-gray-200 rounded-xl text-gray-700 hover:border-blue-600 hover:bg-blue-50 transition-all font-medium text-sm">
+                    <i class="fa-solid fa-comment text-sm"></i><span>커뮤니티</span>
+                </a>
+                <div class="relative" id="adminMenuWrapper">
+                    <button onclick="toggleAdminMenu()" class="flex items-center gap-2 px-4 py-2 border-2 border-gray-200 rounded-xl text-gray-700 hover:border-blue-600 hover:bg-blue-50 transition-all font-medium text-sm">
+                        <i class="fa-solid fa-shield text-sm"></i><span>관리</span><i class="fa-solid fa-chevron-down text-xs"></i>
+                    </button>
+                    <div id="adminMenu" class="hidden absolute left-0 mt-2 w-64 bg-white border-2 border-gray-200 rounded-xl shadow-xl z-50">
+                        <div class="py-2">
+                            <div>
+                                <button onclick="toggleMemberMenu()" class="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50">
+                                    <div class="flex items-center gap-3"><i class="fa-solid fa-users text-gray-600"></i><span class="text-sm font-bold">회원 관리</span></div>
+                                    <i class="fa-solid fa-chevron-down text-xs text-gray-500"></i>
+                                </button>
+                                <div id="memberSubMenu" class="hidden px-4 pb-2">
+                                    <a th:href="@{/admin/user-management}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">회원 조회</a>
+                                    <a th:href="@{/admin/instructor-approval}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">강사 승인</a>
+                                    <a th:href="@{/admin/blacklist}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">블랙리스트 관리</a>
+                                </div>
+                            </div>
+                            <div class="border-t border-gray-100"></div>
+                            <div>
+                                <button onclick="toggleCourseMenu()" class="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50">
+                                    <div class="flex items-center gap-3"><i class="fa-solid fa-book-open text-gray-600"></i><span class="text-sm font-bold">코스 관리</span></div>
+                                    <i class="fa-solid fa-chevron-down text-xs text-gray-500"></i>
+                                </button>
+                                <div id="courseSubMenu" class="hidden px-4 pb-2">
+                                    <a th:href="@{/admin/course-management/approval}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">코스 승인 관리</a>
+                                    <a th:href="@{/admin/live-management}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">실시간 강의 승인 관리</a>
+                                    <a th:href="@{/admin/category-management}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">카테고리 관리</a>
+                                </div>
+                            </div>
+                            <div class="border-t border-gray-100"></div>
+                            <a th:href="@{/admin/settlement}" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50">
+                                <i class="fa-solid fa-wallet text-gray-600"></i><span class="text-sm font-bold">정산 관리</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            <a th:href="@{/auth/logout}" class="flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-red-50 transition-all group">
+                <i class="fa-solid fa-right-from-bracket text-gray-600 group-hover:text-red-600 text-sm"></i>
+                <span class="font-medium text-gray-700 group-hover:text-red-600 text-sm">로그아웃</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<div class="max-w-7xl mx-auto px-6 py-12">
+
+    <!-- Hero Banner -->
+    <div class="relative overflow-hidden mb-8">
+        <div class="relative bg-gradient-to-br from-purple-50 via-white to-blue-50 rounded-3xl p-12 border-2 border-gray-200 shadow-lg">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-200 rounded-full mb-6 shadow-sm">
+                        <div class="w-2.5 h-2.5 bg-purple-500 rounded-full"></div>
+                        <span class="text-sm font-bold text-gray-700">시스템 정상</span>
+                    </div>
+                    <h2 class="text-4xl font-black text-gray-900 mb-4 leading-tight">
+                        안녕하세요,<br/>
+                        <span class="text-purple-600">관리자</span>님
+                    </h2>
+                    <p class="text-xl text-gray-700 font-semibold">플랫폼 운영 상태를 확인하고 관리하세요</p>
+                </div>
+                <div class="hidden lg:block">
+                    <div class="w-48 h-48 bg-gradient-to-br from-purple-400 to-blue-400 rounded-3xl flex items-center justify-center shadow-2xl">
+                        <span class="text-7xl">⚙️</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h1 class="text-4xl font-black text-gray-900 mb-2">강사 승인</h1>
+    <p class="text-gray-600 font-medium mb-8">강사 신청 목록을 확인하고 승인/반려합니다</p>
+
+    <!-- 2 Column Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+        <!-- Left: Application List -->
+        <div>
+            <h2 class="text-xl font-black text-gray-900 mb-4">신청 목록 (<span th:text="${#lists.size(approvals)}">0</span>)</h2>
+
+            <div th:if="${#lists.isEmpty(approvals)}"
+                 class="text-center py-16 bg-white border-2 border-gray-200 rounded-2xl">
+                <div class="w-24 h-24 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fa-solid fa-file-lines text-4xl text-gray-400"></i>
+                </div>
+                <p class="text-gray-500 text-sm">대기중인 신청이 없습니다</p>
+            </div>
+
+            <div class="space-y-4">
+                <div th:each="app : ${approvals}"
+                     th:attr="data-id=${app.approvalId},
+                              data-title=${app.title},
+                              data-applicant=${app.applicantName},
+                              data-category=${app.categoryName},
+                              data-introduction=${app.introduction},
+                              data-career=${app.career},
+                              data-proof=${app.proofFileUrl},
+                              data-date=${app.createdAt != null ? #temporals.format(app.createdAt, 'yyyy-MM-dd') : '-'},
+                              data-status=${app.status.name()}"
+                     onclick="selectApplication(this)"
+                     class="p-6 border-2 rounded-2xl cursor-pointer transition-all hover:shadow-lg border-gray-200 bg-white hover:border-blue-300">
+                    <div class="flex items-start justify-between mb-3">
+                        <div>
+                            <h3 class="text-lg font-black text-gray-900 mb-1" th:text="${app.title ?: '-'}"></h3>
+                            <p class="text-sm text-gray-600" th:text="${app.applicantName ?: '-'}"></p>
+                        </div>
+                        <i class="fa-solid fa-file-lines text-blue-600"></i>
+                    </div>
+                    <div class="flex items-center gap-4 text-sm text-gray-600">
+                        <span class="px-3 py-1 bg-gray-100 rounded-full font-medium" th:text="${app.categoryName ?: '-'}"></span>
+                        <span th:text="${app.createdAt != null ? #temporals.format(app.createdAt, 'yyyy-MM-dd') : '-'}"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Application Detail -->
+        <div>
+            <div id="detail-empty" class="bg-white border-2 border-gray-200 rounded-2xl p-8 text-center sticky top-24">
+                <div class="w-24 h-24 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fa-solid fa-file-lines text-4xl text-gray-400"></i>
+                </div>
+                <p class="text-gray-500 text-sm">신청을 선택하면 상세 정보가 표시됩니다</p>
+            </div>
+
+            <div id="detail-panel" class="hidden bg-white border-2 border-gray-200 rounded-2xl p-8 sticky top-24">
+                <h2 class="text-2xl font-black text-gray-900 mb-6">신청 상세</h2>
+                <div class="space-y-6 mb-8">
+                    <div><label class="text-sm font-bold text-gray-600 mb-2 block">제목</label><p id="d-title" class="text-gray-900 font-medium"></p></div>
+                    <div><label class="text-sm font-bold text-gray-600 mb-2 block">신청자</label><p id="d-applicant" class="text-gray-900 font-medium"></p></div>
+                    <div><label class="text-sm font-bold text-gray-600 mb-2 block">분야</label><p id="d-category" class="text-gray-900 font-medium"></p></div>
+                    <div><label class="text-sm font-bold text-gray-600 mb-2 block">소개</label><p id="d-introduction" class="text-gray-700 leading-relaxed"></p></div>
+                    <div><label class="text-sm font-bold text-gray-600 mb-2 block">경력</label><p id="d-career" class="text-gray-700 leading-relaxed"></p></div>
+                    <div>
+                        <label class="text-sm font-bold text-gray-600 mb-2 block">증빙 자료</label>
+                        <div class="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                            <i class="fa-solid fa-file text-gray-600"></i>
+                            <a id="d-proof" href="#" target="_blank" class="text-sm text-blue-600 font-medium hover:underline">파일 보기</a>
+                        </div>
+                    </div>
+                    <div><label class="text-sm font-bold text-gray-600 mb-2 block">신청일</label><p id="d-date" class="text-gray-900 font-medium"></p></div>
+                </div>
+                <div id="action-buttons" class="flex gap-3">
+                    <form id="approve-form" method="post">
+                        <input type="hidden" name="redirect" value="/admin/instructor-approval"/>
+                        <button type="submit"
+                                class="px-6 py-3 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-xl hover:shadow-xl transition-all font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-circle-check"></i> 승인
+                        </button>
+                    </form>
+                    <button type="button" onclick="openRejectModal()"
+                            class="px-6 py-3 border-2 border-red-300 text-red-600 rounded-xl hover:bg-red-50 transition-all font-bold flex items-center gap-2">
+                        <i class="fa-solid fa-circle-xmark"></i> 반려
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reject Modal -->
+<div id="reject-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" style="display:none">
+    <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-xl">
+        <h3 class="text-2xl font-black text-gray-900 mb-4">반려 사유 입력</h3>
+        <form id="reject-form" method="post">
+            <input type="hidden" name="redirect" value="/admin/instructor-approval"/>
+            <textarea name="rejectReason" rows="4" placeholder="반려 사유를 입력하세요"
+                      class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none resize-none font-medium"></textarea>
+            <div class="flex gap-3 mt-6">
+                <button type="submit" class="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 font-bold">반려</button>
+                <button type="button" onclick="closeRejectModal()" class="flex-1 px-6 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 font-bold text-gray-700">취소</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    let selectedId = null;
+
+    function selectApplication(el) {
+        // 선택 스타일
+        document.querySelectorAll('[data-id]').forEach(e => {
+            e.className = 'p-6 border-2 rounded-2xl cursor-pointer transition-all hover:shadow-lg border-gray-200 bg-white hover:border-blue-300';
+        });
+        el.className = 'p-6 border-2 rounded-2xl cursor-pointer transition-all hover:shadow-lg border-blue-500 bg-blue-50';
+
+        selectedId = el.dataset.id;
+        const isPending = el.dataset.status === 'PENDING';
+
+        document.getElementById('d-title').textContent = el.dataset.title || '-';
+        document.getElementById('d-applicant').textContent = el.dataset.applicant || '-';
+        document.getElementById('d-category').textContent = el.dataset.category || '-';
+        document.getElementById('d-introduction').textContent = el.dataset.introduction || '-';
+        document.getElementById('d-career').textContent = el.dataset.career || '-';
+        document.getElementById('d-date').textContent = el.dataset.date || '-';
+
+        const proof = document.getElementById('d-proof');
+        proof.href = el.dataset.proof || '#';
+        proof.textContent = el.dataset.proof ? '파일 보기' : '없음';
+
+        document.getElementById('approve-form').action = '/admin/approvals/' + selectedId + '/approve';
+        document.getElementById('reject-form').action = '/admin/approvals/' + selectedId + '/reject';
+        document.getElementById('action-buttons').style.display = isPending ? 'flex' : 'none';
+
+        document.getElementById('detail-empty').classList.add('hidden');
+        document.getElementById('detail-panel').classList.remove('hidden');
+    }
+
+    function openRejectModal() {
+        document.getElementById('reject-modal').classList.remove('hidden');
+    }
+    function closeRejectModal() {
+        document.getElementById('reject-modal').classList.add('hidden');
+    }
+    function toggleAdminMenu() { document.getElementById('adminMenu').classList.toggle('hidden'); }
+    function toggleMemberMenu() { document.getElementById('memberSubMenu').classList.toggle('hidden'); }
+    function toggleCourseMenu() { document.getElementById('courseSubMenu').classList.toggle('hidden'); }
+    document.addEventListener('click', e => {
+        if (!document.getElementById('adminMenuWrapper').contains(e.target))
+            document.getElementById('adminMenu').classList.add('hidden');
+    });
+</script>
 
 </body>
 </html>

@@ -4,7 +4,6 @@ import com.wanted.naeil.domain.payment.entity.enums.PlanType;
 import com.wanted.naeil.domain.payment.entity.enums.SubscriptionStatus;
 import com.wanted.naeil.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -81,6 +80,7 @@ public class Subscription {
         this.status = status;
     }
 
+    // 코스 무료 결제 3회
     public void renew(LocalDateTime newEndAt, LocalDateTime newNextResetAt) {
         this.endAt = newEndAt;
         this.nextResetAt = newNextResetAt;

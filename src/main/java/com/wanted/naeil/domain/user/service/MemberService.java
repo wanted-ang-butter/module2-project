@@ -122,6 +122,7 @@ private final LocalFileService localFileService;
                         user.getId(),
                         user.getUsername(),
                         user.getName(),
+                        user.getEmail(),
                         user.getPassword(),
                         user.getRole(),
                         user.getStatus(),

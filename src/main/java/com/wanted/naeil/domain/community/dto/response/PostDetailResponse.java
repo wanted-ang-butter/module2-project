@@ -30,7 +30,7 @@ public class PostDetailResponse {
     private String courseTitle;
 
     public static PostDetailResponse from(Post post, long likeCount,
-                                          boolean isLiked, Long likeId,
+                                            boolean isLiked, Long likeId,
                                           List<CommentResponse> comments) {
         return PostDetailResponse.builder()
                 .postId(post.getPostId())

@@ -1,5 +1,6 @@
 package com.wanted.naeil.global.common.controller;
 
+import com.wanted.naeil.domain.course.service.CourseService;
 import com.wanted.naeil.global.auth.model.dto.AuthDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -13,6 +14,8 @@ import org.springframework.web.servlet.ModelAndView;
 @RequiredArgsConstructor
 public class DashboardController {
 
+    private final CourseService courseService;
+
     @GetMapping("/admin")
     public ModelAndView adminDashboard(@AuthenticationPrincipal AuthDetails authDetails) {
         ModelAndView mv = new ModelAndView("dashboard/adminDashboard");
@@ -21,9 +24,16 @@ public class DashboardController {
     }
 
     @GetMapping("/instructor")
-    public ModelAndView instructorDashboard(@AuthenticationPrincipal AuthDetails authDetails) {
+    public ModelAndView dashboard(@AuthenticationPrincipal AuthDetails authDetails) {
         ModelAndView mv = new ModelAndView("dashboard/instructorDashboard");
-        if (authDetails != null) mv.addObject("user", authDetails.getLoginUserDTO());
+
+        if (authDetails != null) {
+            Long instructorId = authDetails.getLoginUserDTO().getUserId();
+
+            mv.addObject("user", authDetails.getLoginUserDTO());
+            mv.addObject("courses", courseService.getInstructorCourses(instructorId));
+        }
+
         return mv;
     }
 
