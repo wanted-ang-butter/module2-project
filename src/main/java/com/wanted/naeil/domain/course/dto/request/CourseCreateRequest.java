@@ -1,6 +1,5 @@
 package com.wanted.naeil.domain.course.dto.request;
 
-import com.wanted.naeil.domain.course.entity.Category;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -17,9 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CreateCourseRequest {
-    // TODO : 임시로 강사 ID 저장
-    private Long instructorId;
+public class CourseCreateRequest {
 
     @NotBlank(message = "강의 제목은 필수 입력 사항입니다.")
     @Size(max = 100, message = "강의 제목은 100자 이내여야 합니다.")
