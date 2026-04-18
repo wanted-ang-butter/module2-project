@@ -28,7 +28,7 @@ public interface SectionRepository extends JpaRepository<Section, Long> {
         left join LearningProgress lp
             on lp.section = s and lp.user.id = :userId
         where c.id = :courseId and s.id = :sectionId
-        and s.status = com.wanted.naeil.domain.course.entity.SectionStatus.ACTIVE
+        and s.status = com.wanted.naeil.domain.course.entity.enums.SectionStatus.ACTIVE
     """)
     Optional<SectionStudyMainDTO> findSectionStudyMain(
             @Param("userId") Long userId,
@@ -49,7 +49,7 @@ public interface SectionRepository extends JpaRepository<Section, Long> {
         on lp.section = s
        and lp.user.id = :userId
     where s.course.id = :courseId
-      and s.status = com.wanted.naeil.domain.course.entity.SectionStatus.ACTIVE
+      and s.status = com.wanted.naeil.domain.course.entity.enums.SectionStatus.ACTIVE
     order by s.sequence asc
 """)
     List<CurriculumSectionDTO> findCurriculumSections(
