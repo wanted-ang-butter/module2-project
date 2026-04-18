@@ -26,7 +26,7 @@ public class SectionUpdateRequest {
 
     private Boolean isActive;
 
-    private MultipartFile videoUrl;
+    private MultipartFile videoFile;
 
     private MultipartFile attachmentFile;
 }
