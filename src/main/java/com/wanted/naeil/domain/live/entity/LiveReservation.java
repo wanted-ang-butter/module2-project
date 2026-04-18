@@ -1,6 +1,5 @@
 package com.wanted.naeil.domain.live.entity;
 
-import com.wanted.naeil.domain.live.entity.enums.LiveReservationStatus;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -25,14 +24,14 @@ public class LiveReservation extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "live_id", nullable = false)
-    private LiveLecture liveLecture; // DB에는 live_id로 저장
+    private User liveLecture; // DB에는 live_id로 저장
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private LiveReservationStatus status; // RESERVED, CANCELED
 
+
     @Builder
-    public LiveReservation(User user, LiveLecture liveLecture) {
+    public LiveReservation(User user, User liveLecture) {
         this.user = user;
         this.liveLecture = liveLecture;
         this.status = LiveReservationStatus.RESERVED;
