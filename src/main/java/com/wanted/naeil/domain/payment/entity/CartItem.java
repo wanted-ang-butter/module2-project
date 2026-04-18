@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 // 중복 결제 방지를 위한 unique 설정
 @Table(
-        name = "cart_items",
+        name = "cart_item",
         uniqueConstraints = {
                 @UniqueConstraint(name = "uk_cart_user_course", columnNames = {"user_id", "course_id"})
         }
@@ -36,8 +36,6 @@ public class CartItem {
 
     @Column(name = "added_at", nullable = false)
     private LocalDateTime addedAt;
-
-    // 비지니스 로직
 
     public CartItem(User user, Course course) {
         this.user = user;

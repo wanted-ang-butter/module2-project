@@ -1,9 +1,8 @@
 package com.wanted.naeil.domain.payment.entity;
 
-import com.wanted.naeil.domain.payment.entity.enums.PlanType;
-import com.wanted.naeil.domain.payment.entity.enums.SubscriptionStatus;
 import com.wanted.naeil.domain.user.entity.User;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +10,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "subscriptions")
+@Table(name = "subscription")
 @Getter
 @NoArgsConstructor
 public class Subscription {
@@ -48,15 +47,11 @@ public class Subscription {
     @Column(nullable = false, length = 20)
     private SubscriptionStatus status;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "plan_type", nullable = false, length = 20)
-    private PlanType planType;
-
     @Builder
     public Subscription(Payment payment, User user, LocalDateTime startAt,
                         LocalDateTime endAt, LocalDateTime nextResetAt,
                         int remainingFreeCount, Boolean autoRenew,
-                        SubscriptionStatus status, PlanType planType) {
+                        SubscriptionStatus status) {
         this.payment = payment;
         this.user = user;
         this.startAt = startAt;
@@ -65,14 +60,13 @@ public class Subscription {
         this.remainingFreeCount = remainingFreeCount;
         this.autoRenew = autoRenew;
         this.status = status;
-        this.planType = planType;
     }
 
     public void updateAutoRenew(Boolean autoRenew) {
         this.autoRenew = autoRenew;
     }
 
-    public void updateRemainingFreeCount(int remainingFreeCount) {
+    public void updateRemainingFreeCount(Integer remainingFreeCount) {
         this.remainingFreeCount = remainingFreeCount;
     }
 
@@ -80,7 +74,6 @@ public class Subscription {
         this.status = status;
     }
 
-    // 코스 무료 결제 3회
     public void renew(LocalDateTime newEndAt, LocalDateTime newNextResetAt) {
         this.endAt = newEndAt;
         this.nextResetAt = newNextResetAt;

@@ -232,10 +232,3 @@ gradle-app.setting
 *.hprof
 
 # End of https://www.toptal.com/developers/gitignore/api/windows,java,git,database,gradle,intellij+all
-
-# uploads 폴더 내의 모든 파일을 무시
-/uploads/**
-
-# 하지만 .gitkeep 파일들은 예외로 두어 폴더 구조를 유지
-!/uploads/.gitkeep
-!/uploads/**/.gitkeep
