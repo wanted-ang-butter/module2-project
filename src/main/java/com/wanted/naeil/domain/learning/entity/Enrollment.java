@@ -1,19 +1,15 @@
 package com.wanted.naeil.domain.learning.entity;
 
 import com.wanted.naeil.domain.course.entity.Course;
+import com.wanted.naeil.domain.learning.entity.enums.EnrollmentStatus;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
+import lombok.*;
 
 @Entity
 @Table(
-        name = "enrollment",
+        name = "enrollments",
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "uk_enrollment_user_course",
@@ -39,19 +35,23 @@ public class Enrollment extends BaseTimeEntity {
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private EnrollmentStatus status;
 
-    // 진도율 (%)
     @Column(name = "courses_rate", nullable = false)
-    private Integer coursesRate;
+    private double coursesRate;
+
+    @Builder
+    public Enrollment(User user, Course course, EnrollmentStatus status, double coursesRate) {
+        this.user = user;
+        this.course = course;
+        this.status = status;
+        this.coursesRate = coursesRate;
+    }
 
     // 진도율 업데이트
-    public void updateProgress(Integer rate) {
+    public void updateProgress(double rate) {
         this.coursesRate = rate;
     }
 

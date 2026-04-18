@@ -1,6 +1,7 @@
 package com.wanted.naeil.domain.learning.entity;
 
 import com.wanted.naeil.domain.course.entity.Section;
+import com.wanted.naeil.domain.learning.entity.enums.ProgressStatus;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -30,6 +31,7 @@ public class LearningProgress extends BaseTimeEntity {
     private Section section;
 
     @Column(nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
     private ProgressStatus status; // IN_PROGRESS, COMPLETED
 
     @Column(name = "last_accessed_at")

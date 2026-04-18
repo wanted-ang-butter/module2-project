@@ -1,5 +1,6 @@
 package com.wanted.naeil.domain.course.entity;
 
+import com.wanted.naeil.domain.course.entity.enums.CourseStatus;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -40,8 +41,9 @@ public class Course extends BaseTimeEntity {
     private String description;
 
     @Column(nullable = false)
-    private Integer price;
+    private int price;
 
+    @Column(nullable = false)
     private String thumbnail;
 
     @Enumerated(EnumType.STRING)
@@ -52,8 +54,10 @@ public class Course extends BaseTimeEntity {
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
 
+    // 비지니스 로직
+
     @Builder
-    public Course(User instructor, Category category, String title, String description, Integer price, String thumbnail) {
+    public Course(User instructor, Category category, String title, String description, int price, String thumbnail) {
         this.instructor = instructor;
         this.category = category;
         this.title = title;
@@ -62,6 +66,8 @@ public class Course extends BaseTimeEntity {
         this.thumbnail = thumbnail;
         this.status = CourseStatus.PENDING; // 초기 생성 시 승인 대기 상태
     }
+
+
 
     // 비즈니스 로직
     public void activate() {

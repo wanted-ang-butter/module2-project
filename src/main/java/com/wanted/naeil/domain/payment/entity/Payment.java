@@ -1,8 +1,9 @@
 package com.wanted.naeil.domain.payment.entity;
 
+import com.wanted.naeil.domain.payment.entity.enums.PaymentStatus;
 import com.wanted.naeil.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "payment")
+@Table(name = "payments")
 @Getter
 @NoArgsConstructor
 public class Payment {
@@ -26,13 +27,13 @@ public class Payment {
     private User user;
 
     @Column(name = "total_amount", nullable = false)
-    private int totalAmount;   // 총 원가
+    private int totalAmount;
 
     @Column(name = "discount_amount", nullable = false)
-    private int discountAmount; // 총 할인금액
+    private int discountAmount;
 
     @Column(name = "final_amount", nullable = false)
-    private int finalAmount;   // 최종 결제 금액
+    private int finalAmount;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -44,6 +45,9 @@ public class Payment {
     @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PaymentItem> paymentItems = new ArrayList<>();
 
+    // 비지니스 로직
+
+    @Builder
     public Payment(User user, int totalAmount, int discountAmount, int finalAmount) {
         this.user = user;
         this.totalAmount = totalAmount;
@@ -52,11 +56,10 @@ public class Payment {
         this.status = PaymentStatus.READY;
     }
 
-    // TODO : 로직 뭔지 찾아보기
-//    public void addPaymentItem(PaymentItemType paymentItemType) {
-//        this.paymentItems.add(paymentItemType);
-//        paymentItemType.assignPayment(this);
-//    }
+    public void addPaymentItem(PaymentItem paymentItem) {
+        this.paymentItems.add(paymentItem);
+        paymentItem.assignPayment(this);
+    }
 
     public void markSuccess() {
         this.status = PaymentStatus.SUCCESS;

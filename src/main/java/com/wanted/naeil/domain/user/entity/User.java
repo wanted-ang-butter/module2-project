@@ -1,8 +1,9 @@
 package com.wanted.naeil.domain.user.entity;
 
+import com.wanted.naeil.domain.user.entity.enums.Role;
+import com.wanted.naeil.domain.user.entity.enums.UserStatus;
 import com.wanted.naeil.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -56,13 +57,32 @@ public class User extends BaseTimeEntity {
     private UserStatus status;
 
     @Column(name = "warning_count", nullable = false)
-    private Integer warningCount;
+    private int warningCount;
 
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
+
+    // 비밀번호 세팅용 체이닝 메서드
+    public User password(String password) {
+        this.password = password;
+        return this;
+    }
+
+    // 권한 세팅용 체이닝 메서드
+    public User role(Role role) {
+        this.role = role;
+        return this;
+    }
+
+    // 상태 세팅용 체이닝 메서드
+    public User status(UserStatus status) {
+        this.status = status;
+        return this;
+    }
+
     @Builder
-    public User(String username, String password, String name, String nickname, String email, String phone, LocalDate birthDate) {
+    public User(String username, String password, String name, String nickname, String email, String phone, LocalDate birthDate, String profileImg) {
         this.username = username;
         this.password = password;
         this.name = name;
@@ -73,8 +93,10 @@ public class User extends BaseTimeEntity {
         this.role = Role.USER;          // 기본 권한
         this.status = UserStatus.ACTIVE; // 기본 상태
         this.warningCount = 0;          // 경고 횟수 초기화
+        this.profileImg = profileImg;
     }
 
+    // 비즈니스 로직
     // 경고 올리기
     public void addWarning() {
         this.warningCount++;
@@ -87,4 +109,16 @@ public class User extends BaseTimeEntity {
     public void changeRole(Role newRole) {
         this.role = newRole;
     }
+
+
+    // 블랙리스트 등록 성민 수정
+    public void ban() {
+        this.status = UserStatus.BANNED;
+    }
+
+    // 블랙리스트 해제 성민 수정
+    public void unban() {
+        this.status = UserStatus.ACTIVE;
+    }
 }
+

@@ -1,5 +1,7 @@
 package com.wanted.naeil.domain.course.entity;
 
+import com.wanted.naeil.domain.course.entity.enums.SectionStatus;
+import com.wanted.naeil.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -7,13 +9,15 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import java.time.LocalTime;
+
 @Entity
 @Table(name = "sections")
 @Getter
 @NoArgsConstructor
 @SQLDelete(sql = "UPDATE sections SET deleted_at = CURRENT_TIMESTAMP WHERE section_id = ?")
 @Where(clause = "deleted_at IS NULL")
-public class Section {
+public class Section extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,14 +34,14 @@ public class Section {
     @Column(name = "video_url", length = 500)
     private String videoUrl;
 
-    @Column(name = "play_time")
-    private Integer playTime;
+    @Column(name = "play_time", nullable = false)
+    private LocalTime playTime;
 
     @Column(name = "attachment_url", length = 500)
     private String attachmentUrl;
 
     @Column(nullable = false)
-    private Integer sequence; // 강의 순서
+    private int sequence; // 강의 순서
 
     @Column(name = "is_free", nullable = false)
     private Boolean isFree;
@@ -46,18 +50,21 @@ public class Section {
     @Column(nullable = false, length = 20)
     private SectionStatus status;
 
+    // === 비지니스 로직 ===
+
     @Builder
-    public Section(Course course, String title, String videoUrl, Integer playTime, String attachmentUrl, Integer sequence, Boolean isFree) {
+    public Section(Course course, String title, String videoUrl, LocalTime playTime, String attachmentUrl, int sequence, Boolean isFree, SectionStatus status) {
         this.course = course;
         this.title = title;
         this.videoUrl = videoUrl;
         this.playTime = playTime;
         this.attachmentUrl = attachmentUrl;
         this.sequence = sequence;
+        this.status = status;
         this.isFree = (isFree != null) ? isFree : false;
     }
 
-    public void updateSequence(Integer newSequence) {
+    public void updateSequence(int newSequence) {
         this.sequence = newSequence;
     }
 

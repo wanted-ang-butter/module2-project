@@ -1,13 +1,14 @@
 package com.wanted.naeil.domain.payment.entity;
 
 import com.wanted.naeil.domain.course.entity.Course;
+import com.wanted.naeil.domain.payment.entity.enums.PaymentItemType;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "payment_item")
+@Table(name = "payment_items")
 @Getter
 @NoArgsConstructor
 public class PaymentItem {
@@ -38,7 +39,10 @@ public class PaymentItem {
     @Column(name = "final_price", nullable = false)
     private int finalPrice;
 
-    public PaymentItem(Course course, PaymentItemType itemType, int price, int discountAmount, Integer finalPrice) {
+    // 비지니스 로직
+
+    @Builder
+    public PaymentItem(Course course, PaymentItemType itemType, int price, int discountAmount, int finalPrice) {
         this.course = course;
         this.itemType = itemType;
         this.price = price;

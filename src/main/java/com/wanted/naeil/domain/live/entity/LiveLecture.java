@@ -1,5 +1,6 @@
 package com.wanted.naeil.domain.live.entity;
 
+import com.wanted.naeil.domain.live.entity.enums.LiveLectureStatus;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -31,10 +32,10 @@ public class LiveLecture extends BaseTimeEntity {
     private String description;
 
     @Column(name = "max_capacity", nullable = false)
-    private Integer maxCapacity;
+    private int maxCapacity;
 
     @Column(name = "current_count", nullable = false)
-    private Integer currentCount;
+    private int currentCount;
 
     @Column(name = "reservation_start_at")
     private LocalDateTime reservationStartAt;
@@ -48,12 +49,12 @@ public class LiveLecture extends BaseTimeEntity {
     @Column(name = "streaming_url", length = 500)
     private String streamingUrl;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private LiveLectureStatus status;
+    @Enumerated(EnumType.STRING)
+    private LiveLectureStatus status; // RESERVED, CANCELED
 
     @Builder
-    public LiveLecture(User instructor, String title, String description, Integer maxCapacity,
+    public LiveLecture(User instructor, String title, String description, int maxCapacity,
                        LocalDateTime reservationStartAt, LocalDateTime startAt, LocalDateTime endAt) {
         this.instructor = instructor;
         this.title = title;
