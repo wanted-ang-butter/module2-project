@@ -40,7 +40,6 @@ public class GlobalExceptionHandler {
         mv.setViewName(DEFAULT_ERROR_VIEW);
         return mv;
     }
-
     // 404 에러, 데이터 not found
     @ExceptionHandler(NoSuchElementException.class)
     protected ModelAndView handleNoSuchElementException(NoSuchElementException e) {

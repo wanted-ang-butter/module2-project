@@ -26,16 +26,12 @@ public class AdminCategoryController {
                 adminCategoryService.createCategory(request.getName());
     }
     @PatchMapping("/{id}")
-    public CategoryResponse
-    updateCategory(@PathVariable Long id,@RequestBody CategoryRequest request)
-    {
+    public CategoryResponse updateCategory(@PathVariable Long id,@RequestBody CategoryRequest request) {
         return
     adminCategoryService.updateCategory(id, request.getName());
     }
     @DeleteMapping("/{id}")
-    public void
-    deleteCategory(@PathVariable Long id)
-    {
+    public void deleteCategory(@PathVariable Long id) {
         adminCategoryService.deleteCategory(id);
     }
 

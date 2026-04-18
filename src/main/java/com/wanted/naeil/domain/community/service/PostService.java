@@ -6,7 +6,7 @@ import com.wanted.naeil.domain.community.dto.response.PostDetailResponse;
 import com.wanted.naeil.domain.community.dto.response.PostListResponse;
 import com.wanted.naeil.domain.community.entity.Like;
 import com.wanted.naeil.domain.community.entity.Post;
-import com.wanted.naeil.domain.community.entity.PostCategory;
+import com.wanted.naeil.domain.community.entity.enums.PostCategory;
 import com.wanted.naeil.domain.community.repository.LikeRepository;
 import com.wanted.naeil.domain.community.repository.PostRepository;
 import com.wanted.naeil.domain.course.entity.Course;

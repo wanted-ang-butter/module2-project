@@ -120,5 +120,22 @@ public class User extends BaseTimeEntity {
     public void unban() {
         this.status = UserStatus.ACTIVE;
     }
+    // 학생 활성화 성민 수정
+    public void activate() {
+        this.status = UserStatus.ACTIVE;
+    }
+    // 학생 비활성화 성민 수정
+    public void deactivate() {
+        this.status = UserStatus.INACTIVE;
+    }
+    // 경고 횟수 초기화 성민 수정
+    public void resetWarning() {
+        this.warningCount = 0;
+        if (this.status == UserStatus.BANNED){
+            this.status = UserStatus.ACTIVE;
+        }
+    }
+
+
 }
 
