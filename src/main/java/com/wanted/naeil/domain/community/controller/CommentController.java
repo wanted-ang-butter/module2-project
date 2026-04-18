@@ -1,6 +1,6 @@
 package com.wanted.naeil.domain.community.controller;
 
-import com.wanted.naeil.domain.auth.model.dto.AuthDetails;
+import com.wanted.naeil.global.auth.model.dto.AuthDetails;
 import com.wanted.naeil.domain.community.dto.request.CommentCreateRequest;
 import com.wanted.naeil.domain.community.dto.request.CommentUpdateRequest;
 import com.wanted.naeil.domain.community.service.CommentService;
