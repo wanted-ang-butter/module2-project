@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -34,7 +35,22 @@ public class LikeController {
         User loginUser = getLoginUser(authDetails);
         String redirectUrl = likeService.addLike(request, loginUser);
 
-        mv.setViewName("redirect: " + redirectUrl);
+        mv.setViewName("redirect:" + redirectUrl);
+        return mv;
+    }
+
+    // 좋아요 취소
+    @PostMapping("/likes/{likeId}/delete")
+    public ModelAndView deleteLike(@PathVariable Long likeId,
+                                   @AuthenticationPrincipal AuthDetails authDetails,
+                                   ModelAndView mv) {
+
+        log.info("[좋아요 취소] likeId: {}", likeId);
+
+        User loginUser = getLoginUser(authDetails);
+        String redirectUrl = likeService.deleteLike(likeId, loginUser);
+
+        mv.setViewName("redirect:" + redirectUrl);
         return mv;
     }
 

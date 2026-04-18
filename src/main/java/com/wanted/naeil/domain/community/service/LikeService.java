@@ -11,6 +11,7 @@ import com.wanted.naeil.domain.course.repository.CourseRepository;
 import com.wanted.naeil.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,5 +65,24 @@ public class LikeService {
         } else {
             throw new IllegalArgumentException("지원하지 않는 좋아요 대상입니다.");
         }
+    }
+
+    // 좋아요 취소
+    @Transactional
+    public String deleteLike(Long likeId, User loginUser) {
+
+        Like like = likeRepository.findById(likeId)
+                .orElseThrow(() -> new NoSuchElementException("해당 좋아요를 찾을 수 없습니다."));
+
+        if (!like.getUser().getId().equals(loginUser.getId())) {
+            throw new AccessDeniedException("해당 기능에 대한 접속 권한이 없습니다.");
+        }
+
+        String redirectUrl = like.getTargetType() == LikeTargetType.POST
+                ? "/community/" + like.getPost().getCategory().name().toLowerCase() + "/" + like.getPost().getPostId()
+                : "/courses/" + like.getCourse().getId();
+
+        likeRepository.delete(like);
+        return redirectUrl;
     }
 }
