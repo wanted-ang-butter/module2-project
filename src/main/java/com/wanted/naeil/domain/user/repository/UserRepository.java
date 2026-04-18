@@ -11,13 +11,17 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // 사용자 ID가 이미 존재하는지 확인 (중복 ID 체크)
     boolean existsByUsername(String userId);
 
-    // 2. 이메일 중복 체크
+    // 이메일 중복 체크
     boolean existsByEmail(String email);
 
-    // 3. 닉네임 중복 체크
+    // 닉네임 중복 체크
     boolean existsByNickname(String nickname);
 
     // 사용자 ID로 사용자 찾기(username 이 id 임)
     Optional<User> findByUsername(String username);
+
+    Optional<User> findByEmailAndPhone(String email, String phone);
+
+    Optional<User> findByUsernameAndPhone(String username, String phone);
 
 }

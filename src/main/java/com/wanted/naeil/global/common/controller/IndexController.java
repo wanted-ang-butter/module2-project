@@ -1,7 +1,7 @@
 package com.wanted.naeil.global.common.controller;
 
-import com.wanted.naeil.domain.auth.model.dto.AuthDetails;
-import com.wanted.naeil.domain.user.entity.Role;
+import com.wanted.naeil.global.auth.model.dto.AuthDetails;
+import com.wanted.naeil.domain.user.entity.enums.Role;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Slf4j
 public class IndexController {
 
-    @GetMapping(value = {"/", "/main", "/dashboard"})
+    @GetMapping(value = {"/", "/dashboard"})
     public String mainPage(@AuthenticationPrincipal AuthDetails authDetails) {
 
         if (authDetails == null) {

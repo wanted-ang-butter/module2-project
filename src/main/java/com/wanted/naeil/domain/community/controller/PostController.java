@@ -1,16 +1,16 @@
 package com.wanted.naeil.domain.community.controller;
 
-import com.wanted.naeil.domain.auth.model.dto.AuthDetails;
+import com.wanted.naeil.global.auth.model.dto.AuthDetails;
 import com.wanted.naeil.domain.community.dto.request.PostCreateRequest;
 import com.wanted.naeil.domain.community.dto.request.PostUpdateRequest;
 import com.wanted.naeil.domain.community.dto.response.PostDetailResponse;
 import com.wanted.naeil.domain.community.dto.response.PostListResponse;
-import com.wanted.naeil.domain.community.entity.PostCategory;
+import com.wanted.naeil.domain.community.entity.enums.PostCategory;
 import com.wanted.naeil.domain.community.service.PostService;
 import com.wanted.naeil.domain.course.entity.Course;
 import com.wanted.naeil.domain.learning.entity.Enrollment;
 import com.wanted.naeil.domain.learning.repository.EnrollmentRepository;
-import com.wanted.naeil.domain.user.entity.Role;
+import com.wanted.naeil.domain.user.entity.enums.Role;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.domain.user.repository.UserRepository;
 import com.wanted.naeil.global.common.exception.CustomException;

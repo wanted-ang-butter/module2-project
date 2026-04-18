@@ -1,6 +1,7 @@
 package com.wanted.naeil.domain.payment.entity;
 
 import com.wanted.naeil.domain.course.entity.Course;
+import com.wanted.naeil.domain.payment.entity.enums.PaymentItemType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
