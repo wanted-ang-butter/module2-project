@@ -118,7 +118,8 @@
           </div>
 
           <div class="flex items-center gap-3 flex-shrink-0">
-            <a th:href="@{/instructor/course/{id}(id=${course.courseId})}"
+<!--            추후 강사 전용 조회로 수정하기-->
+            <a th:href="@{/course/{id}(id=${course.courseId})}"
                href="/instructor/course/1"
                class="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-blue-300 text-blue-600 transition-all hover:bg-blue-50"
                title="조회">
