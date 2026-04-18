@@ -2,11 +2,13 @@ package com.wanted.naeil.domain.community.service;
 
 import com.wanted.naeil.domain.community.dto.request.PostCreateRequest;
 import com.wanted.naeil.domain.community.dto.request.PostUpdateRequest;
+import com.wanted.naeil.domain.community.dto.response.CommentResponse;
 import com.wanted.naeil.domain.community.dto.response.PostDetailResponse;
 import com.wanted.naeil.domain.community.dto.response.PostListResponse;
 import com.wanted.naeil.domain.community.entity.Like;
 import com.wanted.naeil.domain.community.entity.Post;
 import com.wanted.naeil.domain.community.entity.enums.PostCategory;
+import com.wanted.naeil.domain.community.repository.CommentRepository;
 import com.wanted.naeil.domain.community.repository.LikeRepository;
 import com.wanted.naeil.domain.community.repository.PostRepository;
 import com.wanted.naeil.domain.course.entity.Course;
@@ -32,6 +34,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final LikeRepository likeRepository;
     private final CourseRepository courseRepository;
+    private final CommentRepository commentRepository;
 
     // 글 목록 조회
     @Transactional(readOnly = true)
@@ -54,7 +57,7 @@ public class PostService {
     @Transactional
     public PostDetailResponse getPost(Long postId, User loginUser) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new NoSuchElementException("게시글이 존재하지 않습니다."));
+                .orElseThrow(() -> new NoSuchElementException("비공개 처리 되었거나 삭제된 게시글입니다."));
 
         post.increaseViewCount();
 
@@ -70,7 +73,13 @@ public class PostService {
         }
 
         long likeCount = likeRepository.countByPost(post);
-        return PostDetailResponse.from(post, likeCount, isLiked, likeId);
+
+        List<CommentResponse> comments = commentRepository.findByPostOrderByCreatedAtAsc(post)
+                .stream()
+                .map(CommentResponse::from)
+                .collect(Collectors.toList());
+
+        return PostDetailResponse.from(post, likeCount, isLiked, likeId, comments);
     }
 
     // 글 작성
@@ -79,7 +88,7 @@ public class PostService {
         Course course = null;
         if (request.getCourseId() != null) {
             course = courseRepository.findById(request.getCourseId())
-                    .orElseThrow(() -> new NoSuchElementException("해당 코스가 존재하지 않습니다."));
+                    .orElseThrow(() -> new NoSuchElementException("연결하려는 강의 정보를 찾을 수 없습니다."));
         }
 
         Post post = Post.builder()
@@ -116,8 +125,7 @@ public class PostService {
         boolean isAdmin = loginUser.getRole() == Role.ADMIN;
 
         if (!isOwner && !isAdmin) {
-            // TODO : 현지야 이거 멘트 알맞게 수정해줘. 임시로 해놨어, 전체적인 에러 메시지 다 수정해줘
-            throw new AccessDeniedException("해당 기능에 대한 접속 권한이 없습니다.");
+            throw new AccessDeniedException("해당 게시물에 삭제 권한이 없습니다.");
         }
 
         postRepository.delete(post); // 엔티티의 @SQLDelete가 작동함
@@ -127,7 +135,7 @@ public class PostService {
     @Transactional
     public void toggleResolved(Long postId, User loginUser) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new NoSuchElementException("게시글을 조회할 수 없습니다."));
+                .orElseThrow(() -> new NoSuchElementException("해당 게시글이 존재하지 않습니다."));
 
         validateOwner(post, loginUser);
         post.toggleResolved();

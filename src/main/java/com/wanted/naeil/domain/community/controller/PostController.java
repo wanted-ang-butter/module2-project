@@ -223,8 +223,7 @@ public class PostController {
         return mv;
     }
 
-//     공통 메서드 (로그인 유저 꺼내는)
-    // TODO : 현지 이거, 나중에 예외처리 로직 수정하기
+    // 공통 메서드 (로그인 유저 꺼내는)
     private User getLoginUser(AuthDetails authDetails) {
         if (authDetails == null) return null;
         return userRepository.findByUsername(authDetails.getLoginUserDTO().getUsername())
