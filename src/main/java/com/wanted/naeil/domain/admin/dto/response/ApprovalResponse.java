@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
@@ -30,6 +31,19 @@ public class ApprovalResponse {
     private String description;
     private Integer maxCapacity;
     private LocalDateTime startAt;
+    private Integer requestedAmount;
+    private Integer platformFee;
+    private Integer finalAmount;
+    private String settlementMonth;
+    private List<SettlementDetailInfo> settlementDetails;
+
+    @Getter
+    @Builder
+    public static class SettlementDetailInfo {
+        private String courseName;
+        private int saleCount;
+        private int totalSalesAmount;
+    }
 
 
 

@@ -61,11 +61,11 @@
                         </div>
                     </div>
                 </div>
+                <a th:href="@{/auth/logout}" class="flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-red-50 transition-all group">
+                    <i class="fa-solid fa-right-from-bracket text-gray-600 group-hover:text-red-600 text-sm"></i>
+                    <span class="font-medium text-gray-700 group-hover:text-red-600 text-sm">로그아웃</span>
+                </a>
             </nav>
-            <a th:href="@{/auth/logout}" class="flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-red-50 transition-all group">
-                <i class="fa-solid fa-right-from-bracket text-gray-600 group-hover:text-red-600 text-sm"></i>
-                <span class="font-medium text-gray-700 group-hover:text-red-600 text-sm">로그아웃</span>
-            </a>
         </div>
     </div>
 </header>
@@ -96,6 +96,7 @@
 
     <!-- Main -->
     <main class="flex-1">
+        <button onclick="history.back()" class="flex items-center gap-2 px-4 py-2 border-2 border-gray-200 rounded-xl text-gray-700 hover:bg-gray-100 font-medium text-sm mb-4"><i class="fa-solid fa-arrow-left text-sm"></i>뒤로가기</button>
         <h1 class="text-4xl font-black text-gray-900 mb-8">실시간 강의 승인 관리</h1>
 
         <!-- Stats -->

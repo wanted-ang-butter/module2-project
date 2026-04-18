@@ -61,11 +61,11 @@
                         </div>
                     </div>
                 </div>
+                <a th:href="@{/auth/logout}" class="flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-red-50 transition-all group">
+                    <i class="fa-solid fa-right-from-bracket text-gray-600 group-hover:text-red-600 text-sm"></i>
+                    <span class="font-medium text-gray-700 group-hover:text-red-600 text-sm">로그아웃</span>
+                </a>
             </nav>
-            <a th:href="@{/auth/logout}" class="flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-red-50 transition-all group">
-                <i class="fa-solid fa-right-from-bracket text-gray-600 group-hover:text-red-600 text-sm"></i>
-                <span class="font-medium text-gray-700 group-hover:text-red-600 text-sm">로그아웃</span>
-            </a>
         </div>
     </div>
 </header>
@@ -73,6 +73,8 @@
 <div class="max-w-7xl mx-auto px-6 py-12">
 
     <div class="mb-12">
+
+        <button onclick="history.back()" class="flex items-center gap-2 px-4 py-2 border-2 border-gray-200 rounded-xl text-gray-700 hover:bg-gray-100 font-medium text-sm mb-4"><i class="fa-solid fa-arrow-left text-sm"></i>뒤로가기</button>
 
         <!-- Admin Hero Banner -->
         <div class="relative overflow-hidden mb-8">
@@ -171,30 +173,44 @@
                         <span th:unless="${user.warningCount > 0}" class="text-gray-400 text-xs">없음</span>
                     </td>
                     <td class="px-4 py-3">
-                        <div class="flex gap-1 flex-wrap">
+                        <div class="flex gap-1 items-center">
                             <!-- 활성화/비활성화 -->
                             <form th:if="${user.status.name() == 'ACTIVE'}" method="post"
                                   th:action="@{/admin/user-management/{id}/deactivate(id=${user.id})}">
-                                <button type="submit" class="px-2 py-1 bg-gray-200 text-gray-700 rounded-lg text-xs font-bold hover:bg-gray-300">비활성화</button>
+                                <button type="submit" title="비활성화"
+                                        class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors">
+                                    <i class="fa-solid fa-toggle-on text-sm"></i>
+                                </button>
                             </form>
                             <form th:unless="${user.status.name() == 'ACTIVE'}" method="post"
                                   th:action="@{/admin/user-management/{id}/activate(id=${user.id})}">
-                                <button type="submit" class="px-2 py-1 bg-green-100 text-green-700 rounded-lg text-xs font-bold hover:bg-green-200">활성화</button>
+                                <button type="submit" title="활성화"
+                                        class="w-8 h-8 flex items-center justify-center rounded-full bg-green-100 text-green-600 hover:bg-green-200 transition-colors">
+                                    <i class="fa-solid fa-toggle-off text-sm"></i>
+                                </button>
                             </form>
                             <!-- 블랙리스트 -->
-                            <button type="button"
+                            <button type="button" title="블랙리스트 추가"
                                     th:attr="data-uid=${user.id}, data-uname=${user.name}"
                                     onclick="openBlacklistModal(this.dataset.uid, this.dataset.uname)"
-                                    class="px-2 py-1 bg-red-100 text-red-600 rounded-lg text-xs font-bold hover:bg-red-200">블랙</button>
+                                    class="w-8 h-8 flex items-center justify-center rounded-full bg-red-100 text-red-500 hover:bg-red-200 transition-colors">
+                                <i class="fa-solid fa-ban text-sm"></i>
+                            </button>
                             <!-- 경고 초기화 -->
                             <form method="post" th:action="@{/admin/user-management/{id}/reset-warning(id=${user.id})}">
-                                <button type="submit" class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-lg text-xs font-bold hover:bg-yellow-200">경고초기화</button>
+                                <button type="submit" title="경고 초기화"
+                                        class="w-8 h-8 flex items-center justify-center rounded-full bg-yellow-100 text-yellow-600 hover:bg-yellow-200 transition-colors">
+                                    <i class="fa-solid fa-triangle-exclamation text-sm"></i>
+                                </button>
                             </form>
                             <!-- 삭제 (비활성 회원만) -->
                             <form th:if="${user.status.name() == 'INACTIVE'}" method="post"
                                   th:action="@{/admin/user-management/{id}/delete(id=${user.id})}"
                                   onsubmit="return confirm('삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')">
-                                <button type="submit" class="px-2 py-1 bg-gray-100 text-gray-500 rounded-lg text-xs font-bold hover:bg-gray-200">삭제</button>
+                                <button type="submit" title="회원 삭제"
+                                        class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors">
+                                    <i class="fa-solid fa-trash text-sm"></i>
+                                </button>
                             </form>
                         </div>
                     </td>
@@ -248,15 +264,15 @@
     function openBlacklistModal(userId, userName) {
         document.getElementById('blacklist-user-name').textContent = userName;
         document.getElementById('blacklist-form').action = '/admin/user-management/' + userId + '/blacklist';
-        document.getElementById('blacklist-modal').classList.remove('hidden');
+        document.getElementById('blacklist-modal').style.display = 'flex';
     }
     function closeBlacklistModal() {
-        document.getElementById('blacklist-modal').classList.add('hidden');
+        document.getElementById('blacklist-modal').style.display = 'none';
     }
     var modal = document.getElementById('blacklist-modal');
     if (modal) {
         modal.addEventListener('click', function(e) {
-            if (e.target === this) this.classList.add('hidden');
+            if (e.target === this) this.style.display = 'none';
         });
     }
 </script>
