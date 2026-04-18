@@ -30,7 +30,7 @@ public interface CourseRepository extends JpaRepository <Course, Long> {
     List<CourseListResponse> findAllWithStatus();
 
 
-    @EntityGraph(attributePaths = {"category", "instructor", "sections"})
+    @EntityGraph(attributePaths = {"category", "instructor"})
     Optional<Course> findCourseDetailsById(@Param("courseId") Long courseId);
 
     @Query("SELECT COUNT(l) FROM Like l where l.course.id = :courseId")
