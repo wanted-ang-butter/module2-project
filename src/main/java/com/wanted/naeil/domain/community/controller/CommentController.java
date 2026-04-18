@@ -2,7 +2,7 @@ package com.wanted.naeil.domain.community.controller;
 
 import com.wanted.naeil.domain.auth.model.dto.AuthDetails;
 import com.wanted.naeil.domain.community.dto.request.CommentCreateRequest;
-import com.wanted.naeil.domain.community.repository.CommentRepository;
+import com.wanted.naeil.domain.community.dto.request.CommentUpdateRequest;
 import com.wanted.naeil.domain.community.service.CommentService;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.domain.user.repository.UserRepository;
@@ -26,7 +26,7 @@ public class CommentController {
 
     private final CommentService commentService;
     private final UserRepository userRepository;
-    
+
     // 댓글 작성
     @PostMapping("/{category}/{postId}/comments")
     public ModelAndView createComment(@PathVariable String category,
@@ -44,6 +44,25 @@ public class CommentController {
         return mv;
     }
 
+    // 댓글 수정
+    @PostMapping("/{category}/{postId}/comments/{commentId}/update")
+    public ModelAndView updateComment(@PathVariable String category,
+                                      @PathVariable Long postId,
+                                      @PathVariable Long commentId,
+                                      @ModelAttribute CommentUpdateRequest request,
+                                      @AuthenticationPrincipal AuthDetails authDetails,
+                                      ModelAndView mv) {
+
+        log.info("[댓글 수정] commentId: {}", commentId);
+
+        User loginUser = getLoginUser(authDetails);
+        commentService.updateComment(commentId, request, loginUser);
+        mv.setViewName("redirect:/community/" + category + "/" + postId);
+
+        return mv;
+    }
+
+    // 공통 메서드
     private User getLoginUser(AuthDetails authDetails) {
         if (authDetails == null) return null;
         return userRepository.findByUsername(authDetails.getLoginUserDTO().getUsername())

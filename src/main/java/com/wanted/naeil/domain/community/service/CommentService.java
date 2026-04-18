@@ -1,6 +1,7 @@
 package com.wanted.naeil.domain.community.service;
 
 import com.wanted.naeil.domain.community.dto.request.CommentCreateRequest;
+import com.wanted.naeil.domain.community.dto.request.CommentUpdateRequest;
 import com.wanted.naeil.domain.community.entity.Comment;
 import com.wanted.naeil.domain.community.entity.Post;
 import com.wanted.naeil.domain.community.repository.CommentRepository;
@@ -40,6 +41,21 @@ public class CommentService {
                 .build();
 
         commentRepository.save(comment);
+    }
+
+    // 댓글 수정
+    @Transactional
+    public void updateComment(Long commentId, CommentUpdateRequest request, User loginUser) {
+
+        if (request.getContent() == null || request.getContent().isBlank()) {
+            throw new IllegalArgumentException("내용을 입력해주세요.");
+        }
+
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new NoSuchElementException("해당 댓글이 존재하지 않습니다."));
+
+        validateOwner(comment, loginUser);
+        comment.update(request.getContent());
     }
 
     // 권한 검증 공통 메서드
