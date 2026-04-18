@@ -1,10 +1,7 @@
 package com.wanted.naeil.domain.course.service;
 
 import com.wanted.naeil.domain.course.dto.request.CourseCreateRequest;
-import com.wanted.naeil.domain.course.dto.response.CourseDetailsResponse;
-import com.wanted.naeil.domain.course.dto.response.CourseListResponse;
-import com.wanted.naeil.domain.course.dto.response.CreateCourseResponse;
-import com.wanted.naeil.domain.course.dto.response.SectionResponse;
+import com.wanted.naeil.domain.course.dto.response.*;
 import com.wanted.naeil.domain.course.entity.Category;
 import com.wanted.naeil.domain.course.entity.Course;
 import com.wanted.naeil.domain.course.repository.CategoryRepository;
@@ -36,7 +33,7 @@ public class CourseService {
     private final SectionService sectionService;
     private final ModelMapper modelMapper;
 
-    // 코스 생성 - 관리자
+    // 코스 생성 - 강사
     @Transactional
     public CreateCourseResponse createCourse(Long instructorId, CourseCreateRequest request) throws AccessDeniedException {
 
@@ -76,7 +73,7 @@ public class CourseService {
             throw new IllegalArgumentException("최소 0원 이상의 가격을 입력해주세요.");
         }
 
-        // TODO : 썸네일 파일 업로드 기능 구현
+        // 섬네일 이미지 업로드
         MultipartFile thumbnailImage = request.getThumbnail();
         if (thumbnailImage == null || thumbnailImage.isEmpty()) {
             throw new IllegalArgumentException("썸네일 이미지는 필수입니다. 파일을 첨부해주세요.");
@@ -85,7 +82,6 @@ public class CourseService {
         String thumbnailUrl = localFileService.uploadSingleFile(thumbnailImage, "courses");
 
         Course course = Course.builder()
-                // TODO : 추후 승재 구현되면 세션에서 뽑아 쓰기
                 .instructor(instructor)
                 .category(category)
                 .title(request.getTitle())
@@ -107,6 +103,46 @@ public class CourseService {
         return CreateCourseResponse.from(savedCourse, "강의 등록 신청이 완료되었습니다. 관리자 승인 후 강의가 활성화됩니다.");
     }
 
+    // 내가 등록한 강의 조회 - 강사
+    @Transactional(readOnly = true)
+    public List<InstructorCourseResponse> getInstructorCourses(Long instructorId) {
+
+        // 사용자 존재 확인
+        User instructor = userRepository.findById(instructorId)
+                .orElseThrow(() -> new IllegalArgumentException("강사 정보를 찾을 수 없습니다. ID: " + instructorId));
+
+        // 관리자 role값 체크
+        if (instructor.getRole() != Role.INSTRUCTOR && instructor.getRole() != Role.ADMIN) {
+            throw new AccessDeniedException("강사만 접속이 가능합니다.");
+        }
+
+        return courseRepository.findByInstructorIdOrderByCreatedAtDesc(instructorId).stream()
+                .map(course -> {
+                    long studentCount = courseRepository.countStudentsByCourseId(course.getId());
+                    Double avgRating = courseRepository.getAverageRatingByCourseId(course.getId());
+
+                    return InstructorCourseResponse.of(course, studentCount, avgRating);
+                }).toList();
+    }
+
+    // 코스 수정 페이지 조회 - 강사
+    @Transactional(readOnly = true)
+    public CourseEditResponse getCourseEdit(Long instructorId, Long courseId) {
+
+        // 회원 검증
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new IllegalArgumentException("강사 정보를 찾을 수 없습니다. ID: " + instructorId));
+
+        // 본인 코스 검증
+        validateCourseOwner(course, instructorId);
+        log.info("[courseEdit] 본인 인증 성공 & 수정 페이지 진입, 강사 번호 : {}", instructorId);
+
+        List<CourseEditSectionResponse> sections = sectionService.getSectionEdit(courseId);
+        log.info("[courseEdit] 섹션 조회 성공!");
+
+        return CourseEditResponse.of(course, sections);
+    }
+
     // 강의 전체 조회 - 공통
     @Transactional(readOnly = true)
     public List<CourseListResponse> findAllCourses() {
@@ -126,7 +162,7 @@ public class CourseService {
         Double avgRating = courseRepository.getAverageRatingByCourseId(courseId);
 
         // 섹션 리스트 조회
-        List<SectionResponse> sectionsResponses = sectionService.getSectionsByCourseId(courseId);
+        List<SectionListResponse> sectionsResponses = sectionService.getSectionsByCourseId(courseId);
 
         return CourseDetailsResponse.of(
                 course,
@@ -134,5 +170,12 @@ public class CourseService {
                 likeCount,
                 avgRating,
                 sectionsResponses);
+    }
+
+    // ==== 내부 편의 메서드 ====
+    private void validateCourseOwner(Course course, Long instructorId) {
+        if (!course.getInstructor().getId().equals(instructorId)) {
+            throw new AccessDeniedException("본인이 생성한 강의만 수정할 수 있습니다.");
+        }
     }
 }
