@@ -16,7 +16,7 @@
      th:attr="data-course-id=${courseEdit.courseId}">
 
     <div class="mb-8">
-        <a th:href="@{/instructor/dashboard}"
+        <a th:href="@{/dashboard/instructor}"
            class="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors mb-4">
             <i data-lucide="arrow-left" class="w-4 h-4"></i>
             <span class="text-sm font-medium">강사 메인으로</span>
@@ -268,7 +268,7 @@
 
     <div class="sticky bottom-0 mt-8 bg-gray-50/95 backdrop-blur border-t border-gray-200 py-5">
         <div class="flex justify-end gap-4">
-            <a th:href="@{/instructor/dashboard}"
+            <a th:href="@{/dashboard/instructor}"
                class="px-10 py-4 border-2 border-gray-300 rounded-xl hover:bg-gray-100 transition-all font-black text-gray-700">
                 취소
             </a>
