@@ -3,7 +3,8 @@ package com.wanted.naeil.domain.course.service;
 import com.wanted.naeil.domain.course.dto.CurriculumSectionDTO;
 import com.wanted.naeil.domain.course.dto.SectionStudyMainDTO;
 import com.wanted.naeil.domain.course.dto.request.UploadSectionRequest;
-import com.wanted.naeil.domain.course.dto.response.SectionResponse;
+import com.wanted.naeil.domain.course.dto.response.CourseEditSectionResponse;
+import com.wanted.naeil.domain.course.dto.response.SectionListResponse;
 import com.wanted.naeil.domain.course.dto.response.SectionStudyResponse;
 import com.wanted.naeil.domain.course.entity.Course;
 import com.wanted.naeil.domain.course.entity.Section;
@@ -94,11 +95,11 @@ public class SectionService {
 
     // 섹션 전체 조회
     @Transactional(readOnly = true)
-    public List<SectionResponse> getSectionsByCourseId(Long courseId) {
+    public List<SectionListResponse> getSectionsByCourseId(Long courseId) {
         log.info("[Section] 코스 ID: {}의 섹션 목록 조회", courseId);
 
         return sectionRepository.findByCourseId(courseId).stream()
-                .map(SectionResponse::from)
+                .map(SectionListResponse::from)
                 .collect(Collectors.toList());
     }
 
@@ -164,6 +165,16 @@ public class SectionService {
                         .build())
                 .build();
     }
+
+    // 섹션 수정 로직
+    public List<CourseEditSectionResponse> getSectionEdit(Long courseId) {
+        log.info("[sectionEdit] 섹션 전체 조회 시작");
+
+        return sectionRepository.findByCourseId(courseId).stream()
+                .map(CourseEditSectionResponse::from)
+                .toList();
+    }
+
 
     // ============= 내부 편의 메서드 ================
 

@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>내 강의 관리 | Nae-Il</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      background-color: #f8fafc;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .5);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+  </style>
+</head>
+
+<body>
+<div th:replace="~{fragments/instructorHeader :: instructorHeader}"></div>
+
+<div class="max-w-7xl mx-auto px-6 py-10">
+  <div class="mb-10 pt-8">
+    <a th:href="@{/instructor/dashboard}"
+       href="/instructor/dashboard"
+       class="inline-flex items-center gap-3 text-gray-600 hover:text-blue-600 transition-colors mb-8">
+      <i class="fa-solid fa-arrow-left text-xl"></i>
+      <span class="text-2xl font-bold">이전으로</span>
+    </a>
+
+    <div class="flex items-center justify-between gap-6">
+      <div>
+        <h1 class="text-5xl font-black text-gray-900 mb-5">내 강의 관리</h1>
+        <p class="text-2xl text-gray-600 font-medium">등록한 강의를 조회하고 수정할 수 있습니다</p>
+      </div>
+
+      <a th:href="@{/instructor/course}"
+         href="/instructor/course"
+         class="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-2xl hover:shadow-xl transition-all font-black text-2xl">
+        <i class="fa-solid fa-plus"></i>
+        강의 신청하기
+      </a>
+    </div>
+  </div>
+
+  <section class="mb-16">
+    <div th:if="${courses != null and not #lists.isEmpty(courses)}" class="space-y-4">
+      <div th:each="course : ${courses}"
+           class="bg-white border-2 border-gray-200 rounded-2xl p-6 hover:shadow-xl hover:border-blue-300 transition-all group">
+        <div class="flex items-center gap-6">
+          <img th:src="${course.thumbnail}"
+               th:alt="${course.title}"
+               src="https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400"
+               alt="강의 썸네일"
+               class="w-40 h-24 object-cover rounded-xl border border-gray-200 flex-shrink-0"/>
+
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-3 mb-2">
+              <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold border border-blue-200"
+                    th:text="${course.category}">
+                카테고리
+              </span>
+
+              <span th:if="${course.status != null and course.status.name() == 'ACTIVE'}"
+                    class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">
+                운영중
+              </span>
+
+              <span th:if="${course.status != null and course.status.name() == 'INACTIVE'}"
+                    class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-bold">
+                비활성
+              </span>
+
+              <span th:if="${course.status != null and course.status.name() == 'PENDING'}"
+                    class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold">
+                승인대기
+              </span>
+
+              <span th:if="${course.status != null and course.status.name() == 'REJECTED'}"
+                    class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold">
+                반려
+              </span>
+
+              <span th:if="${course.status == null}"
+                    class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-bold">
+                상태 없음
+              </span>
+            </div>
+
+            <h3 class="text-xl font-black text-gray-900 mb-3 group-hover:text-blue-600 transition-colors truncate"
+                th:text="${course.title}">
+              강의명
+            </h3>
+
+            <div class="flex items-center gap-5 text-sm">
+              <span class="font-bold text-gray-700">
+                <i class="fa-solid fa-users text-gray-500 mr-1"></i>
+                <span th:text="${#numbers.formatInteger(course.studentCount, 1, 'COMMA')}">0</span>명
+              </span>
+
+              <span class="font-bold text-gray-900">
+                <i class="fa-solid fa-star text-yellow-400 mr-1"></i>
+                <span th:text="${course.rating}">0.0</span>
+              </span>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 flex-shrink-0">
+            <a th:href="@{/instructor/course/{id}(id=${course.courseId})}"
+               href="/instructor/course/1"
+               class="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-blue-300 text-blue-600 transition-all hover:bg-blue-50"
+               title="조회">
+              <i class="fa-regular fa-eye"></i>
+            </a>
+
+            <a th:href="@{/instructor/course/{id}/edit(id=${course.courseId})}"
+               href="/instructor/course/1/edit"
+               class="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-green-300 text-green-600 transition-all hover:bg-green-50"
+               title="수정">
+              <i class="fa-regular fa-pen-to-square"></i>
+            </a>
+
+
+            <button type="button"
+                    th:data-id="${course.courseId}"
+                    th:data-title="${course.title}"
+                    th:data-category="${course.category}"
+                    th:data-status="${course.status != null ? course.status.name() : 'NONE'}"
+                    onclick="openDeleteModal(this)"
+                    class="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-red-300 text-red-600 transition-all hover:bg-red-50"
+                    title="삭제">
+              <i class="fa-regular fa-trash-can"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div th:if="${courses == null or #lists.isEmpty(courses)}"
+         class="bg-white rounded-3xl border-2 border-dashed border-gray-200 py-24 text-center">
+      <div class="w-28 h-28 bg-gray-100 rounded-3xl flex items-center justify-center mx-auto mb-8">
+        <span class="text-5xl">📚</span>
+      </div>
+
+      <h3 class="text-3xl font-black text-gray-900 mb-4">등록된 강의가 없습니다</h3>
+      <p class="text-xl text-gray-500 font-medium mb-8">새로운 강의를 등록해보세요</p>
+
+      <a th:href="@{/instructor/course}"
+         href="/instructor/course"
+         class="inline-flex items-center gap-3 px-9 py-4 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-2xl hover:shadow-lg transition-all font-black text-lg">
+        <i class="fa-solid fa-plus"></i>
+        강의 신청하기
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h2 class="text-3xl font-black text-gray-900 mb-2">내 실시간 강의 관리</h2>
+        <p class="text-gray-600 font-medium">등록한 실시간 강의를 조회하고 관리할 수 있습니다</p>
+      </div>
+
+      <a href="#"
+         onclick="alert('실시간 강의 신청 기능은 준비 중입니다.'); return false;"
+         class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-xl hover:shadow-xl transition-all font-bold">
+        <i class="fa-solid fa-plus"></i>
+        실시간 강의 신청하기
+      </a>
+    </div>
+
+    <div th:if="${liveCourses != null and not #lists.isEmpty(liveCourses)}" class="space-y-4">
+      <div th:each="course : ${liveCourses}"
+           class="bg-white border-2 border-gray-200 rounded-2xl p-6 hover:shadow-xl hover:border-blue-300 transition-all group">
+        <div class="flex items-center justify-between gap-6">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-3 mb-3">
+              <span th:text="${course.status}"
+                    class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-bold">
+                예정중
+              </span>
+            </div>
+
+            <h3 class="text-xl font-black text-gray-900 mb-3 group-hover:text-blue-600 transition-colors"
+                th:text="${course.title}">
+              실시간 강의명
+            </h3>
+
+            <div class="flex items-center gap-4 text-sm">
+              <span class="font-bold text-gray-700">
+                <i class="fa-solid fa-calendar text-gray-500 mr-1"></i>
+                <span th:text="${course.datetime}">2026-04-20 19:00</span>
+              </span>
+
+              <span class="font-bold text-gray-700">
+                <i class="fa-solid fa-users text-gray-500 mr-1"></i>
+                <span th:text="${course.registeredCount}">0</span>/<span th:text="${course.capacity}">0</span>명
+              </span>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <a th:href="@{/instructor/live-course/{id}(id=${course.id})}"
+               class="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-blue-300 text-blue-600 transition-all hover:bg-blue-50"
+               title="조회">
+              <i class="fa-regular fa-eye"></i>
+            </a>
+
+            <a th:href="@{/instructor/live-course/edit/{id}(id=${course.id})}"
+               class="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-green-300 text-green-600 transition-all hover:bg-green-50"
+               title="수정">
+              <i class="fa-regular fa-pen-to-square"></i>
+            </a>
+
+            <button type="button"
+                    th:data-id="${course.id}"
+                    th:data-title="${course.title}"
+                    onclick="openDeleteLiveModal(this)"
+                    class="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-red-300 text-red-600 transition-all hover:bg-red-50"
+                    title="삭제">
+              <i class="fa-regular fa-trash-can"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div th:if="${liveCourses == null or #lists.isEmpty(liveCourses)}"
+         class="bg-white rounded-3xl border-2 border-dashed border-gray-200 py-24 text-center">
+      <div class="w-28 h-28 bg-gray-100 rounded-3xl flex items-center justify-center mx-auto mb-8">
+        <i class="fa-solid fa-clock text-gray-400 text-5xl"></i>
+      </div>
+
+      <h3 class="text-3xl font-black text-gray-900 mb-4">등록된 실시간 강의가 없습니다</h3>
+      <p class="text-xl text-gray-500 font-medium mb-8">새로운 실시간 강의를 등록해보세요</p>
+
+      <a href="#"
+         onclick="alert('실시간 강의 신청 기능은 준비 중입니다.'); return false;"
+         class="inline-flex items-center gap-3 px-9 py-4 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-2xl hover:shadow-lg transition-all font-black text-lg">
+        <i class="fa-solid fa-plus"></i>
+        실시간 강의 신청하기
+      </a>
+    </div>
+  </section>
+</div>
+
+<div id="deleteModal" class="modal-overlay">
+  <div class="bg-white rounded-2xl p-8 max-w-2xl w-full mx-4 shadow-xl max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-2xl font-black text-gray-900">강의 삭제 요청</h3>
+      <button type="button"
+              onclick="closeDeleteModal()"
+              class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+        <i class="fa-solid fa-x"></i>
+      </button>
+    </div>
+
+    <div class="bg-red-50 border-2 border-red-200 rounded-xl p-4 mb-6">
+      <div class="flex items-start gap-3">
+        <i class="fa-solid fa-triangle-exclamation text-red-600 mt-0.5"></i>
+        <div>
+          <p class="text-sm font-bold text-red-900 mb-1">삭제를 요청하시겠습니까?</p>
+          <p class="text-sm text-red-700 font-medium">삭제 요청 시 관리자 검토 후 승인 또는 반려됩니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-gray-50 rounded-xl p-6 mb-6">
+      <h4 class="text-sm font-bold text-gray-600 mb-4">강의 정보</h4>
+      <div class="space-y-3">
+        <div class="flex justify-between">
+          <span class="text-sm font-bold text-gray-600">강의명</span>
+          <span id="del-title" class="text-sm font-bold text-gray-900"></span>
+        </div>
+
+        <div class="flex justify-between">
+          <span class="text-sm font-bold text-gray-600">카테고리</span>
+          <span id="del-category" class="text-sm text-gray-900"></span>
+        </div>
+
+        <div class="flex justify-between">
+          <span class="text-sm font-bold text-gray-600">현재 상태</span>
+          <span id="del-status" class="text-sm text-gray-900"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-6">
+      <label class="block text-sm font-bold text-gray-900 mb-2">
+        삭제 사유 <span class="text-red-600">*</span>
+      </label>
+      <textarea id="deleteReason"
+                rows="4"
+                placeholder="삭제 요청 사유를 입력해주세요"
+                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none resize-none font-medium"></textarea>
+    </div>
+
+    <div class="flex gap-3">
+      <button type="button"
+              onclick="closeDeleteModal()"
+              class="flex-1 px-6 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-all font-bold text-gray-700">
+        취소
+      </button>
+
+      <button type="button"
+              onclick="submitDelete()"
+              class="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all font-bold">
+        삭제 요청하기
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="deleteLiveModal" class="modal-overlay">
+  <div class="bg-white rounded-2xl p-8 max-w-2xl w-full mx-4 shadow-xl">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-2xl font-black text-gray-900">실시간 강의 삭제 요청</h3>
+      <button type="button"
+              onclick="closeDeleteLiveModal()"
+              class="p-2 hover:bg-gray-100 rounded-lg">
+        <i class="fa-solid fa-x"></i>
+      </button>
+    </div>
+
+    <div class="bg-red-50 border-2 border-red-200 rounded-xl p-4 mb-6">
+      <div class="flex items-start gap-3">
+        <i class="fa-solid fa-triangle-exclamation text-red-600 mt-0.5"></i>
+        <div>
+          <p class="text-sm font-bold text-red-900 mb-1">삭제를 요청하시겠습니까?</p>
+          <p class="text-sm text-red-700 font-medium">삭제 시 예약한 수강생에게 알림이 발송됩니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-gray-50 rounded-xl p-6 mb-6 space-y-3">
+      <div class="flex justify-between">
+        <span class="text-sm font-bold text-gray-600">강의명</span>
+        <span id="del-live-title" class="text-sm font-bold text-gray-900"></span>
+      </div>
+    </div>
+
+    <div class="mb-6">
+      <label class="block text-sm font-bold text-gray-900 mb-2">
+        삭제 사유 <span class="text-red-600">*</span>
+      </label>
+      <textarea id="deleteLiveReason"
+                rows="4"
+                placeholder="삭제 요청 사유를 입력해주세요"
+                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none resize-none font-medium"></textarea>
+    </div>
+
+    <div class="flex gap-3">
+      <button type="button"
+              onclick="closeDeleteLiveModal()"
+              class="flex-1 px-6 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 font-bold text-gray-700">
+        취소
+      </button>
+
+      <button type="button"
+              onclick="submitDeleteLive()"
+              class="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 font-bold">
+        삭제 요청하기
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  lucide.createIcons();
+
+  let currentDeleteId = null;
+  let currentDeleteLiveId = null;
+
+  function openDeleteModal(button) {
+    currentDeleteId = button.dataset.id;
+    document.getElementById('del-title').textContent = button.dataset.title || '';
+    document.getElementById('del-category').textContent = button.dataset.category || '';
+    document.getElementById('del-status').textContent = button.dataset.status || '';
+    document.getElementById('deleteReason').value = '';
+    document.getElementById('deleteModal').classList.add('open');
+  }
+
+  function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.remove('open');
+  }
+
+  function submitDelete() {
+    const reason = document.getElementById('deleteReason').value.trim();
+
+    if (!reason) {
+      alert('삭제 사유를 입력해주세요');
+      return;
+    }
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `/instructor/course/${currentDeleteId}/delete-request`;
+
+    const reasonInput = document.createElement('input');
+    reasonInput.type = 'hidden';
+    reasonInput.name = 'reason';
+    reasonInput.value = reason;
+
+    form.appendChild(reasonInput);
+
+    const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+    const csrfParameter = document.querySelector('meta[name="_csrf_parameter"]')?.content;
+
+    if (csrfToken && csrfParameter) {
+      const csrfInput = document.createElement('input');
+      csrfInput.type = 'hidden';
+      csrfInput.name = csrfParameter;
+      csrfInput.value = csrfToken;
+      form.appendChild(csrfInput);
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+  }
+
+  function openDeleteLiveModal(button) {
+    currentDeleteLiveId = button.dataset.id;
+    document.getElementById('del-live-title').textContent = button.dataset.title || '';
+    document.getElementById('deleteLiveReason').value = '';
+    document.getElementById('deleteLiveModal').classList.add('open');
+  }
+
+  function closeDeleteLiveModal() {
+    document.getElementById('deleteLiveModal').classList.remove('open');
+  }
+
+  function submitDeleteLive() {
+    const reason = document.getElementById('deleteLiveReason').value.trim();
+
+    if (!reason) {
+      alert('삭제 사유를 입력해주세요');
+      return;
+    }
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `/instructor/live-course/${currentDeleteLiveId}/delete-request`;
+
+    const reasonInput = document.createElement('input');
+    reasonInput.type = 'hidden';
+    reasonInput.name = 'reason';
+    reasonInput.value = reason;
+
+    form.appendChild(reasonInput);
+    document.body.appendChild(form);
+    form.submit();
+  }
+</script>
+</body>
+</html>

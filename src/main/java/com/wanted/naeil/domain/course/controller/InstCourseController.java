@@ -2,7 +2,9 @@ package com.wanted.naeil.domain.course.controller;
 
 import com.wanted.naeil.domain.auth.model.dto.AuthDetails;
 import com.wanted.naeil.domain.course.dto.request.CourseCreateRequest;
+import com.wanted.naeil.domain.course.dto.response.CourseEditResponse;
 import com.wanted.naeil.domain.course.dto.response.CreateCourseResponse;
+import com.wanted.naeil.domain.course.dto.response.InstructorCourseResponse;
 import com.wanted.naeil.domain.course.repository.CategoryRepository;
 import com.wanted.naeil.domain.course.service.CourseService;
 import jakarta.validation.Valid;
@@ -14,8 +16,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.List;
+
 @Controller
-@RequestMapping("/instructor/course")
+@RequestMapping("/instructor")
 @RequiredArgsConstructor
 @Slf4j
 public class InstCourseController {
@@ -24,7 +28,7 @@ public class InstCourseController {
     private final CategoryRepository  categoryRepository;
 
     // 코스 등록 조회
-    @GetMapping
+    @GetMapping("/course")
     public ModelAndView CreateCoursePage(ModelAndView mv) {
         log.info(" [Courses] 강의 생성 페이지 조회 시작");
 
@@ -44,7 +48,7 @@ public class InstCourseController {
      * @param mv : ModelAndView 호출
      * @return : CreateCoursePage 호출
      */
-    @PostMapping
+    @PostMapping("/course")
     public ModelAndView CreateCoursePage(
             @AuthenticationPrincipal AuthDetails authDetails,
             @Valid @ModelAttribute CourseCreateRequest request,
@@ -78,12 +82,47 @@ public class InstCourseController {
         return mv;
     }
 
-    // 강의 수정
-//    @GetMapping("/{courseId}/edit")
+    // 내가 등록한 강의 조회
+    @GetMapping("/course-management")
+    public ModelAndView courseManagementPage(ModelAndView mv,
+                                             @AuthenticationPrincipal AuthDetails authDetails) {
+        Long instructorId = authDetails.getLoginUserDTO().getUserId();
+
+        List<InstructorCourseResponse> courses =
+                courseService.getInstructorCourses(instructorId);
+        // 헤더 정보
+        mv.addObject("user", authDetails.getLoginUserDTO());
+        mv.addObject("courses", courses);
+        // TODO : 실시간 강의 등록하면 인자 넣기
+        mv.addObject("liveCourses", List.of());
+        mv.setViewName("course/InstructorCourseManagement");
+
+        return mv;
+    }
+
+    // 강의 수정 페이지 조회
+    @GetMapping("/course/{courseId}/edit")
+    public ModelAndView EditCoursePage(@AuthenticationPrincipal AuthDetails authDetails,
+                                       @PathVariable Long courseId,ModelAndView mv) {
+
+        Long instructorId = authDetails.getLoginUserDTO().getUserId();
+
+        CourseEditResponse response = courseService.getCourseEdit(instructorId, courseId);
+
+        mv.addObject("user", authDetails.getLoginUserDTO());
+        mv.addObject("courseEdit", response);
+        mv.addObject("categories", categoryRepository.findAll());
+        mv.setViewName("course/courseEdit");
+
+        return mv;
+    }
+
+    // 강의 수정 기능
+    
 
     // 성공시 redirect 페이지
     // TODO : 병합 후 강사의 내 강의 페이지로 수정하기
-    @GetMapping("/complete")
+    @GetMapping("/course/complete")
     public String showCompletePage() {
         return "course/InstructorCourseComplete";
     }
