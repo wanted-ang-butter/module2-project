@@ -62,6 +62,22 @@ public class CommentController {
         return mv;
     }
 
+    // 댓글 삭제
+    @PostMapping("/{category}/{postId}/comments/{commentId}/delete")
+    public ModelAndView deleteComment(@PathVariable String category,
+                                      @PathVariable Long postId,
+                                      @PathVariable Long commentId,
+                                      @AuthenticationPrincipal AuthDetails authDetails,
+                                      ModelAndView mv) {
+
+        log.info("[댓글 삭제] commentId: {}", commentId);
+
+        User loginUser = getLoginUser(authDetails);
+        commentService.deleteComment(commentId, loginUser);
+        mv.setViewName("redirect:/community/" + category + "/" + postId);
+        return mv;
+    }
+
     // 공통 메서드
     private User getLoginUser(AuthDetails authDetails) {
         if (authDetails == null) return null;
