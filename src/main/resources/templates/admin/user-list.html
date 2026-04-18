@@ -12,7 +12,7 @@
     <!-- Top Header -->
     <div class="mb-12">
         <div class="flex items-center justify-between mb-6">
-            <a href="/admin"
+            <a href="/admin/dashboard"
                class="flex items-center gap-2 px-4 py-2 border-2 border-gray-200 rounded-xl hover:border-blue-600 hover:bg-blue-50 transition-all">
                 <span class="font-medium text-gray-700 hover:text-blue-600 text-sm">← 뒤로가기</span>
             </a>
@@ -208,7 +208,7 @@
         }
         tbody.innerHTML = users.map((u, idx) => {
             const isActive = u.status === 'ACTIVE';
-            const isInactive = u.status === 'INACTIVE' || u.status === 'DELETED';
+            const isInactive = u.status === 'INACTIVE';
 
             const statusBadge = isActive
                 ? '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">활성</span>'

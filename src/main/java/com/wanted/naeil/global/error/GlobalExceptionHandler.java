@@ -61,7 +61,7 @@ public class GlobalExceptionHandler {
         mv.setViewName(DEFAULT_ERROR_VIEW);
         return mv;
     }
-    
+
     // 409 에러, 중복 요청 성민(추가)
     @ExceptionHandler(IllegalStateException.class)
     protected ModelAndView handleIllegalStateException(IllegalStateException e) {
