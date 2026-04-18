@@ -73,6 +73,9 @@ public class AdminApprovalService {
                                     .startAt(lecture.getStartAt())
                                     .instuctorName(lecture.getInstructor().getName());
                         }
+                        case SETTLEMENT_REGISTER -> {
+                            builder.instuctorName(approval.getSettlement().getInstructor().getName());
+                        }
                     }
                     return builder.build();
                 })
