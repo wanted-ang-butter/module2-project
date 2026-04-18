@@ -2,11 +2,13 @@ package com.wanted.naeil.domain.community.service;
 
 import com.wanted.naeil.domain.community.dto.request.PostCreateRequest;
 import com.wanted.naeil.domain.community.dto.request.PostUpdateRequest;
+import com.wanted.naeil.domain.community.dto.response.CommentResponse;
 import com.wanted.naeil.domain.community.dto.response.PostDetailResponse;
 import com.wanted.naeil.domain.community.dto.response.PostListResponse;
 import com.wanted.naeil.domain.community.entity.Like;
 import com.wanted.naeil.domain.community.entity.Post;
 import com.wanted.naeil.domain.community.entity.enums.PostCategory;
+import com.wanted.naeil.domain.community.repository.CommentRepository;
 import com.wanted.naeil.domain.community.repository.LikeRepository;
 import com.wanted.naeil.domain.community.repository.PostRepository;
 import com.wanted.naeil.domain.course.entity.Course;
@@ -32,6 +34,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final LikeRepository likeRepository;
     private final CourseRepository courseRepository;
+    private final CommentRepository commentRepository;
 
     // 글 목록 조회
     @Transactional(readOnly = true)
@@ -70,7 +73,13 @@ public class PostService {
         }
 
         long likeCount = likeRepository.countByPost(post);
-        return PostDetailResponse.from(post, likeCount, isLiked, likeId);
+
+        List<CommentResponse> comments = commentRepository.findByPostOrderByCreatedAtAsc(post)
+                .stream()
+                .map(CommentResponse::from)
+                .collect(Collectors.toList());
+
+        return PostDetailResponse.from(post, likeCount, isLiked, likeId, comments);
     }
 
     // 글 작성
