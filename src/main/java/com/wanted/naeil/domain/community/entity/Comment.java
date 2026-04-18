@@ -3,17 +3,18 @@ package com.wanted.naeil.domain.community.entity;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = "comments")
 @Getter
 @NoArgsConstructor
+@SQLDelete(sql = "UPDATE comments SET deleted_at = NOW() WHERE comment_id = ?")
+@Where(clause = "deleted_at IS NULL")
 public class Comment extends BaseTimeEntity {
 
     @Id

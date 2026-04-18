@@ -67,7 +67,14 @@ public class Course extends BaseTimeEntity {
         this.status = CourseStatus.PENDING; // 초기 생성 시 승인 대기 상태
     }
 
-
+    // 강의 정보 수정
+    public void updateBasicInfo(String title, Category category, String description, int price, String thumbnail) {
+        this.title = title;
+        this.category = category;
+        this.description = description;
+        this.price = price;
+        this.thumbnail = thumbnail;
+    }
 
     // 비즈니스 로직
     public void activate() {

@@ -1,6 +1,6 @@
-package com.wanted.naeil.domain.auth.model.dto;
+package com.wanted.naeil.global.auth.model.dto;
 
-import com.wanted.naeil.domain.user.dto.LoginUserDTO;
+import com.wanted.naeil.domain.user.dto.response.LoginUserDTO;
 import com.wanted.naeil.domain.user.entity.enums.Role;
 import com.wanted.naeil.domain.user.entity.enums.UserStatus;
 import org.springframework.security.core.GrantedAuthority;
