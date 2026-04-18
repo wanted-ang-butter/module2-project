@@ -1,12 +1,14 @@
 package com.wanted.naeil.domain.course.controller;
 
-import com.wanted.naeil.domain.course.dto.request.CreateCourseRequest;
+import com.wanted.naeil.domain.auth.model.dto.AuthDetails;
+import com.wanted.naeil.domain.course.dto.request.CourseCreateRequest;
 import com.wanted.naeil.domain.course.dto.response.CreateCourseResponse;
 import com.wanted.naeil.domain.course.repository.CategoryRepository;
 import com.wanted.naeil.domain.course.service.CourseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -27,10 +29,10 @@ public class InstCourseController {
         log.info(" [Courses] 강의 생성 페이지 조회 시작");
 
         // TODO : 임시로 리포에서 바로 불러옴, 추후 서비스 로직 호출해서 하는걸로 수정
-        mv.addObject("createCourseRequest", new CreateCourseRequest());
+        mv.addObject("createCourseRequest", new CourseCreateRequest());
         mv.addObject("categories", categoryRepository.findAll());
 
-        mv.setViewName("course/InstructorCourseEdit");
+        mv.setViewName("course/courseCreate");
 
         return mv;
     }
@@ -44,24 +46,25 @@ public class InstCourseController {
      */
     @PostMapping
     public ModelAndView CreateCoursePage(
-            @Valid @ModelAttribute CreateCourseRequest request,
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @Valid @ModelAttribute CourseCreateRequest request,
             BindingResult bindingResult,
             ModelAndView mv) {
-        // TODO : @AuthenticationPrincipal 으로 pk 뽑기
-        log.info(" [Courses] 강의 생성 시작: {} ", request.getTitle());
+        Long instructorId = authDetails.getLoginUserDTO().getUserId();
+        log.info(" [Courses] 강의 생성 시작 강사 이름 : {}, 코스 이름: {}" ,authDetails.getLoginUserDTO().getName(), request.getTitle());
+
+        // 필수값 미입력 예외처리
         if (bindingResult.hasErrors()) {
             log.warn(" [Validation] 강의 등록 검증 실패: {}", bindingResult.getAllErrors());
 
             mv.addObject("categories", categoryRepository.findAll());
-            mv.setViewName("course/InstructorCourseEdit");
+            mv.setViewName("course/courseCreate");
             return mv;
         }
 
         try {
-            CreateCourseResponse response = courseService.createCourse(request);
-            // TODO : mv.addObject() 으로 값들 꺼내오기
+            CreateCourseResponse response = courseService.createCourse(instructorId, request);
             mv.addObject("message", response.message());
-            // TODO : 리다이렉트 임시로 "강사 메인보드" 로 이동
             // mv.setViewName("redirect:/dashboard/instructorDashboard");
             // 임시페이지
             mv.setViewName("redirect:/instructor/course/complete");
@@ -69,13 +72,17 @@ public class InstCourseController {
             log.error(" [Courses] 강의 생성 중 오류 발생: ", e);
             mv.addObject("errorMessage", "강의 등록 중 오류가 발생했습니다: " + e.getMessage());
             mv.addObject("categories", categoryRepository.findAll());
-            mv.setViewName("course/InstructorCourseEdit");
+            mv.setViewName("course/courseCreate");
         }
 
         return mv;
     }
 
-    // 임시페이지
+    // 강의 수정
+//    @GetMapping("/{courseId}/edit")
+
+    // 성공시 redirect 페이지
+    // TODO : 병합 후 강사의 내 강의 페이지로 수정하기
     @GetMapping("/complete")
     public String showCompletePage() {
         return "course/InstructorCourseComplete";

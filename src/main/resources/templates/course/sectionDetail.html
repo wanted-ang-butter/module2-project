@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title th:text="${sectionStudy.video.sectionTitle} + ' | Nae-Il'">섹션 수강 | Nae-Il</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+  <style>
+    body {
+      font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen bg-[#f6f7f9] text-slate-900">
+
+<header class="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
+  <div class="mx-auto flex h-14 max-w-7xl items-center justify-between px-5">
+    <a href="/" class="flex items-center gap-2">
+      <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-emerald-500 text-white">
+        <i class="fa-solid fa-arrow-trend-up text-sm"></i>
+      </div>
+
+      <div class="leading-tight">
+        <p class="text-xl font-extrabold tracking-tight">
+          내일 <span class="font-medium text-slate-500">Nae-Il</span>
+        </p>
+        <p class="text-[10px] font-semibold text-slate-400">내일의 일, My Work</p>
+      </div>
+    </a>
+
+    <nav class="hidden items-center gap-7 text-sm font-semibold text-slate-600 md:flex">
+      <a href="/course" class="hover:text-blue-600">
+        <i class="fa-solid fa-book-open mr-1 text-xs"></i>
+        전체 강의
+      </a>
+      <a href="#" class="hover:text-blue-600">
+        <i class="fa-regular fa-calendar mr-1 text-xs"></i>
+        실시간 강의
+      </a>
+      <a href="#" class="hover:text-blue-600">
+        <i class="fa-solid fa-graduation-cap mr-1 text-xs"></i>
+        내 강의
+      </a>
+      <a href="#" class="hover:text-blue-600">
+        <i class="fa-regular fa-comment mr-1 text-xs"></i>
+        커뮤니티
+      </a>
+      <a href="/cart" class="hover:text-blue-600">
+        <i class="fa-solid fa-cart-shopping mr-1 text-xs"></i>
+        장바구니
+      </a>
+    </nav>
+
+    <div class="flex items-center gap-3">
+      <a href="/auth/logout"
+         class="hidden rounded-md border border-slate-200 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 md:inline-flex">
+        로그아웃
+      </a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="border-b border-slate-200 bg-white">
+    <div class="mx-auto max-w-7xl px-5 py-5">
+      <a href="/user/my-courses"
+         class="inline-flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-blue-600">
+        <i class="fa-solid fa-chevron-left text-xs"></i>
+        내 강의로 돌아가기
+      </a>
+    </div>
+  </div>
+
+  <div class="mx-auto max-w-7xl px-5 py-8">
+    <section class="mb-8 rounded-2xl border border-slate-200 bg-white px-7 py-8 shadow-sm">
+      <div class="flex flex-col gap-4">
+        <div class="flex flex-wrap items-center gap-2 text-xs font-extrabold">
+          <span class="rounded-md bg-blue-50 px-3 py-1 text-blue-600"
+                th:if="${sectionStudy.course.enrollmentStatus != null and sectionStudy.course.enrollmentStatus.name() == 'IN_PROGRESS'}">
+            수강 중
+          </span>
+
+          <span class="rounded-md bg-emerald-50 px-3 py-1 text-emerald-700"
+                th:if="${sectionStudy.course.enrollmentStatus != null and sectionStudy.course.enrollmentStatus.name() == 'COMPLETED'}">
+            수강 완료
+          </span>
+
+          <span class="rounded-md bg-slate-100 px-3 py-1 text-slate-500"
+                th:text="${sectionStudy.course.category}">
+            프론트엔드
+          </span>
+        </div>
+
+        <div>
+          <h1 class="break-words text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl"
+              th:text="${sectionStudy.course.courseTitle}">
+            React 완벽 가이드: 기초부터 실전까지
+          </h1>
+
+          <div class="mt-4 flex flex-wrap items-center gap-3 text-sm font-semibold text-slate-500">
+            <span>
+              <i class="fa-regular fa-user mr-1 text-slate-400"></i>
+              강사:
+              <span th:text="${sectionStudy.course.instructorName}">김개발</span>
+            </span>
+
+            <span class="h-1 w-1 rounded-full bg-slate-300"></span>
+
+            <span>
+              <i class="fa-regular fa-folder mr-1 text-slate-400"></i>
+              <span th:text="${sectionStudy.course.category}">프론트엔드</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
+      <div class="space-y-6">
+        <section class="overflow-hidden rounded-xl bg-slate-950 shadow-sm">
+          <video th:if="${sectionStudy.video.videoUrl != null}"
+                 th:src="${sectionStudy.video.videoUrl}"
+                 class="aspect-video w-full bg-slate-950"
+                 controls
+                 playsinline>
+            브라우저가 비디오 재생을 지원하지 않습니다.
+          </video>
+
+          <div th:unless="${sectionStudy.video.videoUrl != null}"
+               class="flex aspect-video w-full items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-950 text-white">
+            <div class="text-center">
+              <div class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-white/10">
+                <i class="fa-solid fa-play text-4xl text-white/80"></i>
+              </div>
+              <p class="font-mono text-sm text-white/80">Video Player Placeholder</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <button type="button"
+                    class="h-12 rounded-lg border border-slate-300 bg-white text-sm font-extrabold text-slate-700 hover:bg-slate-50">
+              <i class="fa-solid fa-pause mr-2 text-xs"></i>
+              학습 중단
+            </button>
+
+            <button type="button"
+                    class="h-12 rounded-lg border border-slate-300 bg-white text-sm font-extrabold text-slate-700 hover:bg-slate-50">
+              <i class="fa-regular fa-circle-check mr-2 text-xs"></i>
+              학습 완료
+            </button>
+          </div>
+        </section>
+
+        <section class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div class="flex items-start justify-between gap-4 border-b border-slate-100 pb-5">
+            <div>
+              <h2 class="text-2xl font-extrabold text-slate-900"
+                  th:text="${sectionStudy.video.sectionTitle}">
+                성능 최적화: useMemo, useCallback
+              </h2>
+
+              <p class="mt-2 text-sm font-semibold text-slate-500">
+                현재 학습 상태:
+                <span th:if="${sectionStudy.video.progressStatus == null}">학습 전</span>
+                <span th:if="${sectionStudy.video.progressStatus != null and sectionStudy.video.progressStatus.name() == 'NOT_STARTED'}">학습 전</span>
+                <span th:if="${sectionStudy.video.progressStatus != null and sectionStudy.video.progressStatus.name() == 'IN_PROGRESS'}">학습 중</span>
+                <span th:if="${sectionStudy.video.progressStatus != null and sectionStudy.video.progressStatus.name() == 'COMPLETED'}">학습 완료</span>
+              </p>
+            </div>
+
+            <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-extrabold text-emerald-700"
+                  th:if="${sectionStudy.video.progressStatus != null and sectionStudy.video.progressStatus.name() == 'COMPLETED'}">
+              <i class="fa-regular fa-circle-check mr-1"></i>
+              완료
+            </span>
+
+            <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-extrabold text-blue-700"
+                  th:if="${sectionStudy.video.progressStatus != null and sectionStudy.video.progressStatus.name() == 'IN_PROGRESS'}">
+              <i class="fa-solid fa-play mr-1"></i>
+              수강 중
+            </span>
+
+            <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-extrabold text-slate-500"
+                  th:if="${sectionStudy.video.progressStatus == null or sectionStudy.video.progressStatus.name() == 'NOT_STARTED'}">
+              학습 전
+            </span>
+          </div>
+
+          <div class="pt-5">
+            <h3 class="mb-4 text-lg font-extrabold text-slate-900">강의 설명</h3>
+            <p class="leading-7 text-slate-600">
+              현재 섹션을 학습하고, 우측 강의 목차에서 다음 섹션으로 이어서 수강할 수 있습니다.
+            </p>
+          </div>
+        </section>
+
+        <section class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 class="mb-5 flex items-center gap-2 text-xl font-extrabold text-slate-900">
+            <i class="fa-regular fa-file-lines text-blue-600"></i>
+            강의 자료
+          </h2>
+
+          <a th:if="${sectionStudy.video.attachmentUrl != null}"
+             th:href="${sectionStudy.video.attachmentUrl}"
+             download
+             class="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-4 hover:bg-slate-50">
+            <div class="flex items-center gap-4">
+              <div class="flex h-10 w-10 items-center justify-center rounded-md bg-slate-100 text-slate-500">
+                <i class="fa-regular fa-file-lines"></i>
+              </div>
+
+              <div>
+                <p class="font-extrabold text-slate-800">강의 자료</p>
+                <p class="mt-1 text-xs font-semibold text-slate-400">첨부파일</p>
+              </div>
+            </div>
+
+            <i class="fa-solid fa-download text-slate-400"></i>
+          </a>
+
+          <div th:unless="${sectionStudy.video.attachmentUrl != null}"
+               class="rounded-lg border border-slate-200 bg-slate-50 px-4 py-5 text-sm font-semibold text-slate-500">
+            등록된 첨부파일이 없습니다.
+          </div>
+        </section>
+      </div>
+
+      <aside class="lg:sticky lg:top-24 lg:self-start">
+        <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+          <div class="p-6">
+            <h2 class="text-xl font-extrabold text-slate-900">강의 목차</h2>
+
+            <div class="mt-5">
+              <div class="mb-2 flex items-center justify-between text-xs font-bold text-slate-500">
+                <span>진행률</span>
+                <span class="text-blue-600"
+                      th:text="|${sectionStudy.curriculum.progressRate}%|">
+                  65%
+                </span>
+              </div>
+
+              <div class="h-2 overflow-hidden rounded-full bg-slate-200">
+                <div class="h-full bg-emerald-500"
+                     th:style="|width: ${sectionStudy.curriculum.progressRate}%|"></div>
+              </div>
+
+              <p class="mt-2 text-xs font-semibold text-slate-400">
+                <span th:text="${sectionStudy.curriculum.completedSectionCount}">13</span>/<span th:text="${sectionStudy.curriculum.totalSectionCount}">20</span>
+                강의 완료
+              </p>
+            </div>
+          </div>
+
+          <div class="divide-y divide-slate-100 border-t border-slate-200">
+            <a th:each="item, stat : ${sectionStudy.curriculum.sections}"
+               th:href="@{/course/{courseId}/sections/{sectionId}(courseId=${sectionStudy.course.courseId}, sectionId=${item.sectionId})}"
+               th:class="${item.current} ? 'flex gap-3 bg-blue-50 px-5 py-4' : 'flex gap-3 px-5 py-4 hover:bg-slate-50'">
+
+              <i th:if="${item.current}"
+                 class="fa-solid fa-play mt-1 text-sm text-blue-600"></i>
+
+              <i th:if="${!item.current and item.progressStatus != null and item.progressStatus.name() == 'COMPLETED'}"
+                 class="fa-regular fa-circle-check mt-1 text-sm text-emerald-500"></i>
+
+              <i th:if="${!item.current and (item.progressStatus == null or item.progressStatus.name() == 'NOT_STARTED')}"
+                 class="fa-regular fa-circle mt-1 text-sm text-slate-300"></i>
+
+              <i th:if="${!item.current and item.progressStatus != null and item.progressStatus.name() == 'IN_PROGRESS'}"
+                 class="fa-solid fa-circle-half-stroke mt-1 text-sm text-blue-500"></i>
+
+              <div class="min-w-0">
+                <p th:class="${item.current} ? 'break-words font-extrabold text-blue-700' : 'break-words font-extrabold text-slate-800'"
+                   th:text="|${stat.count}. ${item.title}|">
+                  1. React 소개 및 개발 환경 설정
+                </p>
+
+                <p th:class="${item.current} ? 'mt-1 text-xs font-semibold text-blue-500' : 'mt-1 text-xs font-semibold text-slate-400'"
+                   th:text="${item.playTime}">
+                  15:30
+                </p>
+              </div>
+            </a>
+
+            <div th:if="${sectionStudy.curriculum.sections == null or #lists.isEmpty(sectionStudy.curriculum.sections)}"
+                 class="px-5 py-8 text-sm font-semibold text-slate-500">
+              표시할 강의 목차가 없습니다.
+            </div>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<footer class="mt-16 border-t border-slate-200 bg-white">
+  <div class="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-8 text-xs font-semibold text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+    <p>↗ © 2026 Nae-Il. 코딩으로 만드는 내일</p>
+
+    <div class="flex gap-6">
+      <a href="#" class="hover:text-slate-900">이용약관</a>
+      <a href="#" class="hover:text-slate-900">개인정보처리방침</a>
+      <a href="#" class="hover:text-slate-900">고객 센터</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
