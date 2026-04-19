@@ -79,7 +79,6 @@ private final LocalFileService localFileService;
                 .build();
 
 
-
         // 4. DB 저장
         User savedUser = userRepository.save(user);
 
