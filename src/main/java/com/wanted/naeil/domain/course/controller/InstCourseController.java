@@ -139,7 +139,13 @@ public class InstCourseController {
         return ResponseEntity.ok().build();
     }
 
-    // 코스 상태 변경
+    /**
+     * 코스 상태 변경 : 활성화 <-> 비활성화
+     * @param authDetails : 현재 로그인 정보
+     * @param courseId : 수정할 코스
+     * @param request : 사용자의 입력 상태값
+     * @return : ResponseEntity여서 상태만 변경
+     */
     @PatchMapping(value = "/course/{courseId}/status", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
     public ResponseEntity<Void> updateCourseStatus(
@@ -153,6 +159,23 @@ public class InstCourseController {
                 instructorId, courseId, request.getStatus());
 
         courseService.updateCourseStatus(instructorId, courseId, request);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/course/{courseId}/registration-status")
+    @ResponseBody
+    public ResponseEntity<Void> cancelCourseRegistration(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @PathVariable Long courseId,
+            @Valid @ModelAttribute CourseStatusUpdateRequest request
+    ) {
+        Long instructorId = authDetails.getLoginUserDTO().getUserId();
+
+        log.info("[CourseCancelRequest] 강의 등록 요청 취소 요청 - instructorId: {}, courseId: {}",
+                instructorId, courseId);
+
+        courseService.updateCourseRegistrationStatus(instructorId, courseId, request.getStatus());
 
         return ResponseEntity.ok().build();
     }

@@ -1,6 +1,6 @@
 package com.wanted.naeil.domain.payment.controller;
 
-import com.wanted.naeil.domain.auth.model.dto.AuthDetails;
+import com.wanted.naeil.global.auth.model.dto.AuthDetails;
 import com.wanted.naeil.domain.payment.dto.request.SubscriptionPaymentRequest;
 import com.wanted.naeil.domain.payment.service.CartService;
 import com.wanted.naeil.domain.payment.service.PaymentService;

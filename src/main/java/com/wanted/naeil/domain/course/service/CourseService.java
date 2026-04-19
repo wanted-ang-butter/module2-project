@@ -218,7 +218,7 @@ public class CourseService {
         log.info("[CourseUpdate] 강의 기본 정보 수정 완료 - instructorId: {}, courseId: {}", instructorId, courseId);
     }
 
-    // 코스 상태 수정
+    // 코스 상태 수정 : 활성 <-> 비활성
     @Transactional
     public void updateCourseStatus(Long instructorId, Long courseId, @Valid CourseStatusUpdateRequest request) {
 
@@ -226,6 +226,8 @@ public class CourseService {
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 강의입니다."));
 
         validateCourseOwner(course, instructorId);
+
+        validateChangeableCourseStatus(course);
 
         CourseStatus status = request.getStatus();
 
@@ -241,10 +243,48 @@ public class CourseService {
                 instructorId, courseId, status);
     }
 
+    // 코스 등록 요청 상태 변경 : 승인 대기 <-> 등록 취소
+    @Transactional
+    public void updateCourseRegistrationStatus(Long instructorId, Long courseId, CourseStatus nextStatus) {
+
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 강의입니다."));
+
+        validateCourseOwner(course, instructorId);
+
+        CourseStatus currentStatus = course.getStatus();
+
+        if (currentStatus == CourseStatus.PENDING && nextStatus == CourseStatus.CANCELLED) {
+            course.cancelRegistration();
+
+            log.info("[CourseRegistrationStatus] 강의 등록 요청 취소 완료 - instructorId: {}, courseId: {}",
+                    instructorId, courseId);
+
+            return;
+        }
+
+        if (currentStatus == CourseStatus.CANCELLED && nextStatus == CourseStatus.PENDING) {
+            course.requestRegistration();
+
+            log.info("[CourseRegistrationStatus] 강의 등록 재요청 완료 - instructorId: {}, courseId: {}",
+                    instructorId, courseId);
+            return;
+        }
+
+        throw new IllegalStateException("현재 상태에서는 요청한 등록 상태로 변경할 수 없습니다.");
+    }
+
     // ==== 내부 편의 메서드 ====
     private void validateCourseOwner(Course course, Long instructorId) {
         if (!course.getInstructor().getId().equals(instructorId)) {
             throw new AccessDeniedException("본인이 생성한 강의만 수정할 수 있습니다.");
+        }
+    }
+
+    private void validateChangeableCourseStatus(Course course) {
+        if (course.getStatus() != CourseStatus.ACTIVE && course.getStatus() != CourseStatus.INACTIVE) {
+            throw new IllegalStateException(course.getStatus().getDescription() +
+                    " 상태의 강의는 상태를 변경할 수 없습니다.");
         }
     }
 }
