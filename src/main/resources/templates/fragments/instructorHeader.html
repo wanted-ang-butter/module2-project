@@ -69,7 +69,7 @@
             <a th:href="@{/auth/logout}"
                href="/auth/logout"
                class="hidden lg:inline-flex items-center gap-2 px-3 py-2 text-gray-700 font-bold hover:text-red-600 transition-colors text-sm">
-            <i class="fa-solid fa-arrow-right-from-bracket text-base"></i>
+                <i class="fa-solid fa-arrow-right-from-bracket text-base"></i>
                 <span>로그아웃</span>
             </a>
 
@@ -90,10 +90,29 @@
                 <i class="fa-regular fa-paper-plane text-lg"></i>
             </button>
 
-            <button type="button"
-                    class="w-11 h-11 bg-gradient-to-br from-green-500 to-blue-500 text-white rounded-xl flex items-center justify-center shadow-md">
-                <span class="font-black text-sm">{ }</span>
-            </button>
+            <div class="relative" id="instructorProfileDropdownWrapper">
+                <button type="button"
+                        onclick="toggleInstructorProfileDropdown()"
+                        class="w-11 h-11 bg-gradient-to-br from-green-500 to-blue-500 text-white rounded-xl flex items-center justify-center shadow-md">
+                    <span class="font-black text-sm">{ }</span>
+                </button>
+                <div id="instructorProfileDropdown"
+                     style="display:none;"
+                     class="absolute right-0 mt-2 w-56 bg-white border-2 border-gray-200 rounded-xl shadow-xl z-50">
+                    <div class="py-2">
+                        <a th:href="@{/instructor/course-management}" href="/instructor/course-management"
+                           class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                            <i class="fa-solid fa-video text-gray-600"></i>
+                            <span class="text-sm font-medium text-gray-900">내 강의 관리</span>
+                        </a>
+                        <a th:href="@{/user/me}" href="/user/me"
+                           class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                            <i class="fa-solid fa-gear text-gray-600"></i>
+                            <span class="text-sm font-medium text-gray-900">계정 설정</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
