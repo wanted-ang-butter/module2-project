@@ -136,6 +136,26 @@ public class User extends BaseTimeEntity {
         }
     }
 
+    // 프로필 업로드 승재
+    public void updateProfileImg(String profileImg) {
+        this.profileImg = profileImg;
+    }
+
+    // 닉네임 변경
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    // 비밀번호 변경
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
+    // 이메일 변경
+    public void updateEmail(String email) {
+        this.email = email;
+    }
+
 
 }
 

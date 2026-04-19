@@ -339,6 +339,19 @@
 
 <script>
     lucide.createIcons();
+    function toggleInstructorProfileDropdown() {
+        const el = document.getElementById('instructorProfileDropdown');
+        if (el) {
+            el.style.display = el.style.display === 'none' ? 'block' : 'none';
+        }
+    }
+    document.addEventListener('click', function(e) {
+        const wrapper = document.getElementById('instructorProfileDropdownWrapper');
+        const dropdown = document.getElementById('instructorProfileDropdown');
+        if (wrapper && dropdown && !wrapper.contains(e.target)) {
+            dropdown.style.display = 'none';
+        }
+    });
 </script>
 </body>
 </html>

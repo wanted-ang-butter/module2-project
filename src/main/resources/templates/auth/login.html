@@ -37,6 +37,11 @@
         <p class="text-sm font-bold text-red-600">아이디 또는 비밀번호가 올바르지 않습니다.</p>
     </div>
 
+    <!-- 비밀번호 변경 성공 메시지 -->
+    <div th:if="${message}" class="mb-4 p-4 bg-green-50 border-2 border-green-200 rounded-xl">
+        <p class="text-sm font-bold text-green-600" th:text="${message}"></p>
+    </div>
+
     <!-- Login Form -->
     <div class="bg-white border-2 border-gray-200 rounded-2xl p-8 shadow-xl mb-6">
         <h2 class="text-3xl font-black text-gray-900 mb-2">로그인</h2>
@@ -48,6 +53,8 @@
                 <div class="relative">
                     <i class="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
                     <input type="text" name="user" placeholder="아이디를 입력하세요"
+                           autofocus
+                           autocomplete="username"
                            class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600 focus:outline-none transition-colors font-medium"/>
                 </div>
             </div>
@@ -57,6 +64,7 @@
                 <div class="relative">
                     <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
                     <input type="password" name="pass" placeholder="••••••••"
+                           autocomplete="current-password"
                            class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600 focus:outline-none transition-colors font-medium"/>
                 </div>
             </div>
@@ -87,6 +95,13 @@
         </div>
     </div>
 </div>
-
+<script>
+    document.getElementById('loginForm').addEventListener('submit', function() {
+        const btn = document.getElementById('loginBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-circle-notch animate-spin"></i> 로그인 중...';
+        btn.classList.add('opacity-70', 'cursor-not-allowed');
+    });
+</script>
 </body>
 </html>

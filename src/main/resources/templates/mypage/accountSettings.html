@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>계정 설정 | Nae-Il</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <style>
+        .notice-dropdown { display: none; }
+        .notice-dropdown.open { display: block; }
+        .profile-dropdown { display: none; }
+        .profile-dropdown.open { display: block; }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+<!-- 강사 헤더 -->
+<th:block th:if="${myPage.role.name() == 'INSTRUCTOR'}">
+    <div th:replace="~{fragments/instructorHeader :: instructorHeader}"></div>
+</th:block>
+
+<!-- 회원/구독자 헤더 -->
+<header th:unless="${myPage.role.name() == 'INSTRUCTOR'}"
+        class="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+
+            <!-- Logo -->
+            <a th:href="@{/}" href="/" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="fa-solid fa-terminal text-white text-sm"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-900 tracking-tight">
+                        내일 <span class="text-gray-500 font-normal">Nae-il</span>
+                    </h1>
+                    <p class="text-[10px] font-semibold text-gray-500 tracking-wide">내일의 일, My Work</p>
+                </div>
+            </a>
+
+            <!-- Nav -->
+            <nav class="flex items-center gap-1 flex-nowrap">
+                <a th:href="@{/courses}" href="/courses" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+                    <i class="fa-solid fa-book-open w-4 h-4"></i>
+                    <span class="text-xs font-medium">전체 강의</span>
+                </a>
+                <a th:href="@{/live}" href="/live" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+                    <i class="fa-solid fa-calendar w-4 h-4"></i>
+                    <span class="text-xs font-medium">실시간 강의</span>
+                </a>
+                <a th:href="@{/my-courses}" href="/my-courses" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+                    <i class="fa-solid fa-video w-4 h-4"></i>
+                    <span class="text-xs font-medium">내 강의</span>
+                </a>
+                <a th:href="@{/community/qna}" href="/community/qna" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+                    <i class="fa-solid fa-comment w-4 h-4"></i>
+                    <span class="text-xs font-medium">커뮤니티</span>
+                </a>
+                <a th:href="@{/cart}" href="/cart" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+                    <i class="fa-solid fa-cart-shopping w-4 h-4"></i>
+                    <span class="text-xs font-medium">장바구니</span>
+                </a>
+                <a th:href="@{/credit}" href="/credit" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+                    <i class="fa-solid fa-wallet w-4 h-4"></i>
+                    <span class="text-xs font-medium">크레딧</span>
+                </a>
+            </nav>
+
+            <!-- Right -->
+            <div class="flex items-center gap-4">
+                <a th:href="@{/auth/logout}" href="/auth/logout"
+                   class="flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-red-50 transition-all group">
+                    <i class="fa-solid fa-right-from-bracket text-gray-600 group-hover:text-red-600 text-sm"></i>
+                    <span class="font-medium text-gray-700 group-hover:text-red-600 text-sm">로그아웃</span>
+                </a>
+                <div class="text-right">
+                    <p class="text-sm font-medium text-gray-900" th:text="${myPage.name}">사용자</p>
+                    <p class="text-xs font-mono text-gray-500" th:text="${myPage.email}">email</p>
+                </div>
+                <div class="relative" id="noticeDropdownWrapper">
+                    <button onclick="toggleNoticeDropdown()"
+                            class="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+                        <i class="fa-solid fa-bullhorn text-white text-sm"></i>
+                    </button>
+                    <div id="noticeDropdown" class="notice-dropdown absolute right-0 mt-2 w-48 bg-white border-2 border-gray-200 rounded-xl shadow-xl z-50">
+                        <div class="py-2">
+                            <a href="/notice" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                                <i class="fa-solid fa-bullhorn text-gray-600"></i>
+                                <span class="text-sm font-medium text-gray-900">공지사항</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative" id="profileDropdownWrapper">
+                    <button onclick="toggleProfileDropdown()"
+                            class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+                        <span class="text-white font-mono text-xs font-bold">{ }</span>
+                    </button>
+                    <div id="profileDropdown" class="profile-dropdown absolute right-0 mt-2 w-56 bg-white border-2 border-gray-200 rounded-xl shadow-xl z-50">
+                        <div class="py-2">
+                            <a href="/my-courses" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                                <i class="fa-solid fa-video text-gray-600"></i>
+                                <span class="text-sm font-medium text-gray-900">내 강의</span>
+                            </a>
+                            <a href="/user/me" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                                <i class="fa-solid fa-gear text-gray-600"></i>
+                                <span class="text-sm font-medium text-gray-900">계정 설정</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Page Title -->
+<div class="max-w-7xl mx-auto px-6 pt-8 pb-2">
+    <h1 class="text-2xl font-black text-gray-900">계정 설정</h1>
+</div>
+
+<div class="max-w-7xl mx-auto px-6 py-8">
+    <div class="grid grid-cols-12 gap-8">
+
+        <!-- Left Sidebar -->
+        <div class="col-span-3">
+            <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 sticky top-24">
+                <h2 class="text-xl font-black text-gray-900 mb-6">설정</h2>
+                <nav class="space-y-2">
+                    <a th:if="${myPage.role.name() == 'INSTRUCTOR'}"
+                       th:href="@{/instructor/course-management}" href="/instructor/course-management"
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 font-medium transition-all">
+                        <i class="fa-solid fa-video w-5 h-5"></i>
+                        <span class="text-sm">내 강의 관리</span>
+                    </a>
+                    <a th:unless="${myPage.role.name() == 'INSTRUCTOR'}"
+                       th:href="@{/my-courses}" href="/my-courses"
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 font-medium transition-all">
+                        <i class="fa-solid fa-video w-5 h-5"></i>
+                        <span class="text-sm">내 강의</span>
+                    </a>
+                    <a th:href="@{/user/me}" href="/user/me"
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-bold transition-all">
+                        <i class="fa-solid fa-gear w-5 h-5"></i>
+                        <span class="text-sm">계정 설정</span>
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-span-9 space-y-8">
+
+            <!-- 성공/에러 메시지 -->
+            <div th:if="${successMessage}" class="p-4 bg-green-50 border-2 border-green-200 rounded-xl">
+                <p class="text-sm font-bold text-green-600" th:text="${successMessage}"></p>
+            </div>
+            <div th:if="${errorMessage}" class="p-4 bg-red-50 border-2 border-red-200 rounded-xl">
+                <p class="text-sm font-bold text-red-600" th:text="${errorMessage}"></p>
+            </div>
+
+            <!-- 프로필 설정 -->
+            <div class="bg-white border-2 border-gray-200 rounded-2xl p-8">
+                <h2 class="text-2xl font-black text-gray-900 mb-6">프로필 설정</h2>
+
+                <div class="flex items-start gap-8">
+                    <!-- 프로필 이미지 -->
+                    <div class="flex-shrink-0">
+                        <div class="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-100 to-green-100 border-4 border-white shadow-xl flex items-center justify-center overflow-hidden">
+                            <img th:if="${myPage.profileImg != null}"
+                                 th:src="${myPage.profileImg}"
+                                 alt="프로필 이미지"
+                                 class="w-full h-full object-cover"/>
+                            <i th:unless="${myPage.profileImg != null}"
+                               class="fa-solid fa-user text-gray-400 text-5xl"></i>
+                        </div>
+                    </div>
+
+                    <!-- 이미지 컨트롤 -->
+                    <div class="flex-1 space-y-4">
+                        <div class="flex gap-3">
+                            <form th:action="@{/user/me/profile-image}" method="POST" enctype="multipart/form-data">
+                                <label class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all font-bold cursor-pointer">
+                                    <i class="fa-solid fa-upload w-4 h-4"></i>
+                                    <span>프로필 업로드</span>
+                                    <input type="file" name="profileImg" accept="image/*" class="hidden"
+                                           onchange="this.form.submit()"/>
+                                </label>
+                            </form>
+                            <form th:action="@{/user/me/profile-image/delete}" method="POST">
+                                <button type="submit"
+                                        class="inline-flex items-center gap-2 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:border-red-500 hover:text-red-600 hover:bg-red-50 transition-all font-bold">
+                                    <i class="fa-solid fa-trash w-4 h-4"></i>
+                                    <span>프로필 삭제</span>
+                                </button>
+                            </form>
+                        </div>
+                        <p class="text-sm text-gray-600">JPG, PNG 또는 GIF (최대 5MB)</p>
+                    </div>
+                </div>
+
+                <!-- 닉네임 수정 -->
+                <div class="mt-8 pt-8 border-t-2 border-gray-200">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">닉네임</label>
+                    <form th:action="@{/user/me/nickname}" method="POST" class="flex gap-3">
+                        <input type="text" name="nickname"
+                               th:value="${myPage.nickname}"
+                               class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600 focus:outline-none transition-colors font-medium"/>
+                        <button type="submit"
+                                class="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all font-bold">
+                            저장
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 비밀번호 변경 -->
+            <div class="bg-white border-2 border-gray-200 rounded-2xl p-8">
+                <h2 class="text-2xl font-black text-gray-900 mb-6 flex items-center gap-2">
+                    <i class="fa-solid fa-lock text-blue-600"></i>
+                    <span>비밀번호 변경</span>
+                </h2>
+                <form th:action="@{/user/me/password}" method="POST" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">현재 비밀번호</label>
+                        <div class="relative">
+                            <input type="password" id="currentPassword" name="currentPassword"
+                                   placeholder="현재 비밀번호를 입력하세요"
+                                   class="w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-xl focus:border-blue-600 focus:outline-none transition-colors font-medium"/>
+                            <button type="button" onclick="togglePassword('currentPassword', this)"
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">새 비밀번호</label>
+                        <div class="relative">
+                            <input type="password" id="newPassword" name="newPassword"
+                                   placeholder="새 비밀번호를 입력하세요"
+                                   class="w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-xl focus:border-blue-600 focus:outline-none transition-colors font-medium"/>
+                            <button type="button" onclick="togglePassword('newPassword', this)"
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">새 비밀번호 확인</label>
+                        <div class="relative">
+                            <input type="password" id="confirmPassword" name="confirmPassword"
+                                   placeholder="새 비밀번호를 다시 입력하세요"
+                                   class="w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-xl focus:border-blue-600 focus:outline-none transition-colors font-medium"/>
+                            <button type="button" onclick="togglePassword('confirmPassword', this)"
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                        <p id="pwMatchMsg" class="text-xs mt-1 hidden"></p>
+                    </div>
+                    <button type="submit"
+                            class="w-full py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all font-bold">
+                        비밀번호 변경
+                    </button>
+                </form>
+            </div>
+
+            <!-- 이메일 변경 -->
+            <div class="bg-white border-2 border-gray-200 rounded-2xl p-8">
+                <h2 class="text-2xl font-black text-gray-900 mb-6 flex items-center gap-2">
+                    <i class="fa-solid fa-envelope text-blue-600"></i>
+                    <span>이메일 변경</span>
+                </h2>
+                <form th:action="@{/user/me/email}" method="POST" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">새 이메일</label>
+                        <input type="email" name="email"
+                               th:placeholder="${myPage.email}"
+                               class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600 focus:outline-none transition-colors font-medium"/>
+                    </div>
+                    <button type="submit"
+                            class="w-full py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all font-bold">
+                        이메일 변경
+                    </button>
+                </form>
+            </div>
+
+            <!-- 계정 삭제 -->
+            <div class="bg-white border-2 border-gray-200 rounded-2xl p-8">
+                <h2 class="text-2xl font-black text-gray-900 mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-triangle-exclamation text-red-500"></i>
+                    <span>계정 삭제</span>
+                </h2>
+                <p class="text-sm text-gray-600 mb-6 font-medium">계정 삭제 시 프로필 및 모든 학습 정보가 삭제되며 복구할 수 없습니다.</p>
+                <div class="flex justify-end pt-4 border-t-2 border-gray-100">
+                    <button type="button" onclick="openWithdrawModal()"
+                            class="px-6 py-3 border-2 border-red-400 text-red-500 rounded-xl font-bold hover:bg-red-50 transition-all">
+                        회원 탈퇴 진행하기
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- 탈퇴 확인 모달 -->
+<div id="withdrawModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-2xl p-8 w-full max-w-md mx-4 shadow-2xl">
+        <h3 class="text-xl font-black text-gray-900 mb-2">정말 탈퇴하시겠습니까?</h3>
+        <p class="text-sm text-gray-600 mb-6">탈퇴 후 모든 데이터는 복구할 수 없습니다.</p>
+        <form th:action="@{/user/me/withdraw}" method="POST" class="space-y-4">
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-2">현재 비밀번호</label>
+                <div class="relative">
+                    <input type="password" id="withdrawPassword" name="password"
+                           placeholder="비밀번호를 입력하세요"
+                           class="w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-xl focus:border-red-500 focus:outline-none transition-colors font-medium"/>
+                    <button type="button" onclick="togglePassword('withdrawPassword', this)"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <button type="button" onclick="closeWithdrawModal()"
+                        class="flex-1 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition-all">
+                    취소
+                </button>
+                <button type="submit"
+                        class="flex-1 py-3 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition-all">
+                    탈퇴 확정
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="border-t border-gray-200 bg-white mt-16">
+    <div class="max-w-7xl mx-auto px-6 py-8">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-terminal text-blue-600"></i>
+                <span class="text-sm font-bold text-gray-600">© 2026 Nae-Il. 코딩으로 만드는 내일</span>
+            </div>
+            <div class="flex items-center gap-6 text-sm text-gray-600">
+                <a href="#" class="hover:text-blue-600 transition-colors">이용약관</a>
+                <a href="#" class="hover:text-blue-600 transition-colors">개인정보처리방침</a>
+                <a href="#" class="hover:text-blue-600 transition-colors">고객센터</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script>
+    function toggleNoticeDropdown() {
+        const el = document.getElementById('noticeDropdown');
+        if (el) el.classList.toggle('open');
+    }
+    function toggleProfileDropdown() {
+        const el = document.getElementById('profileDropdown');
+        if (el) el.classList.toggle('open');
+    }
+    function toggleInstructorProfileDropdown() {
+        const el = document.getElementById('instructorProfileDropdown');
+        if (el) {
+            el.style.display = el.style.display === 'none' || el.style.display === '' ? 'block' : 'none';
+        }
+    }
+    document.addEventListener('click', function(e) {
+        const noticeWrapper = document.getElementById('noticeDropdownWrapper');
+        const profileWrapper = document.getElementById('profileDropdownWrapper');
+        const instructorWrapper = document.getElementById('instructorProfileDropdownWrapper');
+
+        if (noticeWrapper && !noticeWrapper.contains(e.target)) {
+            const el = document.getElementById('noticeDropdown');
+            if (el) el.classList.remove('open');
+        }
+        if (profileWrapper && !profileWrapper.contains(e.target)) {
+            const el = document.getElementById('profileDropdown');
+            if (el) el.classList.remove('open');
+        }
+        if (instructorWrapper && !instructorWrapper.contains(e.target)) {
+            const el = document.getElementById('instructorProfileDropdown');
+            if (el) el.style.display = 'none';
+        }
+    });
+
+    function togglePassword(inputId, button) {
+        const input = document.getElementById(inputId);
+        const isPassword = input.getAttribute('type') === 'password';
+        input.setAttribute('type', isPassword ? 'text' : 'password');
+        const icon = button.querySelector('i');
+        icon.classList.toggle('fa-eye', !isPassword);
+        icon.classList.toggle('fa-eye-slash', isPassword);
+    }
+
+    const newPw = document.getElementById('newPassword');
+    const confirmPw = document.getElementById('confirmPassword');
+    const pwMatchMsg = document.getElementById('pwMatchMsg');
+
+    function checkPasswordMatch() {
+        if (confirmPw.value === '') {
+            pwMatchMsg.classList.add('hidden');
+            return;
+        }
+        if (newPw.value === confirmPw.value) {
+            pwMatchMsg.textContent = '비밀번호가 일치합니다.';
+            pwMatchMsg.className = 'text-xs mt-1 text-green-500 block';
+        } else {
+            pwMatchMsg.textContent = '비밀번호가 일치하지 않습니다.';
+            pwMatchMsg.className = 'text-xs mt-1 text-red-500 block';
+        }
+    }
+
+    newPw.addEventListener('input', checkPasswordMatch);
+    confirmPw.addEventListener('input', checkPasswordMatch);
+
+    function openWithdrawModal() {
+        document.getElementById('withdrawModal').classList.remove('hidden');
+    }
+    function closeWithdrawModal() {
+        document.getElementById('withdrawModal').classList.add('hidden');
+        document.getElementById('withdrawPassword').value = '';
+    }
+    document.getElementById('withdrawModal').addEventListener('click', function(e) {
+        if (e.target === this) closeWithdrawModal();
+    });
+</script>
+</body>
+</html>
