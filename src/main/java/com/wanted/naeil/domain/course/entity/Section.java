@@ -64,6 +64,21 @@ public class Section extends BaseTimeEntity {
         this.isFree = (isFree != null) ? isFree : false;
     }
 
+    public void updateSectionInfo(String title, LocalTime playTime, Boolean isFree, SectionStatus status) {
+        this.title = title;
+        this.playTime = playTime;
+        this.isFree = isFree != null ? isFree : false;
+        this.status = status;
+    }
+
+    public void updateVideoUrl(String videoUrl) {
+        this.videoUrl = videoUrl;
+    }
+
+    public void updateAttachmentUrl(String attachmentUrl) {
+        this.attachmentUrl = attachmentUrl;
+    }
+
     public void updateSequence(int newSequence) {
         this.sequence = newSequence;
     }

@@ -1,7 +1,7 @@
-package com.wanted.naeil.domain.auth.service;
+package com.wanted.naeil.global.auth.service;
 
-import com.wanted.naeil.domain.auth.model.dto.AuthDetails;
-import com.wanted.naeil.domain.user.dto.LoginUserDTO;
+import com.wanted.naeil.global.auth.model.dto.AuthDetails;
+import com.wanted.naeil.domain.user.dto.response.LoginUserDTO;
 import com.wanted.naeil.domain.user.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

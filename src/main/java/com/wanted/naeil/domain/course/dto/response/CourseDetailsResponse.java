@@ -23,10 +23,10 @@ public class CourseDetailsResponse {
     private final long sectionCount;
     private final long studentCount;
 
-    private List<SectionResponse> sections;
+    private List<SectionListResponse> sections;
 
     public static CourseDetailsResponse of(Course course, long likeCount, long studentCount,
-                                           Double avgRating, List<SectionResponse> sections
+                                           Double avgRating, List<SectionListResponse> sections
     ) {
         return CourseDetailsResponse.builder()
                 .courseId(course.getId())

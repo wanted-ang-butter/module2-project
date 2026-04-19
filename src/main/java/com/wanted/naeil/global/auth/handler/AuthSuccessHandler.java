@@ -1,4 +1,4 @@
-package com.wanted.naeil.domain.auth.handler;
+package com.wanted.naeil.global.auth.handler;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,14 +21,14 @@ public class AuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         String redirectUrl;
         switch (role) {
             case "ADMIN":
-                redirectUrl = "/admin/dashboard";
+                redirectUrl = "/dashboard/admin";
                 break;
             case "INSTRUCTOR":
-                redirectUrl = "/instructor/dashboard";
+                redirectUrl = "/dashboard/instructor";
                 break;
             case "SUBSCRIBER":
             case "USER":
-                redirectUrl = "/user/dashboard";
+                redirectUrl = "/dashboard/user";
                 break;
             default: // GUEST
                 redirectUrl = "/guest/dashboard";

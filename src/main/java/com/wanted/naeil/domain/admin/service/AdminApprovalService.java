@@ -28,8 +28,8 @@ public class AdminApprovalService {
     private final InsturctorApplicationRepository insturctorApplicationRepository;
     private final LiveLectureRepository liveLectureRepository;
 
-    // 1. 승인 목록조회
-    @Transactional
+    // 승인 목록조회
+    @Transactional(readOnly = true)
     public List<ApprovalResponse> getApprovals(ApprovalRequestType type){
 
         List<AdminApproval>approvals = courseApprovalRepository.findAllByRequestTypeAndStatus(type, ApprovalStatus.PENDING);
@@ -73,12 +73,15 @@ public class AdminApprovalService {
                                     .startAt(lecture.getStartAt())
                                     .instuctorName(lecture.getInstructor().getName());
                         }
+                        case SETTLEMENT_REGISTER -> {
+                            builder.instuctorName(approval.getSettlement().getInstructor().getName());
+                        }
                     }
                     return builder.build();
                 })
                 .collect(Collectors.toList());
         }
-    // 2. 승인 처리
+    //  승인 처리
     @Transactional
     public void approve(Long approvalId, User admin) {
         // 1) 승인건 찾아오기
@@ -107,7 +110,7 @@ public class AdminApprovalService {
         }
         courseApprovalRepository.save(approval);
     }
-    // 3. 반려 처리
+    //  반려 처리
     @Transactional
     public  void reject(Long approvalId , User admin , String rejectReason) {
         // 1) 반려건 찾아오기

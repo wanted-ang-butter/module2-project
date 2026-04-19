@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>코스 신청 검토</title>
@@ -12,7 +12,7 @@
 <header class="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
     <div class="max-w-7xl mx-auto px-6 py-4">
         <div class="flex items-center justify-between">
-            <a href="/admin/dashboard" class="flex items-center gap-3 group">
+            <a th:href="@{/dashboard/admin}" class="flex items-center gap-3 group">
                 <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
                     <i class="fa-solid fa-terminal text-white text-sm"></i>
                 </div>
@@ -22,7 +22,7 @@
                 </div>
             </a>
             <nav class="flex items-center gap-2">
-                <a href="/community/qna" class="flex items-center gap-2 px-4 py-2 border-2 border-gray-200 rounded-xl text-gray-700 hover:border-blue-600 hover:bg-blue-50 transition-all font-medium text-sm">
+                <a th:href="@{/community/qna}" class="flex items-center gap-2 px-4 py-2 border-2 border-gray-200 rounded-xl text-gray-700 hover:border-blue-600 hover:bg-blue-50 transition-all font-medium text-sm">
                     <i class="fa-solid fa-comment text-sm"></i><span>커뮤니티</span>
                 </a>
                 <div class="relative" id="adminMenuWrapper">
@@ -37,9 +37,9 @@
                                     <i class="fa-solid fa-chevron-down text-xs text-gray-500"></i>
                                 </button>
                                 <div id="memberSubMenu" class="hidden px-4 pb-2">
-                                    <a href="/admin/user-management" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">회원 조회</a>
-                                    <a href="/admin/instructor-approval" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">강사 승인</a>
-                                    <a href="/admin/blacklist" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">블랙리스트 관리</a>
+                                    <a th:href="@{/admin/user-management}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">회원 조회</a>
+                                    <a th:href="@{/admin/instructor-approval}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">강사 승인</a>
+                                    <a th:href="@{/admin/blacklist}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">블랙리스트 관리</a>
                                 </div>
                             </div>
                             <div class="border-t border-gray-100"></div>
@@ -49,20 +49,20 @@
                                     <i class="fa-solid fa-chevron-down text-xs text-gray-500"></i>
                                 </button>
                                 <div id="courseSubMenu" class="hidden px-4 pb-2">
-                                    <a href="/admin/course-management/approval" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">코스 승인 관리</a>
-                                    <a href="/admin/live-management" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">실시간 강의 승인 관리</a>
-                                    <a href="/admin/category-management" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">카테고리 관리</a>
+                                    <a th:href="@{/admin/course-management/approval}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">코스 승인 관리</a>
+                                    <a th:href="@{/admin/live-management}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">실시간 강의 승인 관리</a>
+                                    <a th:href="@{/admin/category-management}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">카테고리 관리</a>
                                 </div>
                             </div>
                             <div class="border-t border-gray-100"></div>
-                            <a href="/admin/settlement" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50">
+                            <a th:href="@{/admin/settlement}" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50">
                                 <i class="fa-solid fa-wallet text-gray-600"></i><span class="text-sm font-bold">정산 관리</span>
                             </a>
                         </div>
                     </div>
                 </div>
             </nav>
-            <a href="/auth/logout" class="flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-red-50 transition-all group">
+            <a th:href="@{/auth/logout}" class="flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-red-50 transition-all group">
                 <i class="fa-solid fa-right-from-bracket text-gray-600 group-hover:text-red-600 text-sm"></i>
                 <span class="font-medium text-gray-700 group-hover:text-red-600 text-sm">로그아웃</span>
             </a>
@@ -78,15 +78,15 @@
         <div class="bg-white border-2 border-gray-200 rounded-2xl p-4">
             <p class="text-sm font-black text-gray-900 px-3 py-2 mb-1">코스 관리</p>
             <nav class="space-y-1">
-                <a href="/admin/course-management/approval"
+                <a th:href="@{/admin/course-management/approval}"
                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-purple-700 bg-purple-50">
                     <i class="fa-solid fa-book-open text-purple-500 w-4"></i>코스 승인 관리
                 </a>
-                <a href="/admin/live-management"
+                <a th:href="@{/admin/live-management}"
                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50">
                     <i class="fa-solid fa-video text-gray-400 w-4"></i>실시간 강의 승인 관리
                 </a>
-                <a href="/admin/category-management"
+                <a th:href="@{/admin/category-management}"
                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50">
                     <i class="fa-solid fa-tags text-gray-400 w-4"></i>카테고리 관리
                 </a>
@@ -105,23 +105,32 @@
         <div class="grid grid-cols-3 gap-6 mb-8">
             <div class="bg-white border-2 border-yellow-200 rounded-2xl p-6">
                 <p class="text-sm font-bold text-gray-600 mb-2">검토 대기 중</p>
-                <p id="stat-pending" class="text-4xl font-black text-yellow-600">0건</p>
+                <p class="text-4xl font-black text-yellow-600" th:text="${pendingCount} + '건'">0건</p>
                 <p class="text-xs text-gray-500 mt-2 font-medium">신규 신청</p>
             </div>
             <div class="bg-white border-2 border-green-200 rounded-2xl p-6">
                 <p class="text-sm font-bold text-gray-600 mb-2">승인 완료</p>
-                <p id="stat-approved" class="text-4xl font-black text-green-600">0건</p>
+                <p class="text-4xl font-black text-green-600" th:text="${approvedCount} + '건'">0건</p>
                 <p class="text-xs text-gray-500 mt-2 font-medium">운영 중</p>
             </div>
             <div class="bg-white border-2 border-red-200 rounded-2xl p-6">
                 <p class="text-sm font-bold text-gray-600 mb-2">반려</p>
-                <p id="stat-rejected" class="text-4xl font-black text-red-600">0건</p>
+                <p class="text-4xl font-black text-red-600" th:text="${rejectedCount} + '건'">0건</p>
                 <p class="text-xs text-gray-500 mt-2 font-medium">재신청 필요</p>
             </div>
         </div>
 
         <!-- Filter Tabs -->
-        <div class="flex gap-3 mb-6" id="filter-tabs"></div>
+        <div class="flex gap-3 mb-6">
+            <button onclick="filterRows('ALL')" id="tab-ALL"
+                    class="px-4 py-2 rounded-full font-bold text-sm bg-blue-600 text-white shadow-md">전체</button>
+            <button onclick="filterRows('PENDING')" id="tab-PENDING"
+                    class="px-4 py-2 rounded-full font-bold text-sm bg-white border-2 border-gray-200 text-gray-700 hover:border-blue-300">승인 대기</button>
+            <button onclick="filterRows('APPROVED')" id="tab-APPROVED"
+                    class="px-4 py-2 rounded-full font-bold text-sm bg-white border-2 border-gray-200 text-gray-700 hover:border-blue-300">승인 완료</button>
+            <button onclick="filterRows('REJECTED')" id="tab-REJECTED"
+                    class="px-4 py-2 rounded-full font-bold text-sm bg-white border-2 border-gray-200 text-gray-700 hover:border-blue-300">반려</button>
+        </div>
 
         <!-- Table -->
         <div class="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden overflow-x-auto">
@@ -136,213 +145,84 @@
                         <th class="px-4 py-3 text-left text-sm font-black text-gray-900">액션</th>
                     </tr>
                 </thead>
-                <tbody id="table-body"></tbody>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(approvals)}">
+                        <td colspan="6" class="px-6 py-16 text-center text-gray-400">검토할 강의 신청이 없습니다</td>
+                    </tr>
+                    <tr th:each="approval : ${approvals}"
+                        th:attr="data-status=${approval.status.name()}"
+                        th:classappend="${approval.status.name() == 'PENDING'} ? 'border-l-4 border-l-yellow-400' : ''"
+                        class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                        <td class="px-4 py-3 font-medium text-gray-900 text-sm max-w-xs truncate" th:text="${approval.title ?: '-'}"></td>
+                        <td class="px-4 py-3 text-gray-700 text-sm whitespace-nowrap" th:text="${approval.instuctorName ?: '-'}"></td>
+                        <td class="px-4 py-3 text-gray-700 text-sm whitespace-nowrap" th:text="${approval.categoryName ?: '-'}"></td>
+                        <td class="px-4 py-3 text-gray-600 font-mono text-sm whitespace-nowrap"
+                            th:text="${approval.createdAt != null ? #temporals.format(approval.createdAt, 'yyyy-MM-dd') : '-'}"></td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <span th:classappend="${approval.status.name() == 'PENDING'} ? 'bg-yellow-100 text-yellow-700' : (${approval.status.name() == 'APPROVED'} ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700')"
+                                  class="px-3 py-1 rounded-full text-sm font-bold"
+                                  th:text="${approval.status.name() == 'PENDING'} ? '승인 대기' : (${approval.status.name() == 'APPROVED'} ? '승인 완료' : '반려')"></span>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <div class="flex gap-1.5" th:if="${approval.status.name() == 'PENDING'}">
+                                <form method="post" th:action="@{/admin/approvals/{id}/approve(id=${approval.approvalId})}">
+                                    <input type="hidden" name="redirect" value="/admin/course-management/approval"/>
+                                    <button type="submit" class="px-2.5 py-1.5 border-2 border-green-300 text-green-600 rounded-lg hover:bg-green-50 font-bold text-xs">승인</button>
+                                </form>
+                                <button type="button"
+                                        th:attr="data-id=${approval.approvalId}, data-title=${approval.title}"
+                                        onclick="openRejectModal(this.dataset.id, this.dataset.title)"
+                                        class="px-2.5 py-1.5 border-2 border-red-300 text-red-600 rounded-lg hover:bg-red-50 font-bold text-xs">반려</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
             </table>
         </div>
     </main>
 </div>
 
-<!-- Detail Modal -->
-<div id="detail-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-xl max-h-[90vh] overflow-y-auto">
-        <h3 class="text-2xl font-black text-gray-900 mb-6">강의 신청 상세</h3>
-        <div id="detail-content" class="space-y-4 mb-6"></div>
-        <button onclick="closeDetail()" class="w-full px-6 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 font-bold text-gray-700">닫기</button>
-    </div>
-</div>
-
 <!-- Reject Modal -->
-<div id="reject-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+<div id="reject-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" style="display:none">
     <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-xl">
         <h3 class="text-2xl font-black text-gray-900 mb-4">강의 신청 반려</h3>
         <p id="reject-title" class="text-gray-600 mb-4 font-medium"></p>
-        <textarea id="reject-reason" rows="4" placeholder="강사에게 전달될 반려 사유를 입력하세요"
-                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none resize-none font-medium"></textarea>
-        <div class="flex gap-3 mt-6">
-            <button onclick="confirmReject()" class="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 font-bold">반려 처리</button>
-            <button onclick="closeReject()" class="flex-1 px-6 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 font-bold text-gray-700">취소</button>
-        </div>
-    </div>
-</div>
-
-<!-- Alert Modal -->
-<div id="alert-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 border-2 border-gray-200 shadow-xl">
-        <p id="alert-message" class="text-gray-900 font-semibold text-center mb-6"></p>
-        <button onclick="closeAlert()" class="w-full px-4 py-2 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700">확인</button>
+        <form id="reject-form" method="post">
+            <input type="hidden" name="redirect" value="/admin/course-management/approval"/>
+            <textarea name="rejectReason" rows="4" placeholder="강사에게 전달될 반려 사유를 입력하세요"
+                      class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none resize-none font-medium"></textarea>
+            <div class="flex gap-3 mt-6">
+                <button type="submit" class="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 font-bold">반려 처리</button>
+                <button type="button" onclick="closeRejectModal()" class="flex-1 px-6 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 font-bold text-gray-700">취소</button>
+            </div>
+        </form>
     </div>
 </div>
 
 <script>
-    let allData = [];
-    let currentFilter = '전체';
-    let rejectApprovalId = null;
-    const filters = ['전체', 'PENDING', 'APPROVED', 'REJECTED'];
-    const filterLabels = { '전체': '전체', 'PENDING': '승인 대기', 'APPROVED': '승인 완료', 'REJECTED': '반려' };
-
-    function statusLabel(s) {
-        return { PENDING: '승인 대기', APPROVED: '승인 완료', REJECTED: '반려' }[s] || s;
-    }
-    function statusBadge(s) {
-        return { PENDING: 'bg-yellow-100 text-yellow-700', APPROVED: 'bg-green-100 text-green-700', REJECTED: 'bg-red-100 text-red-700' }[s] || 'bg-gray-100 text-gray-700';
-    }
-
-    function renderStats() {
-        document.getElementById('stat-pending').textContent = allData.filter(c => c.status === 'PENDING').length + '건';
-        document.getElementById('stat-approved').textContent = allData.filter(c => c.status === 'APPROVED').length + '건';
-        document.getElementById('stat-rejected').textContent = allData.filter(c => c.status === 'REJECTED').length + '건';
-    }
-
-    function renderFilters() {
-        const el = document.getElementById('filter-tabs');
-        el.innerHTML = '';
-        filters.forEach(f => {
-            const btn = document.createElement('button');
-            btn.textContent = filterLabels[f];
-            btn.className = `px-4 py-2 rounded-full font-bold text-sm transition-all ${currentFilter === f ? 'bg-blue-600 text-white shadow-md' : 'bg-white border-2 border-gray-200 text-gray-700 hover:border-blue-300'}`;
-            btn.onclick = () => { currentFilter = f; render(); };
-            el.appendChild(btn);
+    function filterRows(status) {
+        document.querySelectorAll('tbody tr[data-status]').forEach(tr => {
+            tr.style.display = (status === 'ALL' || tr.dataset.status === status) ? '' : 'none';
+        });
+        document.querySelectorAll('[id^="tab-"]').forEach(btn => {
+            btn.className = btn.id === 'tab-' + status
+                ? 'px-4 py-2 rounded-full font-bold text-sm bg-blue-600 text-white shadow-md'
+                : 'px-4 py-2 rounded-full font-bold text-sm bg-white border-2 border-gray-200 text-gray-700 hover:border-blue-300';
         });
     }
-
-    function renderTable() {
-        const tbody = document.getElementById('table-body');
-        tbody.innerHTML = '';
-        const list = allData.filter(c => currentFilter === '전체' || c.status === currentFilter);
-
-        if (list.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-16 text-center">
-                <div class="flex flex-col items-center gap-3">
-                    <div class="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center"><span class="text-3xl">📦</span></div>
-                    <p class="text-gray-500 font-medium">검토할 강의 신청이 없습니다</p>
-                </div>
-            </td></tr>`;
-            return;
-        }
-
-        list.forEach((c, i) => {
-            const date = c.createdAt ? c.createdAt.substring(0, 10) : '-';
-            const tr = document.createElement('tr');
-            tr.className = `border-b border-gray-100 hover:bg-gray-50 transition-colors ${c.status === 'PENDING' ? 'border-l-4 border-l-yellow-400' : ''}`;
-            tr.innerHTML = `
-                <td class="px-4 py-3 font-medium text-gray-900 text-sm max-w-xs truncate">${c.title || '-'}</td>
-                <td class="px-4 py-3 text-gray-700 text-sm whitespace-nowrap">${c.instuctorName || '-'}</td>
-                <td class="px-4 py-3 text-gray-700 text-sm whitespace-nowrap">${c.categoryName || '-'}</td>
-                <td class="px-4 py-3 text-gray-600 font-mono text-sm whitespace-nowrap">${date}</td>
-                <td class="px-4 py-3 whitespace-nowrap">
-                    <span class="px-3 py-1 rounded-full text-sm font-bold ${statusBadge(c.status)}">${statusLabel(c.status)}</span>
-                </td>
-                <td class="px-4 py-3 whitespace-nowrap">
-                    <div class="flex gap-1.5">
-                        <button onclick="openDetail(${c.approvalId})" class="px-2.5 py-1.5 border-2 border-blue-300 text-blue-600 rounded-lg hover:bg-blue-50 font-bold text-xs">검토</button>
-                        ${c.status === 'PENDING' ? `
-                            <button onclick="handleApprove(${c.approvalId}, '${c.title}')" class="px-2.5 py-1.5 border-2 border-green-300 text-green-600 rounded-lg hover:bg-green-50 font-bold text-xs">승인</button>
-                            <button onclick="openReject(${c.approvalId}, '${c.title}')" class="px-2.5 py-1.5 border-2 border-red-300 text-red-600 rounded-lg hover:bg-red-50 font-bold text-xs">반려</button>
-                        ` : ''}
-                    </div>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
-
-    function render() { renderStats(); renderFilters(); renderTable(); }
-
-    // 승인
-    function handleApprove(approvalId, title) {
-        fetch(`/api/admin/course-approvals/${approvalId}/approve`, { method: 'PATCH' })
-            .then(res => {
-                if (!res.ok) throw new Error('승인 실패');
-                showAlert(`"${title}" 강의 신청이 승인되었습니다.`);
-            })
-            .catch(() => showAlert('승인 중 오류가 발생했습니다.'));
-    }
-
-    // 반려 모달
-    function openReject(approvalId, title) {
-        rejectApprovalId = approvalId;
-        document.getElementById('reject-title').textContent = `"${title}" 신청을 반려하시겠습니까?`;
-        document.getElementById('reject-reason').value = '';
+    function openRejectModal(id, title) {
+        document.getElementById('reject-title').textContent = '"' + title + '" 신청을 반려하시겠습니까?';
+        document.getElementById('reject-form').action = '/admin/approvals/' + id + '/reject';
         document.getElementById('reject-modal').classList.remove('hidden');
     }
-    function closeReject() { document.getElementById('reject-modal').classList.add('hidden'); }
-
-    function confirmReject() {
-        const reason = document.getElementById('reject-reason').value.trim();
-        if (!reason) { showAlert('반려 사유를 입력해주세요.'); return; }
-        fetch(`/api/admin/course-approvals/${rejectApprovalId}/reject`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ rejectReason: reason })
-        })
-        .then(res => {
-            if (!res.ok) throw new Error('반려 실패');
-            closeReject();
-            showAlert('강의 신청이 반려되었습니다.');
-        })
-        .catch(() => showAlert('반려 중 오류가 발생했습니다.'));
-    }
-
-    // 상세 모달
-    function openDetail(approvalId) {
-        const c = allData.find(x => x.approvalId === approvalId);
-        if (!c) return;
-        const date = c.createdAt ? c.createdAt.substring(0, 10) : '-';
-        document.getElementById('detail-content').innerHTML = `
-            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                <span class="text-sm font-bold text-gray-600">상태</span>
-                <span class="px-3 py-1 rounded-full text-sm font-bold ${statusBadge(c.status)}">${statusLabel(c.status)}</span>
-            </div>
-            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                <span class="text-sm font-bold text-gray-600">코스명</span>
-                <span class="text-sm font-bold text-gray-900">${c.title || '-'}</span>
-            </div>
-            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                <span class="text-sm font-bold text-gray-600">강사명</span>
-                <span class="text-sm font-bold text-gray-900">${c.instuctorName || '-'}</span>
-            </div>
-            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                <span class="text-sm font-bold text-gray-600">카테고리</span>
-                <span class="text-sm font-medium text-gray-900">${c.categoryName || '-'}</span>
-            </div>
-            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                <span class="text-sm font-bold text-gray-600">신청일</span>
-                <span class="text-sm font-mono text-gray-900">${date}</span>
-            </div>
-        `;
-        document.getElementById('detail-modal').classList.remove('hidden');
-    }
-    function closeDetail() { document.getElementById('detail-modal').classList.add('hidden'); }
-
-    // Alert
-    function showAlert(msg) {
-        document.getElementById('alert-message').textContent = msg;
-        document.getElementById('alert-modal').classList.remove('hidden');
-    }
-    function closeAlert() {
-        document.getElementById('alert-modal').classList.add('hidden');
-        loadData();
-    }
-
-    // 데이터 로드 - COURSE_REGISTER 타입
-    function loadData() {
-        fetch('/api/admin/course-approvals?type=COURSE_REGISTER')
-            .then(res => res.json())
-            .then(data => { allData = data; render(); })
-            .catch(err => console.error('조회 실패:', err));
-    }
-
-    // Header 드롭다운
+    function closeRejectModal() { document.getElementById('reject-modal').classList.add('hidden'); }
     function toggleAdminMenu() { document.getElementById('adminMenu').classList.toggle('hidden'); }
     function toggleMemberMenu() { document.getElementById('memberSubMenu').classList.toggle('hidden'); }
     function toggleCourseMenu() { document.getElementById('courseSubMenu').classList.toggle('hidden'); }
     document.addEventListener('click', e => {
-        if (!document.getElementById('adminMenuWrapper').contains(e.target)) {
+        if (!document.getElementById('adminMenuWrapper').contains(e.target))
             document.getElementById('adminMenu').classList.add('hidden');
-        }
     });
-
-    document.addEventListener('DOMContentLoaded', loadData);
 </script>
 
 </body>

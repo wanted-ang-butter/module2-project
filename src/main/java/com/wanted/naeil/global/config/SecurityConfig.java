@@ -1,6 +1,6 @@
 package com.wanted.naeil.global.config;
 
-import com.wanted.naeil.domain.auth.handler.AuthSuccessHandler;
+import com.wanted.naeil.global.auth.handler.AuthSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -42,12 +42,15 @@ public class SecurityConfig {
                                          AuthSuccessHandler authSuccessHandler) throws Exception {
 
         http.authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/auth/login", "/auth/signup", "/auth/fail", "/").permitAll();
+                    auth.requestMatchers("/auth/login", "/auth/signup", "/auth/fail", "/auth/find-id", "/auth/find-password",  "/", "/dashboard/guest").permitAll();
                     auth.requestMatchers("/admin/**").hasAnyAuthority("ADMIN");
                     auth.requestMatchers("/instructor/**").hasAnyAuthority("ADMIN", "INSTRUCTOR");
                     auth.requestMatchers("/subscribe/**").hasAnyAuthority("ADMIN", "INSTRUCTOR", "SUBSCRIBER");
                     auth.requestMatchers("/user/**").hasAnyAuthority("ADMIN", "INSTRUCTOR", "SUBSCRIBER", "USER");
                     auth.requestMatchers("/guest/**").hasAnyAuthority("ADMIN", "INSTRUCTOR", "SUBSCRIBER", "USER", "GUEST");
+                    auth.requestMatchers("/dashboard/admin").hasAnyAuthority("ADMIN");
+                    auth.requestMatchers("/dashboard/instructor").hasAnyAuthority("ADMIN", "INSTRUCTOR");
+                    auth.requestMatchers("/dashboard/user").hasAnyAuthority("ADMIN", "INSTRUCTOR", "SUBSCRIBER", "USER");
                     auth.anyRequest().authenticated();
                 }).formLogin(login -> {
                     login.loginPage("/auth/login");
