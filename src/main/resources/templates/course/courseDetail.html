@@ -68,7 +68,9 @@
           <div class="flex items-center gap-3 shrink-0">
             <span class="font-semibold text-gray-700"
                   th:text="${#numbers.formatInteger(course.likeCount, 0, 'COMMA')}">0</span>
-            <form th:action="@{/course/{id}/like(id=${course.courseId})}" method="post">
+            <form th:action="@{/likes}" method="post">
+              <input type="hidden" name="targetType" value="COURSE">
+              <input type="hidden" name="targetId" th:value="${course.courseId}">
               <button type="submit"
                       class="w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition">
                 <i class="fa-regular fa-heart"></i>
