@@ -1,6 +1,7 @@
 package com.wanted.naeil.domain.user.service;
 
 
+import com.wanted.naeil.domain.payment.entity.Credit;
 import com.wanted.naeil.domain.user.dto.LoginUserDTO;
 import com.wanted.naeil.domain.user.dto.SignupDTO;
 import com.wanted.naeil.domain.user.entity.User;
@@ -14,9 +15,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+// 삭제 해야댐
+import com.wanted.naeil.domain.payment.entity.Credit;
+import com.wanted.naeil.domain.payment.repository.CreditRepository;
+
 @Service
 @RequiredArgsConstructor
 public class MemberService {
+
+    // 삭제 해야댐
+    private final CreditRepository creditRepository;
 
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
@@ -68,6 +76,15 @@ private final LocalFileService localFileService;
                 .build();
 
 
+        // 삭제 해야댐
+        User savedUser = userRepository.save(user);
+
+        Credit credit = Credit.builder()
+                .user(savedUser)
+                .balance(0)
+                .build();
+
+        creditRepository.save(credit);
 
         //4. DB 저장
         return userRepository.save(user).getId();

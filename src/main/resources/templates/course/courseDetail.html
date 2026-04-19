@@ -13,9 +13,82 @@
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
+
+    .toast {
+      position: fixed;
+      top: 28px;
+      right: 28px;
+      z-index: 9999;
+      min-width: 280px;
+      max-width: 360px;
+      padding: 16px 18px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.16);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      transform: translateY(-16px);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s ease;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .toast.success {
+      border-left: 5px solid #22c55e;
+    }
+
+    .toast.warning {
+      border-left: 5px solid #f59e0b;
+    }
+
+    .toast-icon {
+      font-size: 18px;
+      line-height: 1;
+      margin-top: 2px;
+    }
+
+    .toast.success .toast-icon {
+      color: #16a34a;
+    }
+
+    .toast.warning .toast-icon {
+      color: #d97706;
+    }
+
+    .toast-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #111827;
+      margin-bottom: 2px;
+    }
+
+    .toast-message {
+      font-size: 14px;
+      color: #4b5563;
+      line-height: 1.45;
+    }
   </style>
 </head>
 <body class="bg-[#f7f7f9] min-h-screen text-gray-900">
+
+<!-- 토스트 -->
+<div id="cartToast" class="toast">
+  <div id="toastIcon" class="toast-icon">
+    <i class="fa-solid fa-circle-check"></i>
+  </div>
+  <div>
+    <div id="toastTitle" class="toast-title">알림</div>
+    <div id="toastMessage" class="toast-message">메시지</div>
+  </div>
+</div>
 
 <div class="border-b border-gray-200 bg-white">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -181,15 +254,17 @@
           </div>
 
           <div class="space-y-3">
-            <a th:href="@{/payment(courses=${course.courseId})}"
-               href="/payment"
-               class="w-full h-14 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg flex items-center justify-center gap-2 transition">
-              <i class="fa-regular fa-credit-card"></i>
-              <span>바로 결제</span>
-            </a>
+            <!-- 바로 결제 -->
+            <form th:action="@{/payments/courses/direct/{courseId}(courseId=${course.courseId})}" method="post">
+              <button type="submit"
+                      class="w-full h-14 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg flex items-center justify-center gap-2 transition">
+                <i class="fa-regular fa-credit-card"></i>
+                <span>바로 결제</span>
+              </button>
+            </form>
 
-            <form th:action="@{/cart/add}" method="post">
-              <input type="hidden" name="courseId" th:value="${course.courseId}"/>
+            <!-- 장바구니 담기 -->
+            <form th:action="@{/cart/add/{courseId}(courseId=${course.courseId})}" method="post">
               <button type="submit"
                       class="w-full h-14 rounded-2xl border border-gray-300 bg-white hover:bg-gray-50 text-gray-900 font-bold text-lg flex items-center justify-center gap-2 transition">
                 <i class="fa-solid fa-cart-shopping"></i>
@@ -221,6 +296,82 @@
     </aside>
   </div>
 </main>
+
+<script>
+  function showToast(type, title, message) {
+
+    const old = document.getElementById('centerToast');
+    if (old) old.remove();
+
+    const toast = document.createElement('div');
+    toast.id = 'centerToast';
+
+    const color = type === 'success' ? 'border-green-300' : 'border-yellow-300';
+    const icon = type === 'success'
+            ? 'fa-circle-check text-green-600'
+            : 'fa-triangle-exclamation text-yellow-500';
+
+    toast.className = `
+    fixed inset-0 z-[9999] flex items-center justify-center
+    bg-black/30 backdrop-blur-sm
+    opacity-0 transition-all duration-300
+  `;
+
+    toast.innerHTML = `
+    <div class="
+      bg-white rounded-3xl shadow-2xl border ${color}
+      px-8 py-6 w-[360px] text-center
+      scale-90 transition-all duration-300
+    ">
+      <div class="flex flex-col items-center gap-3">
+        <i class="fa-solid ${icon} text-2xl"></i>
+        <div class="text-lg font-extrabold text-gray-900">${title}</div>
+        <div class="text-sm text-gray-600">${message}</div>
+      </div>
+    </div>
+  `;
+
+    document.body.appendChild(toast);
+
+    // 등장 애니메이션
+    requestAnimationFrame(() => {
+      toast.classList.remove('opacity-0');
+      toast.classList.add('opacity-100');
+      toast.firstElementChild.classList.remove('scale-90');
+      toast.firstElementChild.classList.add('scale-100');
+    });
+
+    // 자동 사라짐
+    setTimeout(() => {
+      toast.classList.remove('opacity-100');
+      toast.classList.add('opacity-0');
+      toast.firstElementChild.classList.remove('scale-100');
+      toast.firstElementChild.classList.add('scale-90');
+
+      setTimeout(() => toast.remove(), 300);
+    }, 2000);
+
+    // 클릭 시 닫힘
+    toast.addEventListener('click', () => {
+      toast.remove();
+    });
+  }
+
+  // 상태 체크 (이건 그대로 유지)
+  const params = new URLSearchParams(window.location.search);
+  const cartStatus = params.get('cartStatus');
+
+  if (cartStatus === 'added') {
+    showToast('success', '장바구니 담기 완료', '장바구니에 담았습니다.');
+  } else if (cartStatus === 'duplicate') {
+    showToast('warning', '이미 담긴 강의', '이미 장바구니에 담긴 강의입니다.');
+  }
+
+  if (cartStatus) {
+    const cleanUrl = window.location.pathname;
+    window.history.replaceState({}, document.title, cleanUrl);
+  }
+</script>
 
 </body>
 </html>
