@@ -16,10 +16,10 @@
      th:attr="data-course-id=${courseEdit.courseId}">
 
     <div class="mb-8">
-        <a th:href="@{/dashboard/instructor}"
+        <a th:href="@{/instructor/course-management}"
            class="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors mb-4">
             <i data-lucide="arrow-left" class="w-4 h-4"></i>
-            <span class="text-sm font-medium">강사 메인으로</span>
+            <span class="text-sm font-medium">내 강의 관리로</span>
         </a>
 
         <div class="flex items-center justify-between gap-4">
@@ -445,9 +445,40 @@
         button.closest('.new-section-item').remove();
     }
 
+    // 섹션 추가
     async function createSection(button) {
-        alert('섹션 추가 API는 아직 연결되지 않았습니다.');
+        const sectionItem = button.closest('.section-item');
+        const form = sectionItem.querySelector('.section-form');
+
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const formData = new FormData(form);
+
+        if (!form.querySelector('[name="isFree"]').checked) {
+            formData.set('isFree', 'false');
+        }
+
+        if (!form.querySelector('[name="isActive"]').checked) {
+            formData.set('isActive', 'false');
+        }
+
+        const response = await fetch(`/instructor/course/${courseId}/sections`, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            alert('섹션 추가에 실패했습니다.');
+            return;
+        }
+
+        alert('섹션이 추가되었습니다.');
+        location.reload();
     }
+
 
     async function saveCourseInfo() {
         const form = document.getElementById('courseInfoForm');

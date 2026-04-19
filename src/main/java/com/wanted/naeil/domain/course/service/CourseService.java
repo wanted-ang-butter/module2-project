@@ -1,21 +1,28 @@
 package com.wanted.naeil.domain.course.service;
 
 import com.wanted.naeil.domain.course.dto.request.CourseCreateRequest;
+import com.wanted.naeil.domain.course.dto.request.CourseStatusUpdateRequest;
+import com.wanted.naeil.domain.course.dto.request.CourseUpdateRequest;
 import com.wanted.naeil.domain.course.dto.response.*;
 import com.wanted.naeil.domain.course.entity.Category;
 import com.wanted.naeil.domain.course.entity.Course;
+import com.wanted.naeil.domain.course.entity.enums.CourseStatus;
 import com.wanted.naeil.domain.course.repository.CategoryRepository;
 import com.wanted.naeil.domain.course.repository.CourseRepository;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.domain.user.entity.enums.Role;
 import com.wanted.naeil.domain.user.repository.UserRepository;
+import com.wanted.naeil.global.util.file.FileTransactionService;
 import com.wanted.naeil.global.util.file.LocalFileService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -29,6 +36,7 @@ public class CourseService {
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
     private final LocalFileService localFileService;
+    private final FileTransactionService fileTransactionService;
     private final CategoryRepository categoryRepository;
     private final SectionService sectionService;
     private final ModelMapper modelMapper;
@@ -97,7 +105,7 @@ public class CourseService {
 
         // TODO : createSection() 만들어서 호출하기
         if (request.getSections() != null && !request.getSections().isEmpty()) {
-            sectionService.createSection(course, request.getSections());
+            sectionService.registerSections(course, request.getSections());
         }
 
         return CreateCourseResponse.from(savedCourse, "강의 등록 신청이 완료되었습니다. 관리자 승인 후 강의가 활성화됩니다.");
@@ -170,6 +178,67 @@ public class CourseService {
                 likeCount,
                 avgRating,
                 sectionsResponses);
+    }
+
+    // 코스 수정
+    @Transactional
+    public void updateCourse(Long instructorId, Long courseId, @Valid CourseUpdateRequest request) {
+
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 강의입니다."));
+
+        validateCourseOwner(course, instructorId);
+
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new NoSuchElementException("존재하지 앟는 카테고리입니다."));
+
+        String oldThumbnailUrl = course.getThumbnail();
+        String newThumbnailUrl = null;
+        String thumbnailUrl = oldThumbnailUrl;
+
+        // 새로 받은 썸네일 업데이트
+        if (request.getThumbnail() != null && !request.getThumbnail().isEmpty()) {
+            newThumbnailUrl = localFileService.uploadSingleFile(request.getThumbnail(), "courses");
+            thumbnailUrl = newThumbnailUrl;
+        }
+
+        course.updateBasicInfo(
+                request.getTitle(),
+                category,
+                request.getDescription(),
+                request.getPrice(),
+                thumbnailUrl
+        );
+
+        // 파일 수정은 별도 트랜잭션 관리
+        if (newThumbnailUrl != null) {
+            fileTransactionService.registerReplace(oldThumbnailUrl, newThumbnailUrl);
+        }
+
+        log.info("[CourseUpdate] 강의 기본 정보 수정 완료 - instructorId: {}, courseId: {}", instructorId, courseId);
+    }
+
+    // 코스 상태 수정
+    @Transactional
+    public void updateCourseStatus(Long instructorId, Long courseId, @Valid CourseStatusUpdateRequest request) {
+
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 강의입니다."));
+
+        validateCourseOwner(course, instructorId);
+
+        CourseStatus status = request.getStatus();
+
+        if (status == CourseStatus.ACTIVE) {
+            course.activate();
+        } else if (status == CourseStatus.INACTIVE) {
+            course.deactivate();
+        } else {
+            throw new IllegalArgumentException("변경할 수 없는 강의 상태입니다.");
+        }
+
+        log.info("[CourseStatusUpdate] 강의 상태 변경 완료 - instructorId: {}, courseId: {}, status: {}",
+                instructorId, courseId, status);
     }
 
     // ==== 내부 편의 메서드 ====
