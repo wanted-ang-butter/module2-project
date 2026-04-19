@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>강사 신청 | Nae-Il</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    .notice-dropdown { display: none; }
+    .notice-dropdown.open { display: block; }
+    .profile-dropdown { display: none; }
+    .profile-dropdown.open { display: block; }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+<!-- 헤더 -->
+<header class="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
+  <div class="max-w-7xl mx-auto px-6 py-4">
+    <div class="flex items-center justify-between">
+
+      <!-- Logo -->
+      <a th:href="@{/}" href="/" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+          <i class="fa-solid fa-terminal text-white text-sm"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold text-gray-900 tracking-tight">
+            내일 <span class="text-gray-500 font-normal">Nae-il</span>
+          </h1>
+          <p class="text-[10px] font-semibold text-gray-500 tracking-wide">내일의 일, My Work</p>
+        </div>
+      </a>
+
+      <!-- Nav -->
+      <nav class="flex items-center gap-1 flex-nowrap">
+        <a th:href="@{/courses}" href="/courses" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+          <i class="fa-solid fa-book-open w-4 h-4"></i>
+          <span class="text-xs font-medium">전체 강의</span>
+        </a>
+        <a th:href="@{/live}" href="/live" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+          <i class="fa-solid fa-calendar w-4 h-4"></i>
+          <span class="text-xs font-medium">실시간 강의</span>
+        </a>
+        <a th:href="@{/my-courses}" href="/my-courses" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+          <i class="fa-solid fa-video w-4 h-4"></i>
+          <span class="text-xs font-medium">내 강의</span>
+        </a>
+        <a th:href="@{/community/qna}" href="/community/qna" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+          <i class="fa-solid fa-comment w-4 h-4"></i>
+          <span class="text-xs font-medium">커뮤니티</span>
+        </a>
+        <a th:href="@{/cart}" href="/cart" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+          <i class="fa-solid fa-cart-shopping w-4 h-4"></i>
+          <span class="text-xs font-medium">장바구니</span>
+        </a>
+        <a th:href="@{/credit}" href="/credit" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+          <i class="fa-solid fa-wallet w-4 h-4"></i>
+          <span class="text-xs font-medium">크레딧</span>
+        </a>
+      </nav>
+
+      <!-- Right -->
+      <div class="flex items-center gap-4">
+        <a th:href="@{/auth/logout}" href="/auth/logout"
+           class="flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-red-50 transition-all group">
+          <i class="fa-solid fa-right-from-bracket text-gray-600 group-hover:text-red-600 text-sm"></i>
+          <span class="font-medium text-gray-700 group-hover:text-red-600 text-sm">로그아웃</span>
+        </a>
+        <div class="text-right" th:if="${user}">
+          <p class="text-sm font-medium text-gray-900" th:text="${user.name}">사용자</p>
+          <p class="text-xs font-mono text-gray-500" th:text="${user.email}">email</p>
+        </div>
+        <div class="relative" id="noticeDropdownWrapper">
+          <button onclick="toggleNoticeDropdown()"
+                  class="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+            <i class="fa-solid fa-bullhorn text-white text-sm"></i>
+          </button>
+          <div id="noticeDropdown" class="notice-dropdown absolute right-0 mt-2 w-48 bg-white border-2 border-gray-200 rounded-xl shadow-xl z-50">
+            <div class="py-2">
+              <a href="/notice" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                <i class="fa-solid fa-bullhorn text-gray-600"></i>
+                <span class="text-sm font-medium text-gray-900">공지사항</span>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="relative" id="profileDropdownWrapper">
+          <button onclick="toggleProfileDropdown()"
+                  class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+            <span class="text-white font-mono text-xs font-bold">{ }</span>
+          </button>
+          <div id="profileDropdown" class="profile-dropdown absolute right-0 mt-2 w-56 bg-white border-2 border-gray-200 rounded-xl shadow-xl z-50">
+            <div class="py-2">
+              <a href="/my-courses" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                <i class="fa-solid fa-video text-gray-600"></i>
+                <span class="text-sm font-medium text-gray-900">내 강의</span>
+              </a>
+              <a href="/user/me" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                <i class="fa-solid fa-gear text-gray-600"></i>
+                <span class="text-sm font-medium text-gray-900">계정 설정</span>
+              </a>
+              <a href="/subscriber/mySubscriber" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                <i class="fa-solid fa-user text-gray-600"></i>
+                <span class="text-sm font-medium text-gray-900">나의 구독</span>
+              </a>
+              <a href="/user/me/instructor-application/history" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                <i class="fa-solid fa-chalkboard-user text-gray-600"></i>
+                <span class="text-sm font-medium text-gray-900">강사 신청</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="max-w-7xl mx-auto px-6 py-12">
+  <div class="grid grid-cols-12 gap-8">
+
+    <!-- Left Sidebar -->
+    <div class="col-span-3">
+      <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 sticky top-24">
+        <h2 class="text-xl font-black text-gray-900 mb-6">설정</h2>
+        <nav class="space-y-2">
+          <a th:href="@{/my-courses}" href="/my-courses"
+             class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 font-medium transition-all">
+            <i class="fa-solid fa-video w-5 h-5"></i>
+            <span class="text-sm">내 강의</span>
+          </a>
+          <a th:href="@{/user/me}" href="/user/me"
+             class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 font-medium transition-all">
+            <i class="fa-solid fa-gear w-5 h-5"></i>
+            <span class="text-sm">계정 설정</span>
+          </a>
+          <a th:href="@{/subscriber/mySubscriber}" href="/subscriber/mySubscriber"
+             class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 font-medium transition-all">
+            <i class="fa-solid fa-user w-5 h-5"></i>
+            <span class="text-sm">나의 구독</span>
+          </a>
+          <a th:href="@{/user/me/instructor-application/history}" href="/user/me/instructor-application/history"
+             class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-bold transition-all">
+            <i class="fa-solid fa-chalkboard-user w-5 h-5"></i>
+            <span class="text-sm">강사 신청</span>
+          </a>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-span-9">
+      <div class="bg-white border-2 border-gray-200 rounded-2xl p-8">
+        <div class="flex items-center justify-between mb-8">
+          <div>
+            <h2 class="text-3xl font-black text-gray-900 mb-2">강사 신청 이력</h2>
+            <p class="text-gray-600 font-medium">강사 신청 내역을 확인하고 관리하세요</p>
+          </div>
+          <a th:href="@{/user/me/apply-instructor}" href="/user/me/apply-instructor"
+             class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl hover:shadow-xl hover:shadow-green-200 transition-all font-bold">
+            <i class="fa-solid fa-circle-plus w-5 h-5"></i>
+            <span>강사 신청하기</span>
+          </a>
+        </div>
+
+        <!-- 승인 대기 알림 -->
+        <div th:if="${hasPending}" class="mb-6 p-5 bg-yellow-50 border-2 border-yellow-200 rounded-xl">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-clock text-yellow-600 text-xl"></i>
+            <div>
+              <p class="text-sm font-black text-yellow-900">승인 대기 중</p>
+              <p class="text-sm text-yellow-700 font-medium">현재 신청하신 내용을 검토 중입니다. 검토가 완료되면 알려드리겠습니다.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 신청 이력 없음 -->
+        <div th:if="${applications == null or #lists.isEmpty(applications)}" class="text-center py-16">
+          <i class="fa-solid fa-file-lines text-gray-300 text-6xl mb-4 block"></i>
+          <h3 class="text-xl font-black text-gray-900 mb-2">신청 이력이 없습니다</h3>
+          <p class="text-gray-600 mb-6 font-medium">강사로 활동하고 싶으시다면 신청을 시작해보세요</p>
+          <a th:href="@{/user/me/apply-instructor}" href="/user/me/apply-instructor"
+             class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl hover:shadow-xl hover:shadow-green-200 transition-all font-bold">
+            <i class="fa-solid fa-circle-plus w-5 h-5"></i>
+            <span>강사 신청하기</span>
+          </a>
+        </div>
+
+        <!-- 신청 이력 목록 -->
+        <div th:unless="${applications == null or #lists.isEmpty(applications)}" class="space-y-4">
+          <div th:each="app : ${applications}"
+               th:classappend="${app.status.name() == 'PENDING'} ? 'border-yellow-200 bg-yellow-50' : (${app.status.name() == 'APPROVED'} ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50')"
+               class="p-6 border-2 rounded-xl">
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-3">
+                  <!-- 승인 대기 -->
+                  <div th:if="${app.status.name() == 'PENDING'}"
+                       class="flex items-center gap-2 px-3 py-1 rounded-lg bg-yellow-50 border border-yellow-200">
+                    <i class="fa-solid fa-clock w-4 h-4 text-yellow-600"></i>
+                    <span class="text-sm font-bold text-yellow-600">승인 대기중</span>
+                  </div>
+                  <!-- 승인 완료 -->
+                  <div th:if="${app.status.name() == 'APPROVED'}"
+                       class="flex items-center gap-2 px-3 py-1 rounded-lg bg-green-50 border border-green-200">
+                    <i class="fa-solid fa-circle-check w-4 h-4 text-green-600"></i>
+                    <span class="text-sm font-bold text-green-600">승인 완료</span>
+                  </div>
+                  <!-- 반려 -->
+                  <div th:if="${app.status.name() == 'REJECTED'}"
+                       class="flex items-center gap-2 px-3 py-1 rounded-lg bg-red-50 border border-red-200">
+                    <i class="fa-solid fa-circle-xmark w-4 h-4 text-red-600"></i>
+                    <span class="text-sm font-bold text-red-600">반려됨</span>
+                  </div>
+                </div>
+                <h3 class="text-xl font-black text-gray-900 mb-2" th:text="${app.title}">신청 제목</h3>
+                <p class="text-sm text-gray-600 font-medium">
+                  신청일: <span th:text="${app.createdAt}">2026-04-14</span>
+                </p>
+              </div>
+              <!-- 신청 철회 버튼 (대기 중일 때만) -->
+              <form th:if="${app.status.name() == 'PENDING'}"
+                    th:action="@{/user/instructor-application/{id}/cancel(id=${app.id})}"
+                    method="POST" class="ml-4">
+                <button type="submit"
+                        onclick="return confirm('신청을 철회하시겠습니까?')"
+                        class="inline-flex items-center gap-2 px-4 py-2 border-2 border-red-300 text-red-600 rounded-xl hover:bg-red-50 transition-all font-bold">
+                  <i class="fa-solid fa-trash w-4 h-4"></i>
+                  <span>신청 철회</span>
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="border-t border-gray-200 bg-white mt-16">
+  <div class="max-w-7xl mx-auto px-6 py-8">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-terminal text-blue-600"></i>
+        <span class="text-sm font-bold text-gray-600">© 2026 Nae-Il. 코딩으로 만드는 내일</span>
+      </div>
+      <div class="flex items-center gap-6 text-sm text-gray-600">
+        <a href="#" class="hover:text-blue-600 transition-colors">이용약관</a>
+        <a href="#" class="hover:text-blue-600 transition-colors">개인정보처리방침</a>
+        <a href="#" class="hover:text-blue-600 transition-colors">고객센터</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  function toggleNoticeDropdown() {
+    const el = document.getElementById('noticeDropdown');
+    if (el) el.classList.toggle('open');
+  }
+  function toggleProfileDropdown() {
+    const el = document.getElementById('profileDropdown');
+    if (el) el.classList.toggle('open');
+  }
+  document.addEventListener('click', function(e) {
+    const noticeWrapper = document.getElementById('noticeDropdownWrapper');
+    const profileWrapper = document.getElementById('profileDropdownWrapper');
+    if (noticeWrapper && !noticeWrapper.contains(e.target)) {
+      const el = document.getElementById('noticeDropdown');
+      if (el) el.classList.remove('open');
+    }
+    if (profileWrapper && !profileWrapper.contains(e.target)) {
+      const el = document.getElementById('profileDropdown');
+      if (el) el.classList.remove('open');
+    }
+  });
+</script>
+</body>
+</html>

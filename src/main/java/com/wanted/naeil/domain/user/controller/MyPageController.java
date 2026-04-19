@@ -22,6 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/user")
 @RequiredArgsConstructor
@@ -127,5 +129,22 @@ public class MyPageController {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/user/me"; // 마이페이지(혹은 설정페이지)로 복귀
         }
+    }
+
+    // 강사 신청 내역 조회
+    @GetMapping("/me/instructor-application/history")
+    public ModelAndView instructorApplicationHistory(@AuthenticationPrincipal AuthDetails authDetails, ModelAndView mv) {
+        mv.addObject("user", authDetails.getLoginUserDTO());
+        mv.addObject("applications", List.of());
+        mv.setViewName("mypage/instructorApplicationHistory");
+        return mv;
+    }
+
+    // 강사 신청 폼
+    @GetMapping("/me/apply-instructor")
+    public ModelAndView applyInstructor(@AuthenticationPrincipal AuthDetails authDetails, ModelAndView mv) {
+        mv.addObject("user", authDetails.getLoginUserDTO());
+        mv.setViewName("mypage/applyInstructor");
+        return mv;
     }
 }
