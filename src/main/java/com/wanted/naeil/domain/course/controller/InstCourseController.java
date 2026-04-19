@@ -1,5 +1,7 @@
 package com.wanted.naeil.domain.course.controller;
 
+import com.wanted.naeil.domain.course.dto.request.CourseStatusUpdateRequest;
+import com.wanted.naeil.domain.course.dto.request.CourseUpdateRequest;
 import com.wanted.naeil.global.auth.model.dto.AuthDetails;
 import com.wanted.naeil.domain.course.dto.request.CourseCreateRequest;
 import com.wanted.naeil.domain.course.dto.response.CourseEditResponse;
@@ -9,7 +11,10 @@ import com.wanted.naeil.domain.course.repository.CategoryRepository;
 import com.wanted.naeil.domain.course.service.CourseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -118,6 +123,39 @@ public class InstCourseController {
     }
 
     // 강의 수정 기능
+    @PatchMapping(value = "/course/{courseId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseBody
+    public ResponseEntity<Void> updateCourse(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @PathVariable Long courseId,
+            @Valid @ModelAttribute CourseUpdateRequest request
+            ) {
+        Long instructorId = authDetails.getLoginUserDTO().getUserId();
+
+        log.info("[CourseUpdate] 강의 기본 정보 수정 요청 - instructorId: {}, courseId: {}", instructorId, courseId);
+
+        courseService.updateCourse(instructorId, courseId, request);
+
+        return ResponseEntity.ok().build();
+    }
+
+    // 코스 상태 변경
+    @PatchMapping(value = "/course/{courseId}/status", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseBody
+    public ResponseEntity<Void> updateCourseStatus(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @PathVariable Long courseId,
+            @Valid @ModelAttribute CourseStatusUpdateRequest request
+    ) {
+        Long instructorId = authDetails.getLoginUserDTO().getUserId();
+
+        log.info("[CourseStatusUpdate] 강의 상태 변경 요청 - instructorId: {}, courseId: {}, status: {}",
+                instructorId, courseId, request.getStatus());
+
+        courseService.updateCourseStatus(instructorId, courseId, request);
+
+        return ResponseEntity.ok().build();
+    }
     
 
     // 성공시 redirect 페이지
