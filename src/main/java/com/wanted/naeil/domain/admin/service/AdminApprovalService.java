@@ -6,6 +6,7 @@ import com.wanted.naeil.domain.admin.entity.enums.ApprovalRequestType;
 import com.wanted.naeil.domain.admin.entity.enums.ApprovalStatus;
 import com.wanted.naeil.domain.admin.repository.AdminApprovalRepository;
 import com.wanted.naeil.domain.course.entity.Course;
+import com.wanted.naeil.domain.course.repository.CourseRepository;
 import com.wanted.naeil.domain.live.entity.LiveLecture;
 import com.wanted.naeil.domain.live.entity.enums.LiveLectureStatus;
 import com.wanted.naeil.domain.live.repository.LiveLectureRepository;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor //service에서 Repository 쓰야하니까 필드선언
 public class AdminApprovalService {
     private final AdminApprovalRepository courseApprovalRepository;
+    private final CourseRepository courseRepository;
     private final InsturctorApplicationRepository insturctorApplicationRepository;
     private final LiveLectureRepository liveLectureRepository;
 
@@ -95,7 +97,8 @@ public class AdminApprovalService {
                 approval.getCourse().activate();
             }
             case  COURSE_DELETE -> {
-                approval.getCourse().deactivate();
+                // 정수 추가 : 이미 비활성화에서 신청한거여서 바로 논리적 삭제로 변경
+                courseRepository.delete(approval.getCourse());
             }
             case INSTRUCTOR_REGISTER -> {
                 approval.getInstructorApplications().approve();

@@ -1,5 +1,9 @@
 package com.wanted.naeil.domain.course.service;
 
+import com.wanted.naeil.domain.admin.entity.AdminApproval;
+import com.wanted.naeil.domain.admin.entity.enums.ApprovalRequestType;
+import com.wanted.naeil.domain.admin.entity.enums.ApprovalStatus;
+import com.wanted.naeil.domain.admin.repository.AdminApprovalRepository;
 import com.wanted.naeil.domain.course.dto.request.CourseCreateRequest;
 import com.wanted.naeil.domain.course.dto.request.CourseStatusUpdateRequest;
 import com.wanted.naeil.domain.course.dto.request.CourseUpdateRequest;
@@ -35,6 +39,8 @@ public class CourseService {
 
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
+    private final AdminApprovalRepository adminApprovalRepository;
+
     private final LocalFileService localFileService;
     private final FileTransactionService fileTransactionService;
     private final CategoryRepository categoryRepository;
@@ -274,6 +280,36 @@ public class CourseService {
         throw new IllegalStateException("현재 상태에서는 요청한 등록 상태로 변경할 수 없습니다.");
     }
 
+    public void requestCourseDelete(Long instructorId, Long courseId) {
+
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 강의입니다."));
+
+        validateCourseOwner(course, instructorId);
+
+        validateInactiveCourse(course);
+
+        boolean alreadyRequested = adminApprovalRepository.existsByCourseIdAndRequestTypeAndStatus(
+                courseId,
+                ApprovalRequestType.COURSE_DELETE,
+                ApprovalStatus.PENDING // 관리자 승인 테이블에 저장될 status
+        );
+
+        if (alreadyRequested) {
+            throw new IllegalStateException("이미 삭제 요청이 진행 중인 강의입니다.");
+        }
+
+        AdminApproval approval = AdminApproval.builder()
+                .course(course)
+                .requestType(ApprovalRequestType.COURSE_DELETE)
+                .build();
+
+        adminApprovalRepository.save(approval);
+
+        log.info("[CourseDeleteRequest] 강의 삭제 요청 완료 - instructorId: {}, courseId: {}",
+                instructorId, courseId);
+    }
+
     // ==== 내부 편의 메서드 ====
     private void validateCourseOwner(Course course, Long instructorId) {
         if (!course.getInstructor().getId().equals(instructorId)) {
@@ -285,6 +321,12 @@ public class CourseService {
         if (course.getStatus() != CourseStatus.ACTIVE && course.getStatus() != CourseStatus.INACTIVE) {
             throw new IllegalStateException(course.getStatus().getDescription() +
                     " 상태의 강의는 상태를 변경할 수 없습니다.");
+        }
+    }
+
+    private void validateInactiveCourse(Course course) {
+        if (course.getStatus() != CourseStatus.INACTIVE) {
+            throw new IllegalStateException("비활성화 상태의 강의만 삭제 요청할 수 있습니다.");
         }
     }
 }
