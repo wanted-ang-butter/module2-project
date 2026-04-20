@@ -3,20 +3,28 @@
       th:attr="data-success=${success}">
 <head>
     <meta charset="UTF-8">
-    <title>크레딧 충전</title>
+    <title>크레딧 충전 | Nae-Il</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
     <style>
+        /* 2. 대시보드와 동일한 폰트 및 배경색 설정 */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
         * {
             box-sizing: border-box;
+            font-family: 'Inter', sans-serif !important;
+            letter-spacing: -0.02em;
         }
 
         body {
             margin: 0;
-            font-family: 'Pretendard', sans-serif;
-            background: #f6f7f9;
+            background-color: #ffffff !important;
             color: #111827;
         }
 
+        /* 기존 레이아웃 유지 */
         .container {
             width: 1180px;
             margin: 40px auto 80px;
@@ -492,8 +500,10 @@
         }
     </style>
 </head>
-<body>
-<div th:replace="fragments/userHeader :: userHeader"></div>
+<body class="bg-white">
+
+<div th:replace="~{fragments/userHeader :: userHeader}"></div>
+
 
 <div class="container">
     <div class="banner">
