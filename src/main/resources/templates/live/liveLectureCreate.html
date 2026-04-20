@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>실시간 강의 신청 | Nae-Il</title>
+
+    <meta name="_csrf" th:content="${_csrf != null ? _csrf.token : ''}">
+    <meta name="_csrf_header" th:content="${_csrf != null ? _csrf.headerName : ''}">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            background-color: #f8fafc;
+        }
+    </style>
+</head>
+
+<body>
+<div th:replace="~{fragments/instructorHeader :: instructorHeader}"></div>
+
+<div class="max-w-7xl mx-auto px-6 py-12">
+    <div class="mb-10">
+        <a th:href="@{/instructor/course-management}"
+           href="/instructor/course-management"
+           class="inline-flex items-center gap-3 text-gray-600 hover:text-blue-600 transition-colors mb-6">
+            <i class="fa-solid fa-arrow-left text-sm"></i>
+            <span class="text-sm font-bold">이전으로</span>
+        </a>
+
+        <div class="flex items-end justify-between gap-6">
+            <div>
+                <h1 class="text-5xl font-black text-gray-900 mb-4">강의 신청</h1>
+                <p class="text-2xl text-gray-600 font-medium">새로운 실시간 강의를 등록하세요</p>
+            </div>
+
+            <div class="flex gap-2 bg-gray-100 p-1 rounded-xl">
+                <a th:href="@{/instructor/course}"
+                   href="/instructor/course"
+                   class="px-8 py-3 rounded-lg font-black text-sm text-gray-600 hover:text-gray-900 transition-all">
+                    일반 강의
+                </a>
+
+                <a th:href="@{/instructor/live-lecture}"
+                   href="/instructor/live-lecture"
+                   class="px-8 py-3 rounded-lg font-black text-sm bg-white text-blue-600 shadow-md transition-all">
+                    실시간 강의
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${errorMessage != null}"
+         class="mb-6 rounded-2xl border-2 border-red-200 bg-red-50 px-6 py-4 text-red-700 font-bold">
+        <span th:text="${errorMessage}">강의 등록 중 오류가 발생했습니다.</span>
+    </div>
+
+    <form id="liveLectureForm"
+          th:action="@{/instructor/live-lecture}"
+          action="/instructor/live-lecture"
+          th:object="${createLiveLectureRequest}"
+          method="post"
+          class="space-y-8"
+          onsubmit="return validateLiveLectureForm()">
+
+        <input type="hidden"
+               th:name="${_csrf != null ? _csrf.parameterName : '_csrf'}"
+               th:value="${_csrf != null ? _csrf.token : ''}"/>
+
+        <section class="bg-white border-2 border-gray-200 rounded-2xl p-10 shadow-lg">
+            <h2 class="text-3xl font-black text-gray-900 mb-8">실시간 강의 정보</h2>
+
+            <div class="space-y-7">
+                <div>
+                    <label for="title" class="block text-sm font-black text-gray-700 mb-3">
+                        강의명 <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text"
+                           id="title"
+                           th:field="*{title}"
+                           required
+                           maxlength="100"
+                           placeholder="강의명을 입력하세요"
+                           class="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none font-bold text-gray-900 placeholder:text-gray-400"/>
+
+                    <p th:if="${#fields.hasErrors('title')}"
+                       th:errors="*{title}"
+                       class="mt-2 text-sm font-bold text-red-600">
+                        강의명 오류
+                    </p>
+                </div>
+
+                <div>
+                    <label for="description" class="block text-sm font-black text-gray-700 mb-3">
+                        강의 설명 <span class="text-red-500">*</span>
+                    </label>
+                    <textarea id="description"
+                              th:field="*{description}"
+                              rows="6"
+                              required
+                              placeholder="강의 설명을 입력하세요"
+                              class="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none resize-none font-bold text-gray-900 placeholder:text-gray-400"></textarea>
+
+                    <p th:if="${#fields.hasErrors('description')}"
+                       th:errors="*{description}"
+                       class="mt-2 text-sm font-bold text-red-600">
+                        강의 설명 오류
+                    </p>
+                </div>
+
+                <div>
+                    <label for="maxCapacity" class="block text-sm font-black text-gray-700 mb-3">
+                        수강 정원 <span class="text-red-500">*</span>
+                    </label>
+                    <input type="number"
+                           id="maxCapacity"
+                           th:field="*{maxCapacity}"
+                           min="1"
+                           max="100"
+                           required
+                           placeholder="수강 정원을 입력하세요"
+                           class="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none font-bold text-gray-900 placeholder:text-gray-400"/>
+
+                    <p th:if="${#fields.hasErrors('maxCapacity')}"
+                       th:errors="*{maxCapacity}"
+                       class="mt-2 text-sm font-bold text-red-600">
+                        수강 정원 오류
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="startAt" class="block text-sm font-black text-gray-700 mb-3">
+                            강의 시작 일시 <span class="text-red-500">*</span>
+                        </label>
+                        <input type="datetime-local"
+                               id="startAt"
+                               th:field="*{startAt}"
+                               required
+                               class="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none font-bold text-gray-900"/>
+
+                        <p th:if="${#fields.hasErrors('startAt')}"
+                           th:errors="*{startAt}"
+                           class="mt-2 text-sm font-bold text-red-600">
+                            강의 시작 일시 오류
+                        </p>
+                    </div>
+
+                    <div>
+                        <label for="endAt" class="block text-sm font-black text-gray-700 mb-3">
+                            강의 종료 일시 <span class="text-red-500">*</span>
+                        </label>
+                        <input type="datetime-local"
+                               id="endAt"
+                               th:field="*{endAt}"
+                               required
+                               class="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none font-bold text-gray-900"/>
+
+                        <p th:if="${#fields.hasErrors('endAt')}"
+                           th:errors="*{endAt}"
+                           class="mt-2 text-sm font-bold text-red-600">
+                            강의 종료 일시 오류
+                        </p>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="reservationStartAt" class="block text-sm font-black text-gray-700 mb-3">
+                        예약 시작 일시 <span class="text-red-500">*</span>
+                    </label>
+                    <input type="datetime-local"
+                           id="reservationStartAt"
+                           th:field="*{reservationStartAt}"
+                           required
+                           class="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none font-bold text-gray-900"/>
+
+                    <p th:if="${#fields.hasErrors('reservationStartAt')}"
+                       th:errors="*{reservationStartAt}"
+                       class="mt-2 text-sm font-bold text-red-600">
+                        예약 시작 일시 오류
+                    </p>
+                </div>
+
+                <div>
+                    <label for="streamingUrl" class="block text-sm font-black text-gray-700 mb-3">
+                        방송 URL <span class="text-red-500">*</span>
+                    </label>
+                    <input type="url"
+                           id="streamingUrl"
+                           th:field="*{streamingUrl}"
+                           required
+                           maxlength="500"
+                           placeholder="https://..."
+                           class="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none font-bold text-gray-900 placeholder:text-gray-400"/>
+
+                    <p th:if="${#fields.hasErrors('streamingUrl')}"
+                       th:errors="*{streamingUrl}"
+                       class="mt-2 text-sm font-bold text-red-600">
+                        방송 URL 오류
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <div class="flex justify-end gap-4 pb-6">
+            <a th:href="@{/instructor/course-management}"
+               href="/instructor/course-management"
+               class="px-10 py-4 border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-all font-black text-gray-700">
+                취소
+            </a>
+
+            <button type="submit"
+                    class="px-10 py-4 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-xl hover:shadow-xl transition-all font-black">
+                실시간 강의 등록
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    lucide.createIcons();
+
+    function validateLiveLectureForm() {
+        const startAt = document.getElementById('startAt').value;
+        const endAt = document.getElementById('endAt').value;
+        const reservationStartAt = document.getElementById('reservationStartAt').value;
+        const maxCapacity = Number(document.getElementById('maxCapacity').value);
+
+        if (!startAt || !endAt || !reservationStartAt) {
+            alert('강의 일시와 예약 시작 일시를 입력해주세요.');
+            return false;
+        }
+
+        if (maxCapacity < 1 || maxCapacity > 100) {
+            alert('수강 정원은 1명 이상 100명 이하로 입력해주세요.');
+            return false;
+        }
+
+        const now = new Date();
+        const startDate = new Date(startAt);
+        const endDate = new Date(endAt);
+        const reservationDate = new Date(reservationStartAt);
+
+        if (startDate < now) {
+            alert('강의 시작 일시는 현재 시간 이후여야 합니다.');
+            return false;
+        }
+
+        if (endDate <= startDate) {
+            alert('강의 종료 일시는 강의 시작 일시보다 늦어야 합니다.');
+            return false;
+        }
+
+        if (reservationDate < now) {
+            alert('예약 시작 일시는 현재 시간 이후여야 합니다.');
+            return false;
+        }
+
+        if (reservationDate >= startDate) {
+            alert('예약 시작 일시는 강의 시작 일시보다 빨라야 합니다.');
+            return false;
+        }
+
+        return true;
+    }
+</script>
+</body>
+</html>

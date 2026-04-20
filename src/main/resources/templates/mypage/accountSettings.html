@@ -107,6 +107,14 @@
                                 <i class="fa-solid fa-gear text-gray-600"></i>
                                 <span class="text-sm font-medium text-gray-900">계정 설정</span>
                             </a>
+                            <a href="/subscriber/mySubscriber" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                                <i class="fa-solid fa-user text-gray-600"></i>
+                                <span class="text-sm font-medium text-gray-900">나의 구독</span>
+                            </a>
+                            <a href="/user/me/instructor-application/history" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                                <i class="fa-solid fa-chalkboard-user text-gray-600"></i>
+                                <span class="text-sm font-medium text-gray-900">강사 신청</span>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -114,11 +122,6 @@
         </div>
     </div>
 </header>
-
-<!-- Page Title -->
-<div class="max-w-7xl mx-auto px-6 pt-8 pb-2">
-    <h1 class="text-2xl font-black text-gray-900">계정 설정</h1>
-</div>
 
 <div class="max-w-7xl mx-auto px-6 py-8">
     <div class="grid grid-cols-12 gap-8">
@@ -144,6 +147,18 @@
                        class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-bold transition-all">
                         <i class="fa-solid fa-gear w-5 h-5"></i>
                         <span class="text-sm">계정 설정</span>
+                    </a>
+                    <a th:unless="${myPage.role.name() == 'INSTRUCTOR'}"
+                       th:href="@{/subscriber/mySubscriber}" href="/subscriber/mySubscriber"
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 font-medium transition-all">
+                        <i class="fa-solid fa-user w-5 h-5"></i>
+                        <span class="text-sm">나의 구독</span>
+                    </a>
+                    <a th:unless="${myPage.role.name() == 'INSTRUCTOR'}"
+                       th:href="@{/user/instructor-application}" href="/user/instructor-application"
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 font-medium transition-all">
+                        <i class="fa-solid fa-chalkboard-user w-5 h-5"></i>
+                        <span class="text-sm">강사 신청</span>
                     </a>
                 </nav>
             </div>
