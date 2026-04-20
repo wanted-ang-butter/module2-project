@@ -61,6 +61,7 @@ public interface LiveReservationRepository extends JpaRepository<LiveReservation
             LiveReservationStatus status
     );
 
+    // 실시간 강의 신청한 학생들 조회
     @Query("""
     select r
     from LiveReservation r
@@ -74,4 +75,20 @@ public interface LiveReservationRepository extends JpaRepository<LiveReservation
             @Param("status") LiveReservationStatus status
     );
 
+
+    // 실시간 강의 예매 검증
+    @Query("""
+    select r
+    from LiveReservation r
+    join fetch r.liveLecture l
+    join fetch l.instructor
+    where r.user.id = :userId
+      and l.id = :liveId
+      and r.status = :status
+    """)
+    Optional<LiveReservation> findReservedLiveRoomByUserIdAndLiveId(
+            @Param("userId") Long userId,
+            @Param("liveId") Long liveId,
+            @Param("status") LiveReservationStatus status
+    );
 }

@@ -1,6 +1,7 @@
 package com.wanted.naeil.domain.live.controller;
 
 import com.wanted.naeil.domain.live.dto.response.LiveLectureListResponse;
+import com.wanted.naeil.domain.live.dto.response.UserLiveLectureRoomResponse;
 import com.wanted.naeil.domain.live.service.LiveLectureService;
 import com.wanted.naeil.global.auth.model.dto.AuthDetails;
 import lombok.RequiredArgsConstructor;
@@ -99,4 +100,34 @@ public class UserLiveController {
         return "redirect:" + redirectPath;
 
     }
+
+    @GetMapping("/{liveId}/room")
+    public ModelAndView liveLectureRoomPage(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @PathVariable Long liveId,
+            ModelAndView mv,
+            RedirectAttributes redirectAttributes
+    ) {
+        if (authDetails == null) {
+            throw new AccessDeniedException("로그인 후 입장할 수 있습니다.");
+        }
+
+        Long userId = authDetails.getLoginUserDTO().getUserId();
+
+        try {
+            UserLiveLectureRoomResponse response =
+                    liveLectureService.getUserLiveLectureRoom(userId, liveId);
+
+            mv.addObject("user", authDetails.getLoginUserDTO());
+            mv.addObject("liveCourse", response);
+            mv.setViewName("live/liveLectureRoom");
+
+            return mv;
+        } catch (IllegalStateException | IllegalArgumentException | AccessDeniedException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            mv.setViewName("redirect:/my-courses");
+            return mv;
+        }
+    }
+
 }

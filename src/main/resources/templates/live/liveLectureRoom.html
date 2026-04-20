@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>실시간 강의 입장 | Nae-Il</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+    <style>
+        body {
+            background-color: #f8fafc;
+        }
+    </style>
+</head>
+
+<body>
+<div th:replace="~{fragments/userHeader :: userHeader}"></div>
+
+<div class="max-w-6xl mx-auto px-6 py-12">
+
+    <a th:href="@{/my-courses}"
+       href="/my-courses"
+       class="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors mb-8">
+        <i class="fa-solid fa-arrow-left text-sm"></i>
+        <span class="text-sm font-bold">뒤로가기</span>
+    </a>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <section class="lg:col-span-2 space-y-6">
+
+            <div class="bg-white border-2 border-gray-200 rounded-2xl p-8 shadow-sm">
+                <div class="flex items-center gap-3 mb-5">
+                    <span th:if="${liveCourse.status != null and liveCourse.status.name() == 'IN_PROGRESS'}"
+                          class="inline-flex items-center gap-2 px-3 py-1.5 bg-red-100 text-red-700 rounded-full text-sm font-black">
+                        <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                        LIVE 진행중
+                    </span>
+
+                    <span th:if="${liveCourse.status != null and liveCourse.status.name() == 'APPROVED'}"
+                          class="inline-flex items-center gap-2 px-3 py-1.5 bg-green-100 text-green-700 rounded-full text-sm font-black">
+                        진행 예정
+                    </span>
+
+                    <span th:if="${liveCourse.status != null and liveCourse.status.name() == 'ENDED'}"
+                          class="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm font-black">
+                        종료됨
+                    </span>
+                </div>
+
+                <h1 class="text-4xl font-black text-gray-900 leading-tight mb-5"
+                    th:text="${liveCourse.title}">
+                    Q&A 세션: TypeScript 타입 시스템 깊게 파헤치기
+                </h1>
+
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-600 to-green-600 flex items-center justify-center text-white shadow-md">
+                        <i class="fa-solid fa-chalkboard-user text-sm"></i>
+                    </div>
+
+                    <div>
+                        <p class="text-xs font-black text-gray-500 mb-1">강사</p>
+                        <p class="text-base font-black text-gray-900"
+                           th:text="${liveCourse.instructorName}">
+                            박타입
+                        </p>
+                    </div>
+                </div>
+
+                <div class="border-t-2 border-gray-100 pt-7">
+                    <h2 class="text-xl font-black text-gray-900 mb-4">강의 설명</h2>
+
+                    <p class="text-base text-gray-700 leading-relaxed font-medium whitespace-pre-line"
+                       th:text="${liveCourse.description}">
+                        TypeScript의 고급 타입 시스템을 심도 있게 다룹니다. 제네릭, 유틸리티 타입, 조건부 타입 등 복잡한 타입 문제를 해결하는 방법을 Q&A 형식으로 학습합니다.
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-white border-2 border-gray-200 rounded-2xl p-8 shadow-sm">
+                <div class="flex items-start justify-between gap-6">
+                    <div class="min-w-0">
+                        <h2 class="text-2xl font-black text-gray-900 mb-3">방송 링크</h2>
+                        <p class="text-gray-500 font-medium mb-5">
+                            강의 시간이 되면 아래 링크를 통해 실시간 강의에 참여할 수 있습니다.
+                        </p>
+
+                        <a th:if="${liveCourse.streamingUrl != null and !#strings.isEmpty(liveCourse.streamingUrl)}"
+                           th:href="${liveCourse.streamingUrl}"
+                           th:text="${liveCourse.streamingUrl}"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-black break-all">
+                            https://www.youtube.com/?gl=KR
+                        </a>
+
+                        <p th:if="${liveCourse.streamingUrl == null or #strings.isEmpty(liveCourse.streamingUrl)}"
+                           class="text-gray-400 font-bold">
+                            등록된 방송 링크가 없습니다.
+                        </p>
+                    </div>
+
+                    <div class="hidden md:flex w-16 h-16 rounded-2xl bg-blue-50 items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-link text-blue-600 text-2xl"></i>
+                    </div>
+                </div>
+
+                <div class="mt-8">
+                    <a th:if="${liveCourse.streamingUrl != null and !#strings.isEmpty(liveCourse.streamingUrl)
+                               and liveCourse.status != null
+                               and liveCourse.status.name() == 'IN_PROGRESS'}"
+                       th:href="${liveCourse.streamingUrl}"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="inline-flex w-full items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-xl hover:shadow-xl transition-all font-black text-lg">
+                        <i class="fa-solid fa-video"></i>
+                        실시간 강의 입장하기
+                    </a>
+
+                    <button th:if="${liveCourse.status == null or liveCourse.status.name() != 'IN_PROGRESS'}"
+                            type="button"
+                            disabled
+                            class="w-full px-8 py-4 bg-gray-100 text-gray-400 rounded-xl font-black text-lg cursor-not-allowed">
+                        아직 입장할 수 없습니다
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <aside class="lg:col-span-1">
+            <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 shadow-sm sticky top-24">
+                <h2 class="text-2xl font-black text-gray-900 mb-6">강의 상세</h2>
+
+                <div class="space-y-4">
+
+                    <div class="p-5 rounded-2xl bg-gradient-to-br from-blue-600 to-green-500 text-white">
+                        <div class="flex items-center gap-2 mb-5">
+                            <i class="fa-solid fa-users text-white/90"></i>
+                            <p class="text-sm font-black text-white/90">실시간 참여자</p>
+                        </div>
+
+                        <div class="flex items-end gap-2 mb-4">
+                            <p class="text-4xl font-black"
+                               th:text="${liveCourse.currentCount}">
+                                10
+                            </p>
+                            <p class="text-lg font-bold text-white/80 pb-1">
+                                /
+                                <span th:text="${liveCourse.maxCapacity}">25</span>명
+                            </p>
+                        </div>
+
+                        <div class="w-full h-2 bg-white/25 rounded-full overflow-hidden">
+                            <div class="h-full bg-white rounded-full"
+                                 th:style="${liveCourse.maxCapacity > 0
+                                    ? 'width:' + (liveCourse.currentCount * 100 / liveCourse.maxCapacity) + '%'
+                                    : 'width:0%'}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
+                        <div class="w-11 h-11 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <i class="fa-solid fa-calendar-days text-blue-600"></i>
+                        </div>
+
+                        <div>
+                            <p class="text-xs font-black text-gray-500 mb-1">강의 날짜</p>
+                            <p class="text-sm font-black text-gray-900"
+                               th:text="${liveCourse.startAt != null ? #temporals.format(liveCourse.startAt, 'yyyy-MM-dd') : '-'}">
+                                2026-04-13
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
+                        <div class="w-11 h-11 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <i class="fa-solid fa-clock text-green-600"></i>
+                        </div>
+
+                        <div>
+                            <p class="text-xs font-black text-gray-500 mb-1">강의 시간</p>
+                            <p class="text-sm font-black text-gray-900">
+                                <span th:text="${liveCourse.startAt != null ? #temporals.format(liveCourse.startAt, 'HH:mm') : '-'}">
+                                    14:00
+                                </span>
+                                -
+                                <span th:text="${liveCourse.endAt != null ? #temporals.format(liveCourse.endAt, 'HH:mm') : '-'}">
+                                    16:00
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
+                        <div class="w-11 h-11 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <i class="fa-solid fa-signal text-red-600"></i>
+                        </div>
+
+                        <div>
+                            <p class="text-xs font-black text-gray-500 mb-1">상태</p>
+
+                            <p th:if="${liveCourse.status != null and liveCourse.status.name() == 'IN_PROGRESS'}"
+                               class="inline-flex items-center gap-2 text-sm font-black text-red-600">
+                                <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                                LIVE 진행중
+                            </p>
+
+                            <p th:if="${liveCourse.status != null and liveCourse.status.name() == 'APPROVED'}"
+                               class="text-sm font-black text-green-600">
+                                진행 예정
+                            </p>
+
+                            <p th:if="${liveCourse.status != null and liveCourse.status.name() == 'ENDED'}"
+                               class="text-sm font-black text-gray-600">
+                                종료됨
+                            </p>
+
+                            <p th:if="${liveCourse.status == null}"
+                               class="text-sm font-black text-gray-400">
+                                상태 없음
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-6 border-t-2 border-gray-100">
+                    <a th:href="@{/my-courses}"
+                       href="/my-courses"
+                       class="flex w-full items-center justify-center px-6 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-all font-black text-gray-700">
+                        강의실 나가기
+                    </a>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<footer class="mt-20 border-t border-gray-200 bg-white">
+    <div class="max-w-6xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+        <p class="font-medium">↗ © 2026 Nae-Il. 코딩으로 만드는 내일</p>
+
+        <div class="flex items-center gap-6">
+            <a href="#" class="hover:text-gray-900 transition-colors">이용약관</a>
+            <a href="#" class="hover:text-gray-900 transition-colors">개인정보처리방침</a>
+            <a href="#" class="hover:text-gray-900 transition-colors">고객센터</a>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

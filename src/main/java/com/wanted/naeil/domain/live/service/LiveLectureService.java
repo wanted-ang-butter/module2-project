@@ -5,10 +5,7 @@ import com.wanted.naeil.domain.admin.entity.BlacklistHistory;
 import com.wanted.naeil.domain.admin.repository.AdminApprovalRepository;
 import com.wanted.naeil.domain.admin.repository.BlacklistRepository;
 import com.wanted.naeil.domain.live.dto.request.CreateLiveLectureRequest;
-import com.wanted.naeil.domain.live.dto.response.InstructorLiveDetailResponse;
-import com.wanted.naeil.domain.live.dto.response.InstructorLiveLectureResponse;
-import com.wanted.naeil.domain.live.dto.response.InstructorLiveReservationResponse;
-import com.wanted.naeil.domain.live.dto.response.LiveLectureListResponse;
+import com.wanted.naeil.domain.live.dto.response.*;
 import com.wanted.naeil.domain.live.entity.LiveLecture;
 import com.wanted.naeil.domain.live.entity.LiveReservation;
 import com.wanted.naeil.domain.live.entity.enums.LiveLectureStatus;
@@ -344,6 +341,48 @@ public class LiveLectureService {
                 .map(InstructorLiveReservationResponse::of)
                 .toList();
     }
+
+    @Transactional(readOnly = true)
+    public UserLiveLectureRoomResponse getUserLiveLectureRoom(Long userId, Long liveId) {
+        log.info("[LiveLectureRoom] 실시간 강의 입장 상세 조회 시작 - userId: {}, liveId: {}", userId, liveId);
+
+        LiveReservation reservation = liveReservationRepository
+                .findReservedLiveRoomByUserIdAndLiveId(
+                        userId,
+                        liveId,
+                        LiveReservationStatus.RESERVED
+                )
+                .orElseThrow(() -> new AccessDeniedException("예약한 실시간 강의만 입장할 수 있습니다."));
+
+        LiveLecture liveLecture = reservation.getLiveLecture();
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startAt = liveLecture.getStartAt();
+        LocalDateTime endAt = liveLecture.getEndAt();
+
+        if (startAt == null || endAt == null) {
+            throw new IllegalStateException("실시간 강의 시간이 등록되지 않았습니다.");
+        }
+
+        if (now.isBefore(startAt)) {
+            throw new IllegalStateException("아직 실시간 강의가 시작되지 않았습니다.");
+        }
+
+        if (!now.isBefore(endAt)) {
+            throw new IllegalStateException("이미 종료된 실시간 강의입니다.");
+        }
+
+        LiveLectureStatus status = liveLecture.getStatus();
+
+        if (status != LiveLectureStatus.APPROVED && status != LiveLectureStatus.IN_PROGRESS) {
+            throw new IllegalStateException("입장 가능한 실시간 강의 상태가 아닙니다.");
+        }
+
+        log.info("[LiveLectureRoom] 실시간 강의 입장 상세 조회 완료 - userId: {}, liveId: {}", userId, liveId);
+
+        return UserLiveLectureRoomResponse.of(liveLecture, true);
+    }
+
 
     // ====== 내부 편의 메서드 =======
 
