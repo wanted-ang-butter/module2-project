@@ -2,7 +2,8 @@ package com.wanted.naeil.domain.live.service;
 
 import com.wanted.naeil.domain.admin.entity.AdminApproval;
 import com.wanted.naeil.domain.admin.repository.AdminApprovalRepository;
-import com.wanted.naeil.domain.live.dto.CreateLiveLectureRequest;
+import com.wanted.naeil.domain.live.dto.request.CreateLiveLectureRequest;
+import com.wanted.naeil.domain.live.dto.response.InstructorLiveLectureResponse;
 import com.wanted.naeil.domain.live.entity.LiveLecture;
 import com.wanted.naeil.domain.live.repository.LiveLectureRepository;
 import com.wanted.naeil.domain.user.entity.User;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +28,7 @@ public class LiveLectureService {
     private final UserRepository userRepository;
     private final AdminApprovalRepository adminApprovalRepository;
 
+    // 실시간 강의 등록
     @Transactional
     public String registerLiveLecture(Long instructorId, @Valid CreateLiveLectureRequest request) {
 
@@ -81,6 +84,23 @@ public class LiveLectureService {
 
         return "강의 등록 신청이 완료되었습니다. 관리자 승인 후 강의가 활성화됩니다.";
     }
+
+    // 나의 실시간 강의 목록 조회
+    @Transactional
+    public List<InstructorLiveLectureResponse> getInstructorLiveLectures(Long instructorId) {
+
+        User instructor = userRepository.findById(instructorId)
+                .orElseThrow(() -> new IllegalArgumentException("강사 정보를 찾을 수 없습니다. ID: " + instructorId));
+
+        if (instructor.getRole() != Role.INSTRUCTOR && instructor.getRole() != Role.ADMIN) {
+            throw new AccessDeniedException("강사 권한이 있는 사용자만 실시간 강의 목록을 조회할 수 있습니다.");
+        }
+
+        return liveLectureRepository.findByInstructorIdOrderByCreatedAtDesc(instructorId).stream()
+                .map(InstructorLiveLectureResponse::of)
+                .toList();
+    }
+
 
     // ====== 내부 편의 메서드 =======
     private void validateLiveLectureTime(CreateLiveLectureRequest request) {

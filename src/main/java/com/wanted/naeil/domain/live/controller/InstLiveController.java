@@ -1,6 +1,6 @@
 package com.wanted.naeil.domain.live.controller;
 
-import com.wanted.naeil.domain.live.dto.CreateLiveLectureRequest;
+import com.wanted.naeil.domain.live.dto.request.CreateLiveLectureRequest;
 import com.wanted.naeil.domain.live.service.LiveLectureService;
 import com.wanted.naeil.domain.user.entity.enums.Role;
 import com.wanted.naeil.global.auth.model.dto.AuthDetails;
@@ -58,6 +58,15 @@ public class InstLiveController {
         return mv;
     }
 
+    /**
+     * 실시간 강의 등록 form 제출 로직
+     * @param authDetails : 세션에 저장된 사용자 정보
+     * @param request : 실시간 강의 요청에 필요한 값들
+     * @param bindingResult : dto 필수 입력값 검증 처리
+     * @param mv : message, view 페이지
+     * @param redirectAttributes : 리다이렉트할 때, 메시지가 잘 보이게 추가
+     * @return : 성공 -> 성공 페이지, 실패 -> 값들 유지하면서 신청 폼 리다이렉트
+     */
     @PostMapping("/live-lecture")
     public ModelAndView registerLiveLecture(
             @AuthenticationPrincipal AuthDetails authDetails,
