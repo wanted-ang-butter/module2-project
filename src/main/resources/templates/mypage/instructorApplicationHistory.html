@@ -221,7 +221,7 @@
               </div>
               <!-- 신청 철회 버튼 (대기 중일 때만) -->
               <form th:if="${app.status.name() == 'PENDING'}"
-                    th:action="@{/user/instructor-application/{id}/cancel(id=${app.id})}"
+                    th:action="@{/user/me/instructor-application/{id}/cancel(id=${app.id})}"
                     method="POST" class="ml-4">
                 <button type="submit"
                         onclick="return confirm('신청을 철회하시겠습니까?')"

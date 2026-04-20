@@ -1,10 +1,11 @@
 package com.wanted.naeil.domain.user.controller;
 
-import com.wanted.naeil.domain.user.dto.request.UpdateNicknameRequest;
-import com.wanted.naeil.domain.user.dto.request.UpdatePasswordRequest;
-import com.wanted.naeil.domain.user.dto.request.UpdateProfileImgRequest;
-import com.wanted.naeil.domain.user.dto.request.WithdrawRequest;
+import com.wanted.naeil.domain.course.repository.CategoryRepository;
+import com.wanted.naeil.domain.user.dto.request.*;
 import com.wanted.naeil.domain.user.dto.response.AccountSettingResponse;
+import com.wanted.naeil.domain.user.dto.response.InstructorApplicationResponse;
+import com.wanted.naeil.domain.user.entity.enums.ApplicationStatus;
+import com.wanted.naeil.domain.user.service.InstructorApplicationService;
 import com.wanted.naeil.domain.user.service.MemberService;
 import com.wanted.naeil.global.auth.model.dto.AuthDetails;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,6 +31,8 @@ import java.util.List;
 public class MyPageController {
 
     private final MemberService memberService;
+    private final InstructorApplicationService instructorApplicationService;
+    private final CategoryRepository categoryRepository;
 
     @GetMapping("/me")
     public ModelAndView myPage(@AuthenticationPrincipal AuthDetails authDetails, ModelAndView mv) {
@@ -134,8 +137,12 @@ public class MyPageController {
     // 강사 신청 내역 조회
     @GetMapping("/me/instructor-application/history")
     public ModelAndView instructorApplicationHistory(@AuthenticationPrincipal AuthDetails authDetails, ModelAndView mv) {
+        List<InstructorApplicationResponse> applications =
+                instructorApplicationService.getMyApplications(authDetails.getUsername());
         mv.addObject("user", authDetails.getLoginUserDTO());
-        mv.addObject("applications", List.of());
+        mv.addObject("applications", applications);
+        mv.addObject("hasPending", applications.stream()
+                .anyMatch(a -> a.getStatus() == ApplicationStatus.PENDING));
         mv.setViewName("mypage/instructorApplicationHistory");
         return mv;
     }
@@ -144,7 +151,37 @@ public class MyPageController {
     @GetMapping("/me/apply-instructor")
     public ModelAndView applyInstructor(@AuthenticationPrincipal AuthDetails authDetails, ModelAndView mv) {
         mv.addObject("user", authDetails.getLoginUserDTO());
-        mv.setViewName("mypage/applyInstructor");
+        mv.addObject("categories", categoryRepository.findAll());
+        mv.setViewName("mypage/InstructorApplication"); // 수정
         return mv;
+    }
+
+    // 강사 신청 제출
+    @PostMapping("/me/apply-instructor")
+    public String applyInstructor(@AuthenticationPrincipal AuthDetails authDetails,
+                                  @ModelAttribute ApplyInstructorRequest request,
+                                  RedirectAttributes redirectAttributes) {
+        try {
+            instructorApplicationService.apply(authDetails.getUsername(), request);
+            redirectAttributes.addFlashAttribute("successMessage", "강사 신청이 완료되었습니다.");
+            return "redirect:/user/me/instructor-application/history";
+        } catch (IllegalStateException | IllegalArgumentException e) { // IllegalArgumentException 추가
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/user/me/apply-instructor";
+        }
+    }
+
+    // 강사 신청 철회
+    @PostMapping("/me/instructor-application/{id}/cancel")
+    public String cancelApplication(@AuthenticationPrincipal AuthDetails authDetails,
+                                    @PathVariable Long id,
+                                    RedirectAttributes redirectAttributes) {
+        try {
+            instructorApplicationService.cancel(authDetails.getUsername(), id);
+            redirectAttributes.addFlashAttribute("successMessage", "신청이 철회되었습니다.");
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/user/me/instructor-application/history";
     }
 }
