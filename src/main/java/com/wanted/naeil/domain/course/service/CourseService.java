@@ -1,21 +1,32 @@
 package com.wanted.naeil.domain.course.service;
 
+import com.wanted.naeil.domain.admin.entity.AdminApproval;
+import com.wanted.naeil.domain.admin.entity.enums.ApprovalRequestType;
+import com.wanted.naeil.domain.admin.entity.enums.ApprovalStatus;
+import com.wanted.naeil.domain.admin.repository.AdminApprovalRepository;
 import com.wanted.naeil.domain.course.dto.request.CourseCreateRequest;
+import com.wanted.naeil.domain.course.dto.request.CourseStatusUpdateRequest;
+import com.wanted.naeil.domain.course.dto.request.CourseUpdateRequest;
 import com.wanted.naeil.domain.course.dto.response.*;
 import com.wanted.naeil.domain.course.entity.Category;
 import com.wanted.naeil.domain.course.entity.Course;
+import com.wanted.naeil.domain.course.entity.enums.CourseStatus;
 import com.wanted.naeil.domain.course.repository.CategoryRepository;
 import com.wanted.naeil.domain.course.repository.CourseRepository;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.domain.user.entity.enums.Role;
 import com.wanted.naeil.domain.user.repository.UserRepository;
+import com.wanted.naeil.global.util.file.FileTransactionService;
 import com.wanted.naeil.global.util.file.LocalFileService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -28,7 +39,10 @@ public class CourseService {
 
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
+    private final AdminApprovalRepository adminApprovalRepository;
+
     private final LocalFileService localFileService;
+    private final FileTransactionService fileTransactionService;
     private final CategoryRepository categoryRepository;
     private final SectionService sectionService;
     private final ModelMapper modelMapper;
@@ -97,7 +111,7 @@ public class CourseService {
 
         // TODO : createSection() 만들어서 호출하기
         if (request.getSections() != null && !request.getSections().isEmpty()) {
-            sectionService.createSection(course, request.getSections());
+            sectionService.registerSections(course, request.getSections());
         }
 
         return CreateCourseResponse.from(savedCourse, "강의 등록 신청이 완료되었습니다. 관리자 승인 후 강의가 활성화됩니다.");
@@ -172,10 +186,147 @@ public class CourseService {
                 sectionsResponses);
     }
 
+    // 코스 수정
+    @Transactional
+    public void updateCourse(Long instructorId, Long courseId, @Valid CourseUpdateRequest request) {
+
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 강의입니다."));
+
+        validateCourseOwner(course, instructorId);
+
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new NoSuchElementException("존재하지 앟는 카테고리입니다."));
+
+        String oldThumbnailUrl = course.getThumbnail();
+        String newThumbnailUrl = null;
+        String thumbnailUrl = oldThumbnailUrl;
+
+        // 새로 받은 썸네일 업데이트
+        if (request.getThumbnail() != null && !request.getThumbnail().isEmpty()) {
+            newThumbnailUrl = localFileService.uploadSingleFile(request.getThumbnail(), "courses");
+            thumbnailUrl = newThumbnailUrl;
+        }
+
+        course.updateBasicInfo(
+                request.getTitle(),
+                category,
+                request.getDescription(),
+                request.getPrice(),
+                thumbnailUrl
+        );
+
+        // 파일 수정은 별도 트랜잭션 관리
+        if (newThumbnailUrl != null) {
+            fileTransactionService.registerReplace(oldThumbnailUrl, newThumbnailUrl);
+        }
+
+        log.info("[CourseUpdate] 강의 기본 정보 수정 완료 - instructorId: {}, courseId: {}", instructorId, courseId);
+    }
+
+    // 코스 상태 수정 : 활성 <-> 비활성
+    @Transactional
+    public void updateCourseStatus(Long instructorId, Long courseId, @Valid CourseStatusUpdateRequest request) {
+
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 강의입니다."));
+
+        validateCourseOwner(course, instructorId);
+
+        validateChangeableCourseStatus(course);
+
+        CourseStatus status = request.getStatus();
+
+        if (status == CourseStatus.ACTIVE) {
+            course.activate();
+        } else if (status == CourseStatus.INACTIVE) {
+            course.deactivate();
+        } else {
+            throw new IllegalArgumentException("변경할 수 없는 강의 상태입니다.");
+        }
+
+        log.info("[CourseStatusUpdate] 강의 상태 변경 완료 - instructorId: {}, courseId: {}, status: {}",
+                instructorId, courseId, status);
+    }
+
+    // 코스 등록 요청 상태 변경 : 승인 대기 <-> 등록 취소
+    @Transactional
+    public void updateCourseRegistrationStatus(Long instructorId, Long courseId, CourseStatus nextStatus) {
+
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 강의입니다."));
+
+        validateCourseOwner(course, instructorId);
+
+        CourseStatus currentStatus = course.getStatus();
+
+        if (currentStatus == CourseStatus.PENDING && nextStatus == CourseStatus.CANCELLED) {
+            course.cancelRegistration();
+
+            log.info("[CourseRegistrationStatus] 강의 등록 요청 취소 완료 - instructorId: {}, courseId: {}",
+                    instructorId, courseId);
+
+            return;
+        }
+
+        if (currentStatus == CourseStatus.CANCELLED && nextStatus == CourseStatus.PENDING) {
+            course.requestRegistration();
+
+            log.info("[CourseRegistrationStatus] 강의 등록 재요청 완료 - instructorId: {}, courseId: {}",
+                    instructorId, courseId);
+            return;
+        }
+
+        throw new IllegalStateException("현재 상태에서는 요청한 등록 상태로 변경할 수 없습니다.");
+    }
+
+    public void requestCourseDelete(Long instructorId, Long courseId) {
+
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 강의입니다."));
+
+        validateCourseOwner(course, instructorId);
+
+        validateInactiveCourse(course);
+
+        boolean alreadyRequested = adminApprovalRepository.existsByCourseIdAndRequestTypeAndStatus(
+                courseId,
+                ApprovalRequestType.COURSE_DELETE,
+                ApprovalStatus.PENDING // 관리자 승인 테이블에 저장될 status
+        );
+
+        if (alreadyRequested) {
+            throw new IllegalStateException("이미 삭제 요청이 진행 중인 강의입니다.");
+        }
+
+        AdminApproval approval = AdminApproval.builder()
+                .course(course)
+                .requestType(ApprovalRequestType.COURSE_DELETE)
+                .build();
+
+        adminApprovalRepository.save(approval);
+
+        log.info("[CourseDeleteRequest] 강의 삭제 요청 완료 - instructorId: {}, courseId: {}",
+                instructorId, courseId);
+    }
+
     // ==== 내부 편의 메서드 ====
     private void validateCourseOwner(Course course, Long instructorId) {
         if (!course.getInstructor().getId().equals(instructorId)) {
             throw new AccessDeniedException("본인이 생성한 강의만 수정할 수 있습니다.");
+        }
+    }
+
+    private void validateChangeableCourseStatus(Course course) {
+        if (course.getStatus() != CourseStatus.ACTIVE && course.getStatus() != CourseStatus.INACTIVE) {
+            throw new IllegalStateException(course.getStatus().getDescription() +
+                    " 상태의 강의는 상태를 변경할 수 없습니다.");
+        }
+    }
+
+    private void validateInactiveCourse(Course course) {
+        if (course.getStatus() != CourseStatus.INACTIVE) {
+            throw new IllegalStateException("비활성화 상태의 강의만 삭제 요청할 수 있습니다.");
         }
     }
 }

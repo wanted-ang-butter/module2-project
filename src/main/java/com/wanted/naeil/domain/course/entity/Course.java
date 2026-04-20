@@ -84,4 +84,12 @@ public class Course extends BaseTimeEntity {
     public void deactivate() {
         this.status = CourseStatus.INACTIVE;
     }
+
+    public void cancelRegistration() {
+        this.status = CourseStatus.CANCELLED;
+    }
+
+    public void requestRegistration() {
+        this.status = CourseStatus.PENDING;
+    }
 }

@@ -2,6 +2,7 @@ package com.wanted.naeil.domain.course.repository;
 
 import com.wanted.naeil.domain.course.dto.CurriculumSectionDTO;
 import com.wanted.naeil.domain.course.dto.SectionStudyMainDTO;
+import com.wanted.naeil.domain.course.entity.Course;
 import com.wanted.naeil.domain.course.entity.Section;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -56,4 +57,6 @@ public interface SectionRepository extends JpaRepository<Section, Long> {
             @Param("userId") Long userId,
             @Param("courseId") Long courseId
     );
+
+    int countByCourseId(Long courseId);
 }

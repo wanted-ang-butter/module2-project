@@ -55,15 +55,18 @@ public class LiveLecture extends BaseTimeEntity {
 
     @Builder
     public LiveLecture(User instructor, String title, String description, int maxCapacity,
-                       LocalDateTime reservationStartAt, LocalDateTime startAt, LocalDateTime endAt) {
+                       LocalDateTime reservationStartAt,
+                       LocalDateTime startAt, LocalDateTime endAt,
+                       String streamingUrl) {
         this.instructor = instructor;
         this.title = title;
         this.description = description;
-        this.maxCapacity = maxCapacity;
         this.currentCount = 0;
+        this.maxCapacity = maxCapacity;
         this.reservationStartAt = reservationStartAt;
         this.startAt = startAt;
         this.endAt = endAt;
+        this.streamingUrl = streamingUrl;
         this.status = LiveLectureStatus.PENDING;
     }
 
