@@ -3,7 +3,7 @@ package com.wanted.naeil.domain.user.service;
 
 import com.wanted.naeil.domain.payment.entity.Credit;
 import com.wanted.naeil.domain.payment.repository.CreditRepository;
-import com.wanted.naeil.domain.user.controller.UpdateEmailRequest;
+//import com.wanted.naeil.domain.user.controller.UpdateEmailRequest;
 import com.wanted.naeil.domain.user.dto.request.*;
 import com.wanted.naeil.domain.user.dto.response.FindIdResponse;
 import com.wanted.naeil.domain.user.dto.response.FindPasswordResponse;

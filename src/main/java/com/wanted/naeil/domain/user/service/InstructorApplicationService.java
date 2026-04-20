@@ -62,6 +62,9 @@ public class InstructorApplicationService {
         if (request.getProofFiles() == null || request.getProofFiles().stream().allMatch(f -> f == null || f.isEmpty())) {
             throw new IllegalArgumentException("증빙 자료를 최소 1개 이상 업로드해주세요.");
         }
+        if (request.getProofFiles().size() > 10) {
+            throw new IllegalArgumentException("증빙 자료는 최대 10개까지 업로드 가능합니다.");
+        }
         if (request.getFaceImg() == null || request.getFaceImg().isEmpty()) {
             throw new IllegalArgumentException("얼굴 사진을 업로드해주세요.");
         }
