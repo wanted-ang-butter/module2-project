@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Nae-Il | 멤버십 결제</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+    <style>
+        .grid-bg {
+            background-image:
+                    linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen">
+
+<div class="fixed inset-0 grid-bg opacity-30 pointer-events-none"></div>
+
+<!-- 상단 -->
+<header class="border-b border-slate-200 bg-white/90 backdrop-blur-sm sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-6 py-5">
+        <a th:href="@{/subscription}" href="/subscription"
+           class="inline-flex items-center gap-2 text-slate-500 hover:text-slate-700 text-sm font-medium mb-3">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>이전으로</span>
+        </a>
+
+        <h1 class="text-3xl md:text-4xl font-black tracking-tight text-slate-950">
+            멤버십 결제
+        </h1>
+    </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-6 py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+
+        <!-- 왼쪽: 선택한 플랜 -->
+        <section>
+            <h2 class="text-2xl font-bold mb-6">선택한 플랜</h2>
+
+            <!-- MONTHLY -->
+            <div th:if="${planType == 'MONTHLY'}"
+                 class="bg-white rounded-[28px] border border-slate-200 shadow-[0_8px_24px_rgba(15,23,42,0.08)] p-6 md:p-8">
+
+                <h3 class="text-3xl font-black text-slate-950 mb-6">1개월 이용권</h3>
+
+                <div class="flex items-end gap-2 flex-wrap mb-8">
+                    <span class="text-4xl md:text-5xl font-black text-[#5664f5] leading-none">99,000</span>
+                    <span class="text-3xl md:text-4xl font-black text-[#7a4df5] leading-none">크레딧</span>
+                    <span class="text-lg md:text-xl font-bold text-slate-500">/ 월</span>
+                </div>
+
+                <div class="border-t border-slate-200 pt-6">
+                    <p class="text-xl font-black mb-5 text-slate-800">포함 혜택</p>
+
+                    <div class="space-y-4 text-lg font-semibold text-slate-700">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-circle-check text-green-500"></i>
+                            <span>매월 코스 3개 수강</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-circle-check text-green-500"></i>
+                            <span>실시간 강의 선예매</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- YEARLY -->
+            <div th:if="${planType == 'YEARLY'}"
+                 class="relative bg-white border-[2px] border-[#5b78ff] rounded-[28px] p-6 md:p-8 shadow-[0_10px_28px_rgba(91,120,255,0.12)] overflow-hidden">
+
+                <div class="absolute top-0 right-0 px-5 py-2.5 rounded-bl-[20px] bg-gradient-to-r from-blue-500 to-green-500 text-white text-sm md:text-base font-black shadow-lg">
+                    <i class="fa-solid fa-sparkles mr-2"></i>추천
+                </div>
+
+                <h3 class="text-3xl font-black text-slate-950 mb-4">12개월 이용권</h3>
+
+                <span class="inline-flex items-center px-4 py-2 rounded-full bg-green-100 text-green-700 text-sm md:text-base font-black mb-5">
+            약 17% 할인
+        </span>
+
+                <div class="flex items-end gap-2 flex-wrap mb-2">
+                    <span class="text-4xl md:text-5xl font-black text-[#5b62f6] leading-none">82,500</span>
+                    <span class="text-3xl md:text-4xl font-black text-[#7c4df6] leading-none">크레딧</span>
+                    <span class="text-lg md:text-xl font-bold text-slate-500">/ 월</span>
+                </div>
+
+                <p class="text-sm md:text-base font-semibold text-slate-400 mb-8">
+                    연 990,000 크레딧 결제
+                </p>
+
+                <div class="space-y-4 text-lg font-semibold text-slate-700">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-circle-check text-green-500"></i>
+                        <span>매월 코스 3개 수강</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-circle-check text-green-500"></i>
+                        <span>실시간 강의 선예매</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-circle-check text-green-500"></i>
+                        <span>장기 이용 할인</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 오른쪽: 결제 정보 -->
+        <section>
+            <h2 class="text-2xl font-bold mb-6">결제 정보</h2>
+
+            <div class="bg-white rounded-[28px] border border-slate-200 shadow-[0_8px_24px_rgba(15,23,42,0.08)] p-6 md:p-8">
+                <div class="space-y-6">
+
+                    <div class="flex items-center justify-between border-b border-slate-200 pb-5">
+                        <span class="text-lg md:text-xl font-semibold text-slate-600">선택 플랜</span>
+                        <span class="text-xl md:text-2xl font-black text-slate-950"
+                              th:text="${planType == 'MONTHLY' ? '1개월 이용권' : '12개월 이용권'}">
+                            1개월 이용권
+                        </span>
+                    </div>
+
+                    <div class="flex items-center justify-between border-b border-slate-200 pb-5">
+                        <span class="text-lg md:text-xl font-semibold text-slate-600">이용 기간</span>
+                        <span class="text-xl md:text-2xl font-black text-slate-950"
+                              th:text="${planType == 'MONTHLY' ? '1개월' : '12개월'}">
+                            1개월
+                        </span>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-1 gap-4">
+                        <span class="text-2xl md:text-3xl font-black text-slate-950">최종 결제 금액</span>
+                        <span class="text-2xl md:text-3xl font-black text-[#5664f5] text-right leading-tight">
+                            <span th:text="${planType == 'MONTHLY' ? '99,000' : '990,000'}">99,000</span> 크레딧
+                        </span>
+                    </div>
+
+                    <div class="pt-2">
+                        <p class="text-xl md:text-2xl font-black mb-3">결제 수단</p>
+                        <div class="h-16 rounded-[18px] border-2 border-blue-200 bg-blue-50 flex items-center px-5 gap-3 text-lg md:text-xl font-black text-slate-950">
+                            <i class="fa-regular fa-credit-card text-[#5664f5]"></i>
+                            <span>신용/체크카드</span>
+                        </div>
+                    </div>
+
+                    <form th:action="@{/payments/subscriptions}" method="post" class="pt-1">
+                        <input type="hidden" name="planType" th:value="${planType}">
+                        <input type="hidden" name="price" th:value="${planType == 'MONTHLY' ? 99000 : 990000}">
+
+                        <button type="submit"
+                                class="w-full h-16 md:h-18 rounded-[20px] bg-gradient-to-r from-blue-500 to-green-500 text-white text-2xl md:text-3xl font-black hover:opacity-95 transition shadow-lg">
+                            결제하기
+                        </button>
+                    </form>
+
+                    <p class="text-center text-sm md:text-base font-semibold text-slate-500">
+                        언제든 해지 가능 · 자동 갱신 안내 문자 발송
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</main>
+
+</body>
+</html>

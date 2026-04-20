@@ -5,12 +5,10 @@ import com.wanted.naeil.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Table(name = "credits")
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 public class Credit extends BaseTimeEntity {
@@ -28,15 +26,20 @@ public class Credit extends BaseTimeEntity {
     @Builder.Default
     private int balance = 0;
 
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
     // 비지니스 로직
 
-    public void charge(int amount) {
-        if (amount <= 0) {
-            throw new IllegalArgumentException("충전 금액은 0보다 커야 합니다.");
+    // 최소 충전 금액 및 충전 단위 설정
+    private void validateChargeAmount(int amount) {
+        if (amount < 10000) {
+            throw new IllegalArgumentException("최소 충전 금액은 10,000 크레딧입니다.");
         }
+        if (amount % 1000 != 0) {
+            throw new IllegalArgumentException("1,000 크레딧 단위로만 충전할 수 있습니다.");
+        }
+    }
+
+    public void charge(int amount) {
+        validateChargeAmount(amount);
         this.balance += amount;
     }
 
