@@ -11,16 +11,33 @@ import java.util.List;
 
 public interface LiveReservationRepository extends JpaRepository<LiveReservation, Long> {
 
+    boolean existsByUser_IdAndLiveLecture_IdAndStatus(
+            Long userId,
+            Long liveId,
+            LiveReservationStatus status
+    );
 
-    // 내 강의 페이지 - RESERVED 상태인 예약 목록 조회 (liveLecture fetch join으로 N+1 방지)
     @Query("""
-        SELECT r FROM LiveReservation r
-        JOIN FETCH r.liveLecture l
-        JOIN FETCH l.instructor
-        WHERE r.user = :user
-        AND r.status = :status
-        ORDER BY l.startAt ASC
-    """)
+        select r.liveLecture.id
+        from LiveReservation r
+        where r.user.id = :userId
+          and r.status = :status
+        """)
+    List<Long> findLiveIdsByUserIdAndStatus(
+            @Param("userId") Long userId,
+            @Param("status") LiveReservationStatus status
+    );
+
+    // 내 강의 페이지 - RESERVED 상태인 예약 목록 조회
+    @Query("""
+        select r
+        from LiveReservation r
+        join fetch r.liveLecture l
+        join fetch l.instructor
+        where r.user = :user
+          and r.status = :status
+        order by l.startAt asc
+        """)
     List<LiveReservation> findByUserAndStatusWithLecture(
             @Param("user") User user,
             @Param("status") LiveReservationStatus status
