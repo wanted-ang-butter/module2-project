@@ -8,7 +8,8 @@ import lombok.RequiredArgsConstructor;
 public enum PaymentItemType {
 
     COURSE("코스"),
-    SUBSCRIPTION("구독권");
+    SUBSCRIPTION("구독권"),
+    CREDIT("크레딧 충전");
 
     private final String description;
 }

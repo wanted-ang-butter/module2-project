@@ -61,7 +61,7 @@ public class CartService {
     }
 
     // 3. 장바구니 삭제
-    public void removeCartItem(Long userId, Long cartItemId) {
+    public void deleteCartItem(Long userId, Long cartItemId) {
 
         CartItem cartItem = cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new IllegalArgumentException("장바구니 항목이 존재하지 않습니다."));

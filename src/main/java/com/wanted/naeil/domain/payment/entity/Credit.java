@@ -8,7 +8,7 @@ import lombok.*;
 @Entity
 @Table(name = "credits")
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Credit extends BaseTimeEntity {
