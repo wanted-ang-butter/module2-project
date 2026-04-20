@@ -145,6 +145,36 @@ public class LiveLectureService {
         log.info("[LiveLectureUpdate] 실시간 강의 수정 완료 - liveId: {}", liveId);
     }
 
+    // 실시간 강의 삭제
+    @Transactional
+    public void deleteLiveLecture(Long instructorId, Long liveId) {
+
+        log.info("[실시간 강의] 실시간 강의 삭제 Service 로직 시작!");
+
+        User instructor = userRepository.findById(instructorId)
+                .orElseThrow(() -> new IllegalArgumentException("강사 정보를 찾을 수 없습니다. ID: " + instructorId));
+
+        LiveLecture liveLecture = liveLectureRepository.findById(liveId)
+                .orElseThrow(() -> new IllegalArgumentException("실시간 강의를 찾을 수 없습니다. ID: " + liveId));
+
+        // 강사 본인 or 관리자
+        validateLiveLectureOwnerOrAdmin(instructor, liveLecture);
+
+        // 승인 대기 or 반려 상태일 때만 삭제 가능
+        LiveLectureStatus status = liveLecture.getStatus();
+
+        if (status != LiveLectureStatus.PENDING && status != LiveLectureStatus.REJECTED) {
+            throw new IllegalStateException("승인 대기 또는 반려 상태의 실시간 강의만 삭제할 수 있습니다.");
+        }
+
+        // 관리자 승인 테이블 먼저 삭제
+        adminApprovalRepository.deleteByLecture(liveLecture);
+        // 실시간 강의 삭제
+        liveLectureRepository.delete(liveLecture);
+
+        log.info("[LiveLectureDelete] 실시간 강의 삭제 완료 - liveId: {}", liveId);
+    }
+
 
     // ====== 내부 편의 메서드 =======
     private void validateLiveLectureTime(CreateLiveLectureRequest request) {
@@ -203,7 +233,6 @@ public class LiveLectureService {
             throw new IllegalArgumentException("방송 URL은 필수 입력 값입니다.");
         }
     }
-
 
     private void validateLiveLectureOwnerOrAdmin(User user, LiveLecture liveLecture) {
         if (user.getRole() == Role.ADMIN) {
