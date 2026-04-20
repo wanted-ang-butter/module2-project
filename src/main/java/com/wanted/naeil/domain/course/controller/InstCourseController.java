@@ -35,10 +35,12 @@ public class InstCourseController {
 
     // 코스 등록 조회
     @GetMapping("/course")
-    public ModelAndView CreateCoursePage(ModelAndView mv) {
+    public ModelAndView CreateCoursePage(ModelAndView mv,
+                                         @AuthenticationPrincipal AuthDetails authDetails) {
         log.info(" [Courses] 강의 생성 페이지 조회 시작");
 
         // TODO : 임시로 리포에서 바로 불러옴, 추후 서비스 로직 호출해서 하는걸로 수정
+        mv.addObject("user", authDetails.getLoginUserDTO());
         mv.addObject("createCourseRequest", new CourseCreateRequest());
         mv.addObject("categories", categoryRepository.findAll());
 
