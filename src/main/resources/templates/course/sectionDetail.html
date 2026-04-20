@@ -18,52 +18,7 @@
 
 <body class="min-h-screen bg-[#f6f7f9] text-slate-900">
 
-<header class="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
-  <div class="mx-auto flex h-14 max-w-7xl items-center justify-between px-5">
-    <a href="/" class="flex items-center gap-2">
-      <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-emerald-500 text-white">
-        <i class="fa-solid fa-arrow-trend-up text-sm"></i>
-      </div>
-
-      <div class="leading-tight">
-        <p class="text-xl font-extrabold tracking-tight">
-          내일 <span class="font-medium text-slate-500">Nae-Il</span>
-        </p>
-        <p class="text-[10px] font-semibold text-slate-400">내일의 일, My Work</p>
-      </div>
-    </a>
-
-    <nav class="hidden items-center gap-7 text-sm font-semibold text-slate-600 md:flex">
-      <a href="/course" class="hover:text-blue-600">
-        <i class="fa-solid fa-book-open mr-1 text-xs"></i>
-        전체 강의
-      </a>
-      <a href="#" class="hover:text-blue-600">
-        <i class="fa-regular fa-calendar mr-1 text-xs"></i>
-        실시간 강의
-      </a>
-      <a href="#" class="hover:text-blue-600">
-        <i class="fa-solid fa-graduation-cap mr-1 text-xs"></i>
-        내 강의
-      </a>
-      <a href="#" class="hover:text-blue-600">
-        <i class="fa-regular fa-comment mr-1 text-xs"></i>
-        커뮤니티
-      </a>
-      <a href="/cart" class="hover:text-blue-600">
-        <i class="fa-solid fa-cart-shopping mr-1 text-xs"></i>
-        장바구니
-      </a>
-    </nav>
-
-    <div class="flex items-center gap-3">
-      <a href="/auth/logout"
-         class="hidden rounded-md border border-slate-200 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 md:inline-flex">
-        로그아웃
-      </a>
-    </div>
-  </div>
-</header>
+<div th:replace="fragments/userHeader :: userHeader"></div>
 
 <main>
   <div class="border-b border-slate-200 bg-white">

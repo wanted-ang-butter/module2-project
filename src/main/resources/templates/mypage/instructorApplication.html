@@ -15,103 +15,7 @@
 </head>
 <body class="bg-gray-50">
 
-<!-- 헤더 -->
-<header class="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
-    <div class="max-w-7xl mx-auto px-6 py-4">
-        <div class="flex items-center justify-between">
-            <a th:href="@{/}" href="/" class="flex items-center gap-3 group">
-                <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <i class="fa-solid fa-terminal text-white text-sm"></i>
-                </div>
-                <div>
-                    <h1 class="text-xl font-bold text-gray-900 tracking-tight">
-                        내일 <span class="text-gray-500 font-normal">Nae-il</span>
-                    </h1>
-                    <p class="text-[10px] font-semibold text-gray-500 tracking-wide">내일의 일, My Work</p>
-                </div>
-            </a>
-
-            <nav class="flex items-center gap-1 flex-nowrap">
-                <a th:href="@{/courses}" href="/courses" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
-                    <i class="fa-solid fa-book-open w-4 h-4"></i>
-                    <span class="text-xs font-medium">전체 강의</span>
-                </a>
-                <a th:href="@{/live}" href="/live" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
-                    <i class="fa-solid fa-calendar w-4 h-4"></i>
-                    <span class="text-xs font-medium">실시간 강의</span>
-                </a>
-                <a th:href="@{/my-courses}" href="/my-courses" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
-                    <i class="fa-solid fa-video w-4 h-4"></i>
-                    <span class="text-xs font-medium">내 강의</span>
-                </a>
-                <a th:href="@{/community/qna}" href="/community/qna" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
-                    <i class="fa-solid fa-comment w-4 h-4"></i>
-                    <span class="text-xs font-medium">커뮤니티</span>
-                </a>
-                <a th:href="@{/cart}" href="/cart" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
-                    <i class="fa-solid fa-cart-shopping w-4 h-4"></i>
-                    <span class="text-xs font-medium">장바구니</span>
-                </a>
-                <a th:href="@{/credit}" href="/credit" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
-                    <i class="fa-solid fa-wallet w-4 h-4"></i>
-                    <span class="text-xs font-medium">크레딧</span>
-                </a>
-            </nav>
-
-            <div class="flex items-center gap-4">
-                <a th:href="@{/auth/logout}" href="/auth/logout"
-                   class="flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-red-50 transition-all group">
-                    <i class="fa-solid fa-right-from-bracket text-gray-600 group-hover:text-red-600 text-sm"></i>
-                    <span class="font-medium text-gray-700 group-hover:text-red-600 text-sm">로그아웃</span>
-                </a>
-                <div class="text-right" th:if="${user}">
-                    <p class="text-sm font-medium text-gray-900" th:text="${user.name}">사용자</p>
-                    <p class="text-xs font-mono text-gray-500" th:text="${user.email}">email</p>
-                </div>
-                <div class="relative" id="noticeDropdownWrapper">
-                    <button onclick="toggleNoticeDropdown()"
-                            class="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shadow-md hover:shadow-lg transition-shadow cursor-pointer">
-                        <i class="fa-solid fa-bullhorn text-white text-sm"></i>
-                    </button>
-                    <div id="noticeDropdown" class="notice-dropdown absolute right-0 mt-2 w-48 bg-white border-2 border-gray-200 rounded-xl shadow-xl z-50">
-                        <div class="py-2">
-                            <a href="/notice" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
-                                <i class="fa-solid fa-bullhorn text-gray-600"></i>
-                                <span class="text-sm font-medium text-gray-900">공지사항</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="relative" id="profileDropdownWrapper">
-                    <button onclick="toggleProfileDropdown()"
-                            class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center shadow-md hover:shadow-lg transition-shadow cursor-pointer">
-                        <span class="text-white font-mono text-xs font-bold">{ }</span>
-                    </button>
-                    <div id="profileDropdown" class="profile-dropdown absolute right-0 mt-2 w-56 bg-white border-2 border-gray-200 rounded-xl shadow-xl z-50">
-                        <div class="py-2">
-                            <a href="/my-courses" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
-                                <i class="fa-solid fa-video text-gray-600"></i>
-                                <span class="text-sm font-medium text-gray-900">내 강의</span>
-                            </a>
-                            <a href="/user/me" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
-                                <i class="fa-solid fa-gear text-gray-600"></i>
-                                <span class="text-sm font-medium text-gray-900">계정 설정</span>
-                            </a>
-                            <a href="/subscriber/mySubscriber" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
-                                <i class="fa-solid fa-user text-gray-600"></i>
-                                <span class="text-sm font-medium text-gray-900">나의 구독</span>
-                            </a>
-                            <a href="/user/me/instructor-application/history" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
-                                <i class="fa-solid fa-chalkboard-user text-gray-600"></i>
-                                <span class="text-sm font-medium text-gray-900">강사 신청</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</header>
+<div th:replace="fragments/userHeader :: userHeader"></div>
 
 <div class="max-w-7xl mx-auto px-6 py-12">
     <div class="grid grid-cols-12 gap-8">
@@ -130,10 +34,10 @@
                         <i class="fa-solid fa-gear w-5 h-5"></i>
                         <span class="text-sm">계정 설정</span>
                     </a>
-                    <a th:href="@{/subscriber/mySubscriber}" href="/subscriber/mySubscriber"
+                    <a th:href="@{/payment/history}" href="/payment/history"
                        class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 font-medium transition-all">
                         <i class="fa-solid fa-user w-5 h-5"></i>
-                        <span class="text-sm">나의 구독</span>
+                        <span class="text-sm">결제 내역</span>
                     </a>
                     <a th:href="@{/user/me/apply-instructor}" href="/user/me/apply-instructor"
                        class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-bold transition-all">
@@ -210,32 +114,34 @@
                     <!-- 증빙 자료 -->
                     <div>
                         <label class="block text-sm font-bold text-gray-900 mb-2">증빙 자료 <span class="text-red-500">*</span></label>
+                        <div id="proofFileList" class="space-y-2 mb-2"></div>
                         <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-blue-500 hover:bg-blue-50 transition-colors cursor-pointer"
-                             onclick="document.getElementById('proofFiles').click()">
+                             onclick="document.getElementById('proofFilesInput').click()">
                             <i class="fa-solid fa-upload text-gray-400 text-3xl mb-3 block"></i>
                             <p class="text-sm font-medium text-gray-600">파일을 선택하거나 드래그하여 업로드</p>
-                            <p class="text-xs text-gray-400 mt-1">PDF, DOC, DOCX, JPG, PNG (최대 10MB)</p>
-                            <input type="file" id="proofFiles" name="proofFiles"
+                            <p class="text-xs text-gray-400 mt-1">PDF, DOC, DOCX, JPG, PNG (최대 10MB, 최대 10개)</p>
+                            <input type="file" id="proofFilesInput"
                                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
                                    multiple
-                                   class="hidden" onchange="showFileNames(this, 'proofFileName')"/>
+                                   class="hidden" onchange="addProofFiles(this)"/>
                         </div>
-                        <p id="proofFileName" class="text-sm text-blue-600 font-medium mt-2 hidden"></p>
+                        <!-- 실제 전송용 hidden input들이 JS로 동적 추가됨 -->
+                        <div id="proofFilesContainer"></div>
                     </div>
 
                     <!-- 얼굴 사진 -->
                     <div>
                         <label class="block text-sm font-bold text-gray-900 mb-2">얼굴 사진 <span class="text-red-500">*</span></label>
-                        <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-blue-500 hover:bg-blue-50 transition-colors cursor-pointer"
-                             onclick="document.getElementById('faceImg').click()">
+                        <div id="faceImgPreview" class="mb-2"></div>
+                        <div id="faceImgUploadArea" class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-blue-500 hover:bg-blue-50 transition-colors cursor-pointer"
+                             onclick="document.getElementById('faceImgInput').click()">
                             <i class="fa-solid fa-image text-gray-400 text-3xl mb-3 block"></i>
                             <p class="text-sm font-medium text-gray-600">얼굴 사진을 업로드하세요</p>
                             <p class="text-xs text-gray-400 mt-1">JPG, PNG (최대 5MB)</p>
-                            <input type="file" id="faceImg" name="faceImg"
+                            <input type="file" id="faceImgInput" name="faceImg"
                                    accept=".jpg,.jpeg,.png"
-                                   class="hidden" onchange="showFileNames(this, 'faceImgName')"/>
+                                   class="hidden" onchange="addFaceImg(this)"/>
                         </div>
-                        <p id="faceImgName" class="text-sm text-blue-600 font-medium mt-2 hidden"></p>
                     </div>
 
                     <!-- 버튼 -->
@@ -274,6 +180,7 @@
 </footer>
 
 <script>
+    let proofFiles = [];
     function toggleNoticeDropdown() {
         const el = document.getElementById('noticeDropdown');
         if (el) el.classList.toggle('open');
@@ -293,13 +200,133 @@
         }
     });
 
-    function showFileNames(input, targetId) {
-        const target = document.getElementById(targetId);
-        if (input.files && input.files.length > 0) {
-            const names = Array.from(input.files).map(f => f.name).join(', ');
-            target.textContent = '선택된 파일: ' + names;
-            target.classList.remove('hidden');
+    // ===== 증빙 자료 관리 =====
+    // let proofFiles = []; // 선택된 파일 배열
+
+    function addProofFiles(input) {
+        const newFiles = Array.from(input.files);
+
+        // 전체 체크를 forEach 밖에서 먼저 해요
+        const availableSlots = 10 - proofFiles.length;
+        if (availableSlots <= 0) {
+            alert('증빙 자료는 최대 10개까지 업로드 가능합니다.');
+            input.value = '';
+            return;
         }
+
+        let addedCount = 0;
+        newFiles.forEach(file => {
+            if (addedCount >= availableSlots) return; // 슬롯 초과 시 그냥 건너뜀
+            if (file.size > 10 * 1024 * 1024) {
+                alert(`${file.name}: 파일 크기는 10MB 이하여야 합니다.`);
+                return;
+            }
+            proofFiles.push(file);
+            addedCount++;
+        });
+
+        // 10개 초과분이 잘렸을 때 한 번만 알림
+        if (newFiles.length > availableSlots) {
+            alert(`증빙 자료는 최대 10개까지 업로드 가능합니다. ${availableSlots}개만 추가되었습니다.`);
+        }
+
+        input.value = '';
+        renderProofFiles();
+        syncProofFilesToForm();
+    }
+
+    function removeProofFile(index) {
+        proofFiles.splice(index, 1);
+        renderProofFiles();
+        syncProofFilesToForm();
+    }
+
+    function renderProofFiles() {
+        const list = document.getElementById('proofFileList');
+        list.innerHTML = '';
+        proofFiles.forEach((file, index) => {
+            const item = document.createElement('div');
+            item.className = 'flex items-center justify-between p-4 border-2 border-green-200 bg-green-50 rounded-xl';
+            item.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                        <i class="fa-solid fa-file-lines text-green-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-gray-900">${file.name}</p>
+                        <p class="text-xs text-gray-500">${(file.size / 1024).toFixed(2)} KB</p>
+                    </div>
+                </div>
+                <button type="button" onclick="removeProofFile(${index})"
+                        class="p-2 hover:bg-red-100 rounded-lg transition-colors">
+                    <i class="fa-solid fa-xmark text-red-600"></i>
+                </button>
+            `;
+            list.appendChild(item);
+        });
+    }
+
+    function syncProofFilesToForm() {
+        // 기존 hidden input 제거
+        const container = document.getElementById('proofFilesContainer');
+        container.innerHTML = '';
+
+        // DataTransfer로 FileList 생성해서 hidden input에 연결
+        const dt = new DataTransfer();
+        proofFiles.forEach(file => dt.items.add(file));
+
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.name = 'proofFiles';
+        input.multiple = true;
+        input.style.display = 'none';
+        input.files = dt.files;
+        container.appendChild(input);
+    }
+
+    // ===== 얼굴 사진 관리 =====
+    function addFaceImg(input) {
+        const file = input.files[0];
+        if (!file) return;
+
+        // 5MB 체크
+        if (file.size > 5 * 1024 * 1024) {
+            alert('파일 크기는 5MB 이하여야 합니다.');
+            input.value = '';
+            return;
+        }
+
+        const preview = document.getElementById('faceImgPreview');
+        const uploadArea = document.getElementById('faceImgUploadArea');
+
+        preview.innerHTML = `
+            <div class="flex items-center justify-between p-4 border-2 border-blue-200 bg-blue-50 rounded-xl">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i class="fa-solid fa-image text-blue-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-gray-900">${file.name}</p>
+                        <p class="text-xs text-gray-500">${(file.size / 1024).toFixed(2)} KB</p>
+                    </div>
+                </div>
+                <button type="button" onclick="removeFaceImg()"
+                        class="p-2 hover:bg-red-100 rounded-lg transition-colors">
+                    <i class="fa-solid fa-xmark text-red-600"></i>
+                </button>
+            </div>
+        `;
+        uploadArea.classList.add('hidden'); // 업로드 영역 숨기기
+    }
+
+    function removeFaceImg() {
+        const preview = document.getElementById('faceImgPreview');
+        const uploadArea = document.getElementById('faceImgUploadArea');
+        const input = document.getElementById('faceImgInput');
+
+        preview.innerHTML = '';
+        uploadArea.classList.remove('hidden'); // 업로드 영역 다시 보이기
+        input.value = ''; // input 초기화
     }
 </script>
 </body>

@@ -60,18 +60,17 @@ public class CartController {
         return "payment/cart";
     }
 
-    // 장바구니 삭제 -> @deleteMapping 으로 변경 예정
+    // 장바구니 삭제
     @DeleteMapping("/delete/{cartItemId}")
-    public String removeCartItem(@PathVariable Long cartItemId,
+    public String deleteCartItem(@PathVariable Long cartItemId,
                                  @AuthenticationPrincipal AuthDetails authDetails) {
 
         Long loginUserId = getLoginUserId(authDetails);
 
-        cartService.removeCartItem(loginUserId, cartItemId);
+        cartService.deleteCartItem(loginUserId, cartItemId);
 
         return "redirect:/cart";
     }
-
 
     // 체크된 장바구니 항목 결제
     @PostMapping("/checkout")

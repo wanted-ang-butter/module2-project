@@ -5,7 +5,11 @@ import com.wanted.naeil.domain.learning.entity.Enrollment;
 import com.wanted.naeil.domain.learning.entity.enums.EnrollmentStatus;
 import com.wanted.naeil.domain.learning.repository.EnrollmentRepository;
 import com.wanted.naeil.domain.payment.dto.request.SubscriptionPaymentRequest;
-import com.wanted.naeil.domain.payment.entity.*;
+import com.wanted.naeil.domain.payment.entity.CartItem;
+import com.wanted.naeil.domain.payment.entity.Credit;
+import com.wanted.naeil.domain.payment.entity.Payment;
+import com.wanted.naeil.domain.payment.entity.PaymentItem;
+import com.wanted.naeil.domain.payment.entity.Subscription;
 import com.wanted.naeil.domain.payment.entity.enums.PaymentItemType;
 import com.wanted.naeil.domain.payment.entity.enums.PlanType;
 import com.wanted.naeil.domain.payment.entity.enums.SubscriptionStatus;
@@ -58,8 +62,6 @@ public class PaymentService {
         Subscription subscription = getActiveSubscription(userId);
         int remainingFreeCount = (subscription != null) ? subscription.getRemainingFreeCount() : 0;
 
-        System.out.println("남은 무료 횟수: " + remainingFreeCount);
-
         int totalAmount = calculateTotalAmount(cartItems);
         List<PaymentItem> paymentItems = new ArrayList<>();
 
@@ -77,13 +79,13 @@ public class PaymentService {
                 remainingFreeCount--;
             }
 
-            PaymentItem paymentItem = PaymentItem.builder()
-                    .course(course)
-                    .itemType(PaymentItemType.COURSE)
-                    .price(price)
-                    .discountAmount(itemDiscountAmount)
-                    .finalPrice(itemFinalPrice)
-                    .build();
+            PaymentItem paymentItem = createPaymentItem(
+                    course,
+                    PaymentItemType.COURSE,
+                    price,
+                    itemDiscountAmount,
+                    itemFinalPrice
+            );
 
             paymentItems.add(paymentItem);
         }
@@ -98,12 +100,7 @@ public class PaymentService {
 
         validateEnoughCredit(credit, finalAmount);
 
-        Payment payment = Payment.builder()
-                .user(user)
-                .totalAmount(totalAmount)
-                .discountAmount(discountAmount)
-                .finalAmount(finalAmount)
-                .build();
+        Payment payment = createPayment(user, totalAmount, discountAmount, finalAmount);
 
         // PaymentItem 연관관계 연결
         paymentItems.forEach(payment::addPaymentItem);
@@ -127,11 +124,13 @@ public class PaymentService {
 
         // 크레딧 차감
         credit.deduct(finalAmount);
+
         // 결제 성공 상태 변경
         payment.markSuccess();
 
         // 결제 데이터 저장
         Payment savedPayment = paymentRepository.save(payment);
+
         // 장바구니 정리
         cartItemRepository.deleteAll(cartItems);
 
@@ -157,20 +156,15 @@ public class PaymentService {
 
         validateEnoughCredit(credit, finalAmount);
 
-        Payment payment = Payment.builder()
-                .user(user)
-                .totalAmount(totalAmount)
-                .discountAmount(discountAmount)
-                .finalAmount(finalAmount)
-                .build();
+        Payment payment = createPayment(user, totalAmount, discountAmount, finalAmount);
 
-        PaymentItem paymentItem = PaymentItem.builder()
-                .course(null)
-                .itemType(PaymentItemType.SUBSCRIPTION)
-                .price(totalAmount)
-                .discountAmount(discountAmount)
-                .finalPrice(finalAmount)
-                .build();
+        PaymentItem paymentItem = createPaymentItem(
+                null,
+                PaymentItemType.SUBSCRIPTION,
+                totalAmount,
+                discountAmount,
+                finalAmount
+        );
 
         payment.addPaymentItem(paymentItem);
 
@@ -302,20 +296,15 @@ public class PaymentService {
             return;
         }
 
-        Payment payment = Payment.builder()
-                .user(user)
-                .totalAmount(amount)
-                .discountAmount(0)
-                .finalAmount(amount)
-                .build();
+        Payment payment = createPayment(user, amount, 0, amount);
 
-        PaymentItem paymentItem = PaymentItem.builder()
-                .course(null)
-                .itemType(PaymentItemType.SUBSCRIPTION)
-                .price(amount)
-                .discountAmount(0)
-                .finalPrice(amount)
-                .build();
+        PaymentItem paymentItem = createPaymentItem(
+                null,
+                PaymentItemType.SUBSCRIPTION,
+                amount,
+                0,
+                amount
+        );
 
         payment.addPaymentItem(paymentItem);
 
@@ -330,5 +319,28 @@ public class PaymentService {
 
         subscription.renew(newEndAt, newNextResetAt);
         subscription.updateRemainingFreeCount(3);
+    }
+
+    private Payment createPayment(User user, int totalAmount, int discountAmount, int finalAmount) {
+        return Payment.builder()
+                .user(user)
+                .totalAmount(totalAmount)
+                .discountAmount(discountAmount)
+                .finalAmount(finalAmount)
+                .build();
+    }
+
+    private PaymentItem createPaymentItem(Course course,
+                                          PaymentItemType itemType,
+                                          int price,
+                                          int discountAmount,
+                                          int finalPrice) {
+        return PaymentItem.builder()
+                .course(course)
+                .itemType(itemType)
+                .price(price)
+                .discountAmount(discountAmount)
+                .finalPrice(finalPrice)
+                .build();
     }
 }

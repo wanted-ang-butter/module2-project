@@ -22,72 +22,7 @@
 
 <div class="fixed inset-0 grid-bg opacity-30 pointer-events-none"></div>
 
-<header class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-slate-200 shadow-sm">
-  <div class="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
-
-    <a th:href="@{/}" href="/" class="flex items-center gap-3">
-      <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center">
-        <i class="fa-solid fa-arrow-trend-up text-white text-lg"></i>
-      </div>
-      <div>
-        <h1 class="text-xl font-black text-slate-900">
-          내일 <span class="text-slate-500">Nae-il</span>
-        </h1>
-        <p class="text-xs text-slate-500">My Work</p>
-      </div>
-    </a>
-
-    <nav class="hidden xl:flex items-center gap-6 text-sm font-semibold text-slate-600">
-      <a th:href="@{/course}" href="/course" class="flex items-center gap-2 hover:text-slate-900">
-        <i class="fa-regular fa-book-open"></i> 전체 강의
-      </a>
-
-      <a th:href="@{/live}" href="/live" class="flex items-center gap-2 hover:text-slate-900">
-        <i class="fa-regular fa-calendar"></i> 실시간 강의
-      </a>
-
-      <a th:href="@{/my-courses}" href="/my-courses" class="flex items-center gap-2 hover:text-slate-900">
-        <i class="fa-regular fa-folder"></i> 내 강의
-      </a>
-
-      <a th:href="@{/community}" href="/community" class="flex items-center gap-2 hover:text-slate-900">
-        <i class="fa-regular fa-comment"></i> 커뮤니티
-      </a>
-
-      <a th:href="@{/cart}" href="/cart"
-         class="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-100">
-        <i class="fa-solid fa-cart-shopping"></i> 장바구니
-      </a>
-
-      <a th:href="@{/credit/charge}"
-         href="/credit/charge"
-         class="flex items-center gap-2 hover:text-slate-900">
-        <i class="fa-regular fa-credit-card"></i> 크레딧
-      </a>
-    </nav>
-
-    <div class="hidden lg:flex items-center gap-4">
-      <a th:href="@{/logout}" class="flex items-center gap-1 text-sm text-slate-600 hover:text-slate-900">
-        <i class="fa-solid fa-right-from-bracket"></i> 로그아웃
-      </a>
-
-      <div class="text-right">
-        <p class="text-sm font-bold">개발자님</p>
-        <p class="text-xs text-slate-500">dev@naeil.io</p>
-      </div>
-
-      <div class="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center text-white">
-        <i class="fa-solid fa-paper-plane"></i>
-      </div>
-
-      <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-green-500 rounded-xl flex items-center justify-center text-white">
-        <i class="fa-solid fa-code"></i>
-      </div>
-    </div>
-  </div>
-</header>
-
-<div class="h-16"></div>
+<div th:replace="fragments/userHeader :: userHeader"></div>
 
 <main class="max-w-[1400px] mx-auto px-8 py-10">
 

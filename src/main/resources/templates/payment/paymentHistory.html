@@ -1,0 +1,928 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>결제 내역</title>
+    <link rel="icon" href="/favicon.ico">
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #eef2ff;
+            --text-main: #111827;
+            --text-sub: #6b7280;
+            --border: #e5e7eb;
+            --bg: #f8fafc;
+            --white: #ffffff;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --danger-light: #fef2f2;
+            --shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Pretendard", "Noto Sans KR", sans-serif;
+            background: #f3f4f6;
+            color: var(--text-main);
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .topbar {
+            width: 100%;
+            background: rgba(255,255,255,0.96);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .topbar-inner {
+            max-width: 1360px;
+            margin: 0 auto;
+            padding: 18px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-width: 250px;
+        }
+
+        .brand-logo {
+            width: 58px;
+            height: 58px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #5b5ce6, #66c37a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: 800;
+            box-shadow: 0 10px 24px rgba(91, 92, 230, 0.22);
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .brand-title {
+            font-size: 19px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .brand-subtitle {
+            font-size: 12px;
+            color: var(--text-sub);
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 34px;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .nav a {
+            font-size: 15px;
+            font-weight: 700;
+            color: #374151;
+        }
+
+        .nav a:hover {
+            color: var(--primary);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logout-link {
+            font-size: 15px;
+            font-weight: 700;
+            color: #374151;
+        }
+
+        .profile-dropdown {
+            position: relative;
+        }
+
+        .profile-button {
+            border: none;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .profile-info {
+            text-align: right;
+        }
+
+        .profile-name {
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .profile-email {
+            font-size: 13px;
+            color: var(--text-sub);
+            margin-top: 2px;
+        }
+
+        .profile-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #5b5ce6, #66c37a);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: 800;
+            overflow: hidden;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 58px;
+            right: 0;
+            width: 220px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            padding: 10px;
+            display: none;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 14px 14px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .dropdown-item:hover,
+        .dropdown-item.active {
+            background: #f3f4f6;
+            color: var(--primary);
+        }
+
+        .page {
+            max-width: 1360px;
+            margin: 0 auto;
+            padding: 34px 28px 80px;
+        }
+
+        .back-row {
+            margin-bottom: 18px;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            height: 42px;
+            padding: 0 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: white;
+            color: #374151;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 44px;
+            font-weight: 900;
+            margin: 0 0 10px;
+            letter-spacing: -0.03em;
+        }
+
+        .page-subtitle {
+            margin: 0;
+            color: var(--text-sub);
+            font-size: 16px;
+        }
+
+        .subscription-hero {
+            background: linear-gradient(135deg, #5b6df5 0%, #78b6dc 48%, #7fc27c 100%);
+            color: white;
+            border-radius: 22px;
+            padding: 30px;
+            margin-bottom: 26px;
+            box-shadow: 0 16px 36px rgba(79, 70, 229, 0.14);
+        }
+
+        .subscription-hero-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+            gap: 20px;
+        }
+
+        .subscription-title {
+            font-size: 34px;
+            font-weight: 900;
+            margin: 0 0 8px;
+        }
+
+        .subscription-desc {
+            margin: 0;
+            font-size: 15px;
+            color: rgba(255,255,255,0.92);
+        }
+
+        .subscription-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .subscription-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .stat-box {
+            background: rgba(255,255,255,0.14);
+            border-radius: 16px;
+            padding: 18px 20px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: rgba(255,255,255,0.84);
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: 800;
+            color: white;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 26px;
+        }
+
+        .info-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 800;
+            margin: 0 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: "▣";
+            font-size: 12px;
+            color: var(--primary);
+        }
+
+        .credit-main {
+            font-size: 30px;
+            font-weight: 900;
+            margin-bottom: 10px;
+            color: #111827;
+        }
+
+        .card-description {
+            color: var(--text-sub);
+            font-size: 14px;
+            line-height: 1.7;
+            margin: 0 0 18px;
+        }
+
+        .button {
+            width: 100%;
+            height: 48px;
+            border-radius: 14px;
+            border: none;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .button-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .button-outline-danger {
+            background: white;
+            color: var(--danger);
+            border: 1px solid rgba(220, 38, 38, 0.34);
+        }
+
+        .history-section {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .history-header {
+            padding: 24px 24px 14px;
+        }
+
+        .history-title {
+            font-size: 28px;
+            font-weight: 900;
+            margin: 0 0 8px;
+        }
+
+        .history-subtitle {
+            margin: 0;
+            font-size: 14px;
+            color: var(--text-sub);
+        }
+
+        .history-toolbar {
+            padding: 0 24px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .tab-list {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            border: none;
+            background: transparent;
+            color: #6b7280;
+            padding: 10px 2px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-button.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .sort-box {
+            min-width: 110px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-size: 14px;
+            color: #374151;
+            background: white;
+            text-align: center;
+        }
+
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 980px;
+        }
+
+        th, td {
+            padding: 16px 20px;
+            text-align: left;
+            border-top: 1px solid #f1f5f9;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        th {
+            background: #fafafa;
+            color: #475569;
+            font-weight: 800;
+        }
+
+        tr:hover td {
+            background: #fcfcff;
+        }
+
+        .type-chip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 82px;
+            padding: 7px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .type-course {
+            background: #eef2ff;
+            color: #4f46e5;
+        }
+
+        .type-subscription {
+            background: #f3e8ff;
+            color: #7c3aed;
+        }
+
+        .type-credit {
+            background: #ecfdf3;
+            color: #16a34a;
+        }
+
+        .amount-plus {
+            color: #16a34a;
+            font-weight: 900;
+        }
+
+        .amount-minus {
+            color: #ef4444;
+            font-weight: 900;
+        }
+
+        .status-chip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 56px;
+            padding: 7px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 800;
+            background: #ecfdf3;
+            color: #15803d;
+        }
+
+        .status-failed {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .empty-box {
+            padding: 34px 24px 42px;
+            text-align: center;
+            color: var(--text-sub);
+            display: none;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 24px 24px 28px;
+            border-top: 1px solid var(--border);
+        }
+
+        .page-button {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: white;
+            cursor: pointer;
+            font-weight: 700;
+            color: #374151;
+        }
+
+        .page-button.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .page-button:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 1024px) {
+            .nav {
+                display: none;
+            }
+
+            .content-grid,
+            .subscription-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .topbar-inner,
+            .page {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+
+            .page-title {
+                font-size: 34px;
+            }
+
+            .profile-info {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="fragments/userHeader :: userHeader"></div>
+
+<main class="page">
+    <div class="back-row">
+        <button type="button" class="back-button" onclick="goBack()">← 이전으로 돌아가기</button>
+    </div>
+
+    <section class="page-header">
+        <h1 class="page-title">결제 내역</h1>
+        <p class="page-subtitle">// 지금까지의 모든 결제 내역과 현재 구독 정보를 확인하세요</p>
+    </section>
+
+    <section class="subscription-hero">
+        <div class="subscription-hero-header">
+            <div>
+                <h2 class="subscription-title" id="subscriptionPlanName">프리미엄 구독</h2>
+                <p class="subscription-desc">// 매달 3개의 강의를 무료로 수강하세요</p>
+            </div>
+            <div class="subscription-icon">□</div>
+        </div>
+
+        <div class="subscription-stats">
+            <div class="stat-box">
+                <div class="stat-label">구독 시작일</div>
+                <div class="stat-value" id="subscriptionStartAt">-</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">다음 결제일</div>
+                <div class="stat-value" id="subscriptionEndAt">-</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">이벤트 사용</div>
+                <div class="stat-value" id="subscriptionUsage">0 / 3 강의</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content-grid">
+        <div class="info-card">
+            <h3 class="card-title">내 보유 크레딧</h3>
+            <div class="credit-main" id="creditBalance">9,900 크레딧</div>
+            <p class="card-description">// 강의 결제와 구독 결제는 모두 크레딧으로 진행됩니다.</p>
+            <button type="button" class="button button-primary" onclick="goToCreditPage()">크레딧 충전</button>
+        </div>
+
+        <div class="info-card">
+            <h3 class="card-title">구독 관리</h3>
+            <p class="card-description">
+                // 구독을 해지하면 다음 결제일부터 자동 결제가 중단됩니다.<br>
+                // 현재 구독 기간은 계속 유지됩니다.
+            </p>
+            <button type="button" class="button button-outline-danger" onclick="cancelSubscription()">구독 해지</button>
+        </div>
+    </section>
+
+    <section class="history-section">
+        <div class="history-header">
+            <h2 class="history-title">결제 내역</h2>
+            <p class="history-subtitle">// 최신순으로 10개씩 조회됩니다</p>
+        </div>
+
+        <div class="history-toolbar">
+            <div class="tab-list">
+                <button type="button" class="tab-button active" onclick="changeTab(this, '')">전체</button>
+                <button type="button" class="tab-button" onclick="changeTab(this, 'COURSE')">강의</button>
+                <button type="button" class="tab-button" onclick="changeTab(this, 'SUBSCRIPTION')">구독권</button>
+                <button type="button" class="tab-button" onclick="changeTab(this, 'CREDIT')">크레딧 충전</button>
+            </div>
+
+            <div class="sort-box">최신순</div>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>날짜</th>
+                    <th>구분</th>
+                    <th>상품명</th>
+                    <th>결제 수단</th>
+                    <th>금액</th>
+                    <th>상태</th>
+                </tr>
+                </thead>
+                <tbody id="paymentTableBody"></tbody>
+            </table>
+        </div>
+
+        <div class="empty-box" id="emptyBox">조회된 결제 내역이 없습니다.</div>
+        <div class="pagination" id="pagination"></div>
+    </section>
+</main>
+
+<script>
+    const profileButton = document.getElementById('profileButton');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+
+    let currentType = '';
+    let currentPage = 0;
+    const pageSize = 10;
+
+    profileButton.addEventListener('click', function (e) {
+        e.stopPropagation();
+        dropdownMenu.classList.toggle('show');
+    });
+
+    document.addEventListener('click', function () {
+        dropdownMenu.classList.remove('show');
+    });
+
+    function goBack() {
+        window.history.back();
+    }
+
+    async function loadSubscription() {
+        try {
+            const response = await fetch('/api/subscription');
+            if (!response.ok) throw new Error('구독 정보 조회 실패');
+
+            const data = await response.json();
+
+            if (!data.subscribed) {
+                document.getElementById('subscriptionPlanName').innerText = '구독 중인 상품이 없습니다';
+                document.getElementById('subscriptionStartAt').innerText = '-';
+                document.getElementById('subscriptionEndAt').innerText = '-';
+                document.getElementById('subscriptionUsage').innerText = '0 / 3 강의';
+                return;
+            }
+
+            document.getElementById('subscriptionPlanName').innerText = data.planName ?? '프리미엄 구독';
+            document.getElementById('subscriptionStartAt').innerText = formatDateOnly(data.startAt);
+            document.getElementById('subscriptionEndAt').innerText = formatDateOnly(data.endAt);
+            document.getElementById('subscriptionUsage').innerText =
+                `${data.usedFreeCount ?? 0} / ${data.totalFreeCount ?? 3} 강의`;
+
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async function loadPayments(page = 0, itemType = '') {
+        try {
+            let url = `/api/payments?page=${page}&size=${pageSize}`;
+            if (itemType) {
+                url += `&itemType=${itemType}`;
+            }
+
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('결제 내역 조회 실패');
+
+            const data = await response.json();
+            renderPaymentTable(data.content || []);
+            renderPagination(data);
+            updateCreditBalance(data.content || []);
+
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    function updateCreditBalance(items) {
+        const creditItem = items.find(item => item.itemType === 'CREDIT');
+        if (creditItem) {
+            document.getElementById('creditBalance').innerText = creditItem.displayAmount.replace('+', '');
+        }
+    }
+
+    function renderPaymentTable(items) {
+        const tbody = document.getElementById('paymentTableBody');
+        const emptyBox = document.getElementById('emptyBox');
+
+        tbody.innerHTML = '';
+
+        if (!items || items.length === 0) {
+            emptyBox.style.display = 'block';
+            return;
+        }
+
+        emptyBox.style.display = 'none';
+
+        items.forEach(item => {
+            const tr = document.createElement('tr');
+
+            const amountClass = item.displayAmount && item.displayAmount.startsWith('+')
+                ? 'amount-plus'
+                : 'amount-minus';
+
+            const typeClass = getTypeClass(item.itemType);
+            const statusClass = item.status === 'SUCCESS' ? '' : 'status-failed';
+            const statusLabel = getStatusLabel(item.status);
+
+            tr.innerHTML = `
+                <td>${formatDateTime(item.paidAt)}</td>
+                <td><span class="type-chip ${typeClass}">${item.itemTypeName ?? '-'}</span></td>
+                <td>${item.itemName ?? '-'}</td>
+                <td>${item.displayPaymentMethod ?? '-'}</td>
+                <td class="${amountClass}">${item.displayAmount ?? '-'}</td>
+                <td><span class="status-chip ${statusClass}">${statusLabel}</span></td>
+            `;
+
+            tbody.appendChild(tr);
+        });
+    }
+
+    function renderPagination(pageData) {
+        const pagination = document.getElementById('pagination');
+        pagination.innerHTML = '';
+
+        if (!pageData || pageData.totalPages === 0) return;
+
+        const prevButton = document.createElement('button');
+        prevButton.className = 'page-button';
+        prevButton.innerText = '<';
+        prevButton.disabled = pageData.first;
+        prevButton.onclick = () => movePage(pageData.number - 1);
+        pagination.appendChild(prevButton);
+
+        for (let i = 0; i < pageData.totalPages; i++) {
+            const pageButton = document.createElement('button');
+            pageButton.className = 'page-button' + (i === pageData.number ? ' active' : '');
+            pageButton.innerText = i + 1;
+            pageButton.onclick = () => movePage(i);
+            pagination.appendChild(pageButton);
+        }
+
+        const nextButton = document.createElement('button');
+        nextButton.className = 'page-button';
+        nextButton.innerText = '>';
+        nextButton.disabled = pageData.last;
+        nextButton.onclick = () => movePage(pageData.number + 1);
+        pagination.appendChild(nextButton);
+    }
+
+    function movePage(page) {
+        currentPage = page;
+        loadPayments(currentPage, currentType);
+    }
+
+    function changeTab(button, type) {
+        document.querySelectorAll('.tab-button').forEach(tab => tab.classList.remove('active'));
+        button.classList.add('active');
+
+        currentType = type;
+        currentPage = 0;
+        loadPayments(currentPage, currentType);
+    }
+
+    async function cancelSubscription() {
+        const confirmed = confirm('구독을 해지하시겠습니까?\n다음 결제일부터 자동 결제가 중단됩니다.');
+        if (!confirmed) return;
+
+        try {
+            const response = await fetch('/api/subscription/cancel', { method: 'PATCH' });
+
+            if (!response.ok) {
+                throw new Error('구독 해지 실패');
+            }
+
+            alert('구독이 해지되었습니다.');
+            await loadSubscription();
+
+        } catch (error) {
+            console.error(error);
+            alert('구독 해지 중 오류가 발생했습니다.');
+        }
+    }
+
+    function goToCreditPage() {
+        window.location.href = '/credit/charge';
+    }
+
+    function getTypeClass(itemType) {
+        switch (itemType) {
+            case 'COURSE': return 'type-course';
+            case 'SUBSCRIPTION': return 'type-subscription';
+            case 'CREDIT': return 'type-credit';
+            default: return '';
+        }
+    }
+
+    function getStatusLabel(status) {
+        switch (status) {
+            case 'SUCCESS': return '완료';
+            case 'FAILED': return '실패';
+            case 'READY': return '대기';
+            case 'CANCELED': return '취소';
+            default: return status ?? '-';
+        }
+    }
+
+    function formatDateOnly(dateString) {
+        if (!dateString) return '-';
+
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return '-';
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+
+        return `${year}-${month}-${day}`;
+    }
+
+    function formatDateTime(dateString) {
+        if (!dateString) return '-';
+
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return '-';
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+
+        return `${year}-${month}-${day} ${hours}:${minutes}`;
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+        await loadSubscription();
+        await loadPayments();
+    });
+
+</script>
+
+</body>
+</html>

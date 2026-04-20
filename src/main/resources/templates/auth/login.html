@@ -70,8 +70,8 @@
             </div>
 
             <div class="flex items-center gap-2">
-                <input type="checkbox" id="remember-me" name="remember-me" class="w-4 h-4"/>
-                <label for="remember-me" class="text-sm font-medium text-gray-600">이 컴퓨터에서 ID 기억하기</label>
+                <input type="checkbox" id="rememberIdCheck" class="w-4 h-4"/>
+                <label for="rememberIdCheck" class="text-sm font-medium text-gray-600">이 컴퓨터에서 ID 기억하기</label>
             </div>
 
             <button type="submit"
@@ -96,11 +96,24 @@
     </div>
 </div>
 <script>
-    document.getElementById('loginForm').addEventListener('submit', function() {
-        const btn = document.getElementById('loginBtn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-circle-notch animate-spin"></i> 로그인 중...';
-        btn.classList.add('opacity-70', 'cursor-not-allowed');
+    // 아이디 기억하기
+    const usernameInput = document.querySelector('input[name="user"]');
+    const rememberIdCheck = document.getElementById('rememberIdCheck');
+    const savedId = localStorage.getItem('savedUsername');
+
+    // 저장된 아이디 있으면 불러오기
+    if (savedId) {
+        usernameInput.value = savedId;
+        rememberIdCheck.checked = true;
+    }
+
+    // 폼 제출 시 처리
+    document.querySelector('form').addEventListener('submit', function() {
+        if (rememberIdCheck.checked) {
+            localStorage.setItem('savedUsername', usernameInput.value);
+        } else {
+            localStorage.removeItem('savedUsername');
+        }
     });
 </script>
 </body>
