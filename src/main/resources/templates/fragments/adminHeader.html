@@ -58,13 +58,13 @@
                                 <div id="memberSubMenu" class="hidden px-4 pb-2">
 
                                     <!-- 🔥 수정됨 -->
-                                    <a th:href="@{/admin/user-list}" href="/admin/user-list"
+                                    <a th:href="@{/admin/user-management}" href="/admin/user-management"
                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">
                                         회원 조회
                                     </a>
 
                                     <!-- 🔥 수정됨 -->
-                                    <a th:href="@{/admin/instructor-application}" href="/admin/instructor-application"
+                                    <a th:href="@{/admin/instructor-approval}" href="/admin/instructor-approval"
                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">
                                         강사 승인
                                     </a>
@@ -94,6 +94,14 @@
                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">
                                         코스 승인 관리
                                     </a>
+                                    <a th:href="@{/admin/live-management}" href="/admin/live-management"
+                                       class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">
+                                        실시간 강의 승인 관리
+                                    </a>
+                                    <a th:href="@{/admin/category-management}" href="/admin/category-management"
+                                       class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">
+                                        카테고리 관리
+                                    </a>
                                 </div>
                             </div>
 
@@ -120,4 +128,23 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function toggleAdminMenu() {
+            document.getElementById('adminMenu').classList.toggle('hidden');
+        }
+        function toggleMemberMenu() {
+            document.getElementById('memberSubMenu').classList.toggle('hidden');
+            document.getElementById('memberChevron').classList.toggle('rotate-180');
+        }
+        function toggleCourseMenu() {
+            document.getElementById('courseSubMenu').classList.toggle('hidden');
+        }
+        document.addEventListener('click', function(e) {
+            const wrapper = document.getElementById('adminMenuWrapper');
+            if (wrapper && !wrapper.contains(e.target)) {
+                document.getElementById('adminMenu').classList.add('hidden');
+            }
+        });
+    </script>
 </header>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,29 +13,7 @@
 </head>
 <body>
 
-<header class="bg-white border-b border-gray-200 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        <div class="flex items-center gap-8">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">N</div>
-                <span class="text-xl font-black text-gray-900">내일 <span class="text-gray-400 font-medium text-sm">Nae-il</span></span>
-            </div>
-            <nav class="hidden md:flex items-center gap-6 text-sm font-bold text-gray-600">
-                <a href="#" class="text-blue-600 border-b-2 border-blue-600 pb-1">전체 강의</a>
-                <a href="#" class="hover:text-gray-900">실시간 강의</a>
-                <a href="#" class="hover:text-gray-900">내 강의</a>
-                <a href="#" class="hover:text-gray-900">커뮤니티</a>
-            </nav>
-        </div>
-        <div class="flex items-center gap-4">
-            <button class="p-2 text-gray-400 hover:text-gray-600"><i data-lucide="search"></i></button>
-            <div class="flex items-center gap-3 pl-4 border-l border-gray-200">
-                <span class="text-sm font-bold text-gray-700">개발자님</span>
-                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-xs">JS</div>
-            </div>
-        </div>
-    </div>
-</header>
+<div th:replace="fragments/userHeader :: userHeader"></div>
 
 <main class="max-w-7xl mx-auto px-6 py-12">
     <a th:href="@{/dashboard}"
