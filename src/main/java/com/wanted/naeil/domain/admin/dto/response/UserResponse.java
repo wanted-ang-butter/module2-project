@@ -42,4 +42,8 @@ public class UserResponse {
                 .build();
     }
 
+    public String getCreatedDateLabel() {
+        return createdAt == null ? "-" : createdAt.toLocalDate().toString();
+    }
+
 }

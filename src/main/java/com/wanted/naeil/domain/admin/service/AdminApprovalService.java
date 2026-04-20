@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service   // 스프링한테 서비스 클래스라고 알려줘야쥐잉
@@ -48,6 +49,9 @@ public class AdminApprovalService {
                     switch (approval.getRequestType()) {
                         case COURSE_REGISTER , COURSE_DELETE -> {
                             Course course = approval.getCourse();
+                            if (course == null) {
+                                return null;
+                            }
                             builder.courseId(course.getId())
                                     .title(course.getTitle())
                                     .price(course.getPrice())
@@ -58,6 +62,9 @@ public class AdminApprovalService {
                         case INSTRUCTOR_REGISTER -> {
                             InstructorApplications applications =
                                     approval.getInstructorApplications();
+                            if (applications == null) {
+                                return null;
+                            }
                             builder.applicationId(applications.getId())
                                     .applicantName(applications.getUser().getName())
                                     .role(applications.getUser().getRole())
@@ -70,6 +77,9 @@ public class AdminApprovalService {
                         }
                         case LIVE_REGISTER -> {
                             LiveLecture lecture = approval.getLecture();
+                            if (lecture == null) {
+                                return null;
+                            }
                             builder.liveId((lecture.getId()))
                                     .title(lecture.getTitle())
                                     .description(lecture.getDescription())
@@ -79,6 +89,9 @@ public class AdminApprovalService {
                         }
                         case SETTLEMENT_REGISTER -> {
                             Settlement s = approval.getSettlement();
+                            if (s == null) {
+                                return null;
+                            }
                             builder.instuctorName(s.getInstructor().getName())
                                     .requestedAmount(s.getRequestedAmount())
                                     .platformFee(s.getPlatformFee())
@@ -95,6 +108,7 @@ public class AdminApprovalService {
                     }
                     return builder.build();
                 })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         }
     //  승인 처리

@@ -20,7 +20,7 @@
 
     <div class="mb-12">
         <h1 class="text-4xl font-black text-gray-900 mb-2">관리자 대시보드</h1>
-        <p class="text-lg text-gray-600 font-medium">플랫폼 전체를 관리하고 운영하세요</p>
+        <p class="text-lg text-gray-600 font-medium">플랫폼 전체를 관리하고 운영 상태를 확인하세요.</p>
     </div>
 
     <div class="relative overflow-hidden mb-12">
@@ -33,15 +33,15 @@
                         <span class="text-sm font-bold text-gray-700">시스템 정상</span>
                     </div>
                     <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-4 leading-tight">
-                        안녕하세요,<br />
+                        안녕하세요.<br />
                         <span class="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent"
                               th:text="${user != null ? user.nickname : '관리자'}">관리자</span>님
                     </h2>
-                    <p class="text-xl text-gray-700 font-semibold">플랫폼 운영 상태를 확인하고 관리하세요</p>
+                    <p class="text-xl text-gray-700 font-semibold">플랫폼 운영 상태를 확인하고 관리해보세요.</p>
                 </div>
                 <div class="hidden lg:block">
                     <div class="w-48 h-48 bg-gradient-to-br from-purple-400 to-blue-400 rounded-3xl flex items-center justify-center shadow-2xl">
-                        <span class="text-7xl">⚙️</span>
+                        <i class="fa-solid fa-shield-halved text-white text-7xl"></i>
                     </div>
                 </div>
             </div>
@@ -68,7 +68,8 @@
                 </div>
             </div>
             <p class="text-4xl font-black text-gray-900 mb-2">143</p>
-            <p class="text-sm text-orange-600 font-bold">3명 승인 대기</p>
+            <p class="text-sm text-orange-600 font-bold"
+               th:text="${pendingInstructorApprovalCount} + '명 승인 대기'">0명 승인 대기</p>
         </div>
 
         <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 hover:shadow-xl transition-all hover:border-purple-300">
@@ -104,48 +105,30 @@
                         <i class="fa-solid fa-clock text-orange-600"></i>
                         <span>강사 승인</span>
                     </h2>
-                    <span class="px-3 py-1.5 bg-orange-100 text-orange-700 rounded-lg text-sm font-bold">3건 대기</span>
+                    <span class="px-3 py-1.5 bg-orange-100 text-orange-700 rounded-lg text-sm font-bold"
+                          th:text="${pendingInstructorApprovalCount} + '건 대기'">0건 대기</span>
                 </div>
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between p-4 border-2 border-gray-200 rounded-xl hover:border-orange-300 transition-all">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center shadow-md">
-                                <i class="fa-solid fa-chalkboard-user text-white"></i>
-                            </div>
-                            <div>
-                                <p class="font-black text-gray-900">박개발</p>
-                                <p class="text-sm text-gray-600 font-medium">5년 경력 · 신청 강의 2개</p>
-                            </div>
-                        </div>
-                        <a th:href="@{/admin/instructor-application}" href="/admin/instructor-application"
-                           class="px-4 py-2 border-2 border-orange-300 rounded-lg hover:bg-orange-50 transition-all font-bold text-orange-600 text-sm">승인</a>
-                    </div>
 
-                    <div class="flex items-center justify-between p-4 border-2 border-gray-200 rounded-xl hover:border-orange-300 transition-all">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center shadow-md">
-                                <i class="fa-solid fa-chalkboard-user text-white"></i>
-                            </div>
-                            <div>
-                                <p class="font-black text-gray-900">이코딩</p>
-                                <p class="text-sm text-gray-600 font-medium">3년 경력 · 신청 강의 1개</p>
-                            </div>
-                        </div>
-                        <a th:href="@{/admin/instructor-application}" href="/admin/instructor-application"
-                           class="px-4 py-2 border-2 border-orange-300 rounded-lg hover:bg-orange-50 transition-all font-bold text-orange-600 text-sm">승인</a>
-                    </div>
+                <div th:if="${#lists.isEmpty(pendingInstructorApprovals)}"
+                     class="p-8 border-2 border-dashed border-gray-200 rounded-xl text-center text-gray-400">
+                    승인 대기 중인 강사 요청이 없습니다.
+                </div>
 
-                    <div class="flex items-center justify-between p-4 border-2 border-gray-200 rounded-xl hover:border-orange-300 transition-all">
+                <div class="space-y-4" th:unless="${#lists.isEmpty(pendingInstructorApprovals)}">
+                    <div th:each="approval : ${pendingInstructorApprovals}"
+                         class="flex items-center justify-between p-4 border-2 border-gray-200 rounded-xl hover:border-orange-300 transition-all">
                         <div class="flex items-center gap-4">
                             <div class="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center shadow-md">
                                 <i class="fa-solid fa-chalkboard-user text-white"></i>
                             </div>
                             <div>
-                                <p class="font-black text-gray-900">최프로</p>
-                                <p class="text-sm text-gray-600 font-medium">7년 경력 · 신청 강의 4개</p>
+                                <p class="font-black text-gray-900"
+                                   th:text="${approval.applicantName != null ? approval.applicantName : '강사 승인 요청'}">강사 승인 요청</p>
+                                <p class="text-sm text-gray-600 font-medium"
+                                   th:text="${(approval.categoryName != null ? approval.categoryName : '카테고리 미지정') + ' · ' + (approval.title != null ? approval.title : '강사 승인 요청')}">카테고리 · 강사 승인 요청</p>
                             </div>
                         </div>
-                        <a th:href="@{/admin/instructor-application}" href="/admin/instructor-application"
+                        <a th:href="@{/admin/instructor-approval}" href="/admin/instructor-approval"
                            class="px-4 py-2 border-2 border-orange-300 rounded-lg hover:bg-orange-50 transition-all font-bold text-orange-600 text-sm">승인</a>
                     </div>
                 </div>
@@ -166,7 +149,7 @@
                                 <p class="font-black text-gray-900">Python 데이터 분석</p>
                                 <span class="px-2 py-1 text-xs font-bold rounded bg-yellow-100 text-yellow-700">승인대기</span>
                             </div>
-                            <p class="text-sm text-gray-600 font-medium">강사: 김데이터 · 수강생: 0명</p>
+                            <p class="text-sm text-gray-600 font-medium">강사: 김데이터 · 수강생 0명</p>
                         </div>
                         <button type="button" onclick="openModal()"
                                 class="px-4 py-2 border-2 border-gray-300 rounded-lg hover:border-purple-600 hover:bg-purple-50 transition-all font-bold text-gray-700 hover:text-purple-600">
@@ -180,7 +163,7 @@
                                 <p class="font-black text-gray-900">Vue.js 마스터클래스</p>
                                 <span class="px-2 py-1 text-xs font-bold rounded bg-green-100 text-green-700">운영중</span>
                             </div>
-                            <p class="text-sm text-gray-600 font-medium">강사: 박뷰 · 수강생: 234명</p>
+                            <p class="text-sm text-gray-600 font-medium">강사: 박뷰 · 수강생 234명</p>
                         </div>
                         <button type="button" onclick="openModal()"
                                 class="px-4 py-2 border-2 border-gray-300 rounded-lg hover:border-purple-600 hover:bg-purple-50 transition-all font-bold text-gray-700 hover:text-purple-600">
@@ -209,7 +192,7 @@
                         <p class="text-xs text-gray-500 mt-1 font-medium">이번 주</p>
                     </div>
                 </div>
-                <a th:href="@{/admin/user-list}" href="/admin/user-list"
+                <a th:href="@{/admin/user-management}" href="/admin/user-management"
                    class="block w-full mt-4 py-3 border-2 border-gray-300 rounded-xl hover:border-blue-600 hover:bg-blue-50 transition-all font-bold text-gray-700 hover:text-blue-600 text-center">
                     회원 목록 관리
                 </a>
@@ -335,14 +318,14 @@
             </div>
             <div class="p-4 bg-gray-50 rounded-xl">
                 <span class="text-sm font-bold text-gray-600 block mb-2">코스 설명</span>
-                <p class="text-sm text-gray-900 leading-relaxed">Python을 활용한 데이터 분석 기초부터 실전 프로젝트까지 다루는 강의입니다.</p>
+                <p class="text-sm text-gray-900 leading-relaxed">Python을 사용한 데이터 분석 기초부터 실전 프로젝트까지 다루는 강의입니다.</p>
             </div>
             <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                <span class="text-sm font-bold text-gray-600">신청일</span>
+                <span class="text-sm font-bold text-gray-600">요청일</span>
                 <span class="text-sm font-mono text-gray-900">2026-04-10</span>
             </div>
             <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                <span class="text-sm font-bold text-gray-600">수강생 수</span>
+                <span class="text-sm font-bold text-gray-600">수강생수</span>
                 <span class="text-sm font-medium text-gray-900">0명</span>
             </div>
         </div>
