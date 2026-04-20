@@ -35,7 +35,7 @@ public class InstructorApplications extends BaseTimeEntity {
     @Column(columnDefinition = "TEXT")
     private String career;
 
-    @Column(name = "proof_file")
+    @Column(name = "proof_file", columnDefinition = "TEXT")
     private String proofFileUrl;
 
     @Column(name = "face_img")

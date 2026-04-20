@@ -11,6 +11,7 @@ import com.wanted.naeil.global.auth.model.dto.AuthDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.Authentication;
@@ -18,6 +19,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
@@ -57,8 +59,13 @@ public class MyPageController {
 
     @PostMapping("/me/nickname")
     public String updateNickname(@AuthenticationPrincipal AuthDetails authDetails,
-                                 @ModelAttribute UpdateNicknameRequest request,
+                                 @Valid @ModelAttribute UpdateNicknameRequest request,
+                                 BindingResult bindingResult,
                                  RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("errorMessage", bindingResult.getFieldError().getDefaultMessage());
+            return "redirect:/user/me";
+        }
         try {
             memberService.updateNickname(authDetails.getUsername(), request);
             redirectAttributes.addFlashAttribute("successMessage", "닉네임이 변경되었습니다.");
@@ -72,19 +79,22 @@ public class MyPageController {
     // 비밀번호 변경(완료 시 세션 만료)
     @PostMapping("/me/password")
     public String updatePassword(@AuthenticationPrincipal AuthDetails authDetails,
-                                 @ModelAttribute UpdatePasswordRequest request,
+                                 @Valid @ModelAttribute UpdatePasswordRequest request,
+                                 BindingResult bindingResult,
                                  HttpServletRequest httpRequest,
                                  HttpServletResponse httpResponse,
                                  RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("errorMessage", bindingResult.getFieldError().getDefaultMessage());
+            return "redirect:/user/me";
+        }
         try {
             memberService.updatePassword(authDetails.getUsername(), request);
 
-            // Spring Security의 공식 로그아웃 핸들러 사용
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth != null) {
                 new SecurityContextLogoutHandler().logout(httpRequest, httpResponse, auth);
             }
-
             redirectAttributes.addFlashAttribute("message", "비밀번호가 변경되었습니다. 다시 로그인해 주세요.");
             return "redirect:/auth/login";
 
@@ -96,8 +106,13 @@ public class MyPageController {
 
     @PostMapping("/me/email")
     public String updateEmail(@AuthenticationPrincipal AuthDetails authDetails,
-                              @ModelAttribute UpdateEmailRequest request,
+                              @Valid @ModelAttribute UpdateEmailRequest request,
+                              BindingResult bindingResult,
                               RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("errorMessage", bindingResult.getFieldError().getDefaultMessage());
+            return "redirect:/user/me";
+        }
         try {
             memberService.updateEmail(authDetails.getUsername(), request);
             redirectAttributes.addFlashAttribute("successMessage", "이메일이 변경되었습니다.");

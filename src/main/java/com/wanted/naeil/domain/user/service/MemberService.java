@@ -3,7 +3,7 @@ package com.wanted.naeil.domain.user.service;
 
 import com.wanted.naeil.domain.payment.entity.Credit;
 import com.wanted.naeil.domain.payment.repository.CreditRepository;
-import com.wanted.naeil.domain.user.controller.UpdateEmailRequest;
+//import com.wanted.naeil.domain.user.controller.UpdateEmailRequest;
 import com.wanted.naeil.domain.user.dto.request.*;
 import com.wanted.naeil.domain.user.dto.response.FindIdResponse;
 import com.wanted.naeil.domain.user.dto.response.FindPasswordResponse;
@@ -11,6 +11,7 @@ import com.wanted.naeil.domain.user.dto.response.LoginUserDTO;
 import com.wanted.naeil.domain.user.dto.response.AccountSettingResponse;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.domain.user.repository.UserRepository;
+import com.wanted.naeil.global.util.file.FileTransactionService;
 import com.wanted.naeil.global.util.file.LocalFileService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -31,6 +32,7 @@ public class MemberService {
     private final PasswordEncoder encoder;
     private final ModelMapper modelMapper;
     private final CreditRepository creditRepository;
+    private final FileTransactionService fileTransactionService;
 //    private final ResourceLoader resourceLoader;
 private final LocalFileService localFileService;
 
@@ -179,8 +181,14 @@ private final LocalFileService localFileService;
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
         validateProfileImg(request.getProfileImg());
-        String profileImgPath = localFileService.uploadSingleFile(request.getProfileImg(), "profiles");
-        user.updateProfileImg(profileImgPath);
+
+        String oldProfileImgUrl = user.getProfileImg(); // 기존 이미지 URL 저장
+        String newProfileImgPath = localFileService.uploadSingleFile(request.getProfileImg(), "profiles");
+
+        user.updateProfileImg(newProfileImgPath);
+
+        // 트랜잭션 성공 시 기존 파일 삭제, 실패 시 새 파일 삭제
+        fileTransactionService.registerReplace(oldProfileImgUrl, newProfileImgPath);
     }
 
 
@@ -189,10 +197,12 @@ private final LocalFileService localFileService;
     public void deleteProfileImg(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
-        if (user.getProfileImg() != null) {
-            localFileService.deleteFile(user.getProfileImg());
-        }
+
+        String profileImgUrl = user.getProfileImg();
         user.updateProfileImg(null);
+
+        // 트랜잭션 성공 시에만 파일 삭제
+        fileTransactionService.registerDelete(profileImgUrl);
     }
 
     // 닉네임 변경
