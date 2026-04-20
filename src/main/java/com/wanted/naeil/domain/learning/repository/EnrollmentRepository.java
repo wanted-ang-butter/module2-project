@@ -16,6 +16,16 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
     List<Enrollment> findByUser(User user);
 
+    // 내 강의 페이지용
+    @Query("""
+        SELECT e FROM Enrollment e
+        JOIN FETCH e.course c
+        JOIN FETCH c.instructor
+        WHERE e.user = :user
+        ORDER BY e.createdAt DESC
+    """)
+    List<Enrollment> findByUserWithCourse(@Param("user") User user);
+
     @Query("""
         select e.status
         from Enrollment e
