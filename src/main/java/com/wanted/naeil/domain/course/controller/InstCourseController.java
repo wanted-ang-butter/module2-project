@@ -20,6 +20,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -139,7 +140,13 @@ public class InstCourseController {
         return ResponseEntity.ok().build();
     }
 
-    // 코스 상태 변경
+    /**
+     * 코스 상태 변경 : 활성화 <-> 비활성화
+     * @param authDetails : 현재 로그인 정보
+     * @param courseId : 수정할 코스
+     * @param request : 사용자의 입력 상태값
+     * @return : ResponseEntity여서 상태만 변경
+     */
     @PatchMapping(value = "/course/{courseId}/status", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
     public ResponseEntity<Void> updateCourseStatus(
@@ -155,6 +162,44 @@ public class InstCourseController {
         courseService.updateCourseStatus(instructorId, courseId, request);
 
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 코스 등록 요청 상대 변경 : 승인 대기 <-> 승인 대기 요청 취소
+     * @param authDetails
+     * @param courseId
+     * @param request : 사용자 입력 상태
+     * @return : ResponseEntity여서 상태만 변경
+     */
+    @PatchMapping("/course/{courseId}/registration-status")
+    @ResponseBody
+    public ResponseEntity<Void> cancelCourseRegistration(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @PathVariable Long courseId,
+            @Valid @ModelAttribute CourseStatusUpdateRequest request
+    ) {
+        Long instructorId = authDetails.getLoginUserDTO().getUserId();
+
+        log.info("[CourseCancelRequest] 강의 등록 요청 취소 요청 - instructorId: {}, courseId: {}",
+                instructorId, courseId);
+
+        courseService.updateCourseRegistrationStatus(instructorId, courseId, request.getStatus());
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/course/{courseId}/delete-request")
+    public String requestCourseDelete(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @PathVariable Long courseId,
+            RedirectAttributes redirectAttributes
+    ) {
+        Long instructorId = authDetails.getLoginUserDTO().getUserId();
+
+        courseService.requestCourseDelete(instructorId, courseId);
+
+        redirectAttributes.addFlashAttribute("message", "강의 삭제 요청이 접수되었습니다.");
+        return "redirect:/instructor/course-management";
     }
     
 

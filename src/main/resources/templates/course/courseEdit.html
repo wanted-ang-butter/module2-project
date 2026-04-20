@@ -13,7 +13,7 @@
 <div th:replace="~{fragments/instructorHeader :: instructorHeader}"></div>
 
 <div class="max-w-5xl mx-auto px-6 py-12"
-     th:attr="data-course-id=${courseEdit.courseId}">
+     th:attr="data-course-id=${courseEdit.courseId}, data-course-status=${courseEdit.status.name()}">
 
     <div class="mb-8">
         <a th:href="@{/instructor/course-management}"
@@ -281,11 +281,27 @@
             </button>
 
             <button type="button"
-                    th:if="${courseEdit.status.name() != 'ACTIVE'}"
+                    th:if="${courseEdit.status.name() == 'INACTIVE'}"
                     onclick="toggleCourseStatus('ACTIVE')"
                     class="px-10 py-4 border-2 border-green-300 rounded-xl text-green-700 hover:bg-green-50 transition-all font-black">
                 강의 활성화
             </button>
+
+            <span th:if="${courseEdit.status.name() == 'PENDING'}"
+                  class="px-6 py-4 rounded-xl bg-yellow-50 text-yellow-700 border-2 border-yellow-200 font-black">
+            승인대기 상태에서는 활성화/비활성화를 변경할 수 없습니다.
+            </span>
+
+            <span th:if="${courseEdit.status.name() == 'CANCELLED'}"
+                  class="px-6 py-4 rounded-xl bg-orange-50 text-orange-700 border-2 border-orange-200 font-black">
+            요청취소 상태에서는 등록 요청을 다시 진행해야 합니다.
+            </span>
+
+            <span th:if="${courseEdit.status.name() == 'REJECTED'}"
+                  class="px-6 py-4 rounded-xl bg-red-50 text-red-700 border-2 border-red-200 font-black">
+            반려 상태에서는 활성화/비활성화를 변경할 수 없습니다.
+            </span>
+
 
             <button type="button"
                     onclick="saveCourseInfo()"
@@ -301,6 +317,7 @@
 
     const root = document.querySelector('[data-course-id]');
     const courseId = root.dataset.courseId;
+    const courseStatus = root.dataset.courseStatus;
     let newSectionIndex = 0;
 
     function updateFileName(inputElement, spanId) {
@@ -539,6 +556,11 @@
     }
 
     async function toggleCourseStatus(nextStatus) {
+        if (courseStatus !== 'ACTIVE' && courseStatus !== 'INACTIVE') {
+            alert('승인대기, 요청취소, 반려 상태에서는 활성화/비활성화를 변경할 수 없습니다.');
+            return;
+        }
+
         const message = nextStatus === 'ACTIVE'
             ? '강의를 활성화하시겠습니까?'
             : '강의를 비활성화하시겠습니까?';
