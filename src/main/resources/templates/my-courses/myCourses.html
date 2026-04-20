@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>내 강의 | Nae-Il</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    .line-clamp-2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:9999; align-items:center; justify-content:center; }
+    .modal-overlay.open { display:flex; }
+  </style>
+</head>
+<body class="bg-white">
+
+<div th:replace="fragments/userHeader :: userHeader"></div>
+<div class="max-w-7xl mx-auto px-6 py-12">
+  <div class="mb-6">
+    <a th:href="@{/dashboard}" class="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors">
+      <i class="fa-solid fa-chevron-left text-xs"></i>
+      <span class="text-sm font-medium">이전으로</span>
+    </a>
+  </div>
+
+  <div class="mb-12">
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">내 강의</h1>
+    <p class="text-gray-600 font-mono">// 수강중인 강의를 관리하세요</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-8 text-white">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+          <i class="fa-solid fa-arrow-trend-up text-white text-xl"></i>
+        </div>
+        <div>
+          <p class="text-sm font-mono text-white/80">전체 평균 진행률</p>
+          <p class="text-3xl font-bold"><span th:text="${averageRate}">0</span>%</p>
+        </div>
+      </div>
+      <div class="h-2 bg-white/20 rounded-full overflow-hidden">
+        <div class="h-full bg-white rounded-full transition-all duration-500"
+             th:style="'width:' + ${averageRate} + '%'"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-6">
+    <h2 class="text-xl font-semibold text-gray-900 mb-1">
+      수강중인 강의 (<span th:text="${#lists.size(myCourses)}">0</span>)
+    </h2>
+    <p class="text-sm text-gray-600 font-mono">// 강의를 클릭하여 이어서 학습하세요</p>
+  </div>
+
+  <div th:if="${not #lists.isEmpty(myCourses)}"
+       class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div th:each="course : ${myCourses}"
+         class="bg-white border-2 border-gray-200 rounded-2xl p-6 hover:shadow-xl transition-all">
+      <a th:href="@{/course/{id}(id=${course.courseId})}" class="block group">
+        <div class="aspect-video bg-gray-100 rounded-xl mb-4 overflow-hidden">
+          <img th:src="${course.thumbnail}" th:alt="${course.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"/>
+        </div>
+        <h3 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors" th:text="${course.title}">강의 제목</h3>
+        <p class="text-sm text-gray-600 mb-4 font-bold" th:text="${course.instructorName}">강사명</p>
+        <div class="mb-4">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-xs font-bold text-gray-600">진행률</span>
+            <span class="text-xs font-bold text-blue-600"><span th:text="${course.coursesRate}">0</span>%</span>
+          </div>
+          <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-blue-600 to-green-600 rounded-full transition-all" th:style="'width:' + ${course.coursesRate} + '%'"></div>
+          </div>
+        </div>
+        <div class="mb-4">
+          <div class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-xl font-bold">
+            <i class="fa-solid fa-play text-sm"></i>
+            <span>이어보기</span>
+          </div>
+        </div>
+      </a>
+      <div class="border-t-2 border-gray-100 pt-4">
+        <div th:if="${course.reviewId != null}">
+          <div class="flex items-center gap-1 mb-2">
+            <span th:each="i : ${#numbers.sequence(1,5)}" th:class="${i <= course.rating} ? 'text-yellow-400' : 'text-gray-300'">★</span>
+            <span class="text-sm font-bold text-gray-700 ml-1" th:text="${course.rating}">0.0</span>
+          </div>
+          <p class="text-sm text-gray-700 mb-3 line-clamp-2" th:text="${course.reviewContent}">내용</p>
+          <div class="flex gap-2">
+            <button type="button" th:attr="data-review-id=${course.reviewId}, data-rating=${course.rating}, data-content=${course.reviewContent}" onclick="openUpdateModal(this)" class="px-3 py-1.5 text-xs border-2 border-blue-100 text-blue-600 rounded-lg font-bold">수정</button>
+            <form th:action="@{/my-courses/reviews/{id}/delete(id=${course.reviewId})}" method="post">
+              <button type="submit" onclick="return confirm('삭제하시겠습니까?')" class="px-3 py-1.5 text-xs border-2 border-red-100 text-red-600 rounded-lg font-bold">삭제</button>
+            </form>
+          </div>
+        </div>
+        <div th:if="${course.reviewId == null}">
+          <button type="button" th:attr="data-course-id=${course.courseId}" onclick="openCreateModal(this)" class="block w-full px-4 py-2 border-2 border-gray-200 text-gray-600 rounded-xl font-bold text-sm text-center">수강평 작성하기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div th:if="${#lists.isEmpty(myCourses)}" class="text-center py-16 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+    <div class="text-4xl mb-4">📖</div>
+    <h3 class="text-lg font-bold text-gray-900 mb-2">수강중인 강의가 없습니다</h3>
+    <a th:href="@{/}" class="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg font-bold">강의 둘러보기</a>
+  </div>
+
+  <div class="mt-20">
+    <div class="mb-6">
+      <h2 class="text-xl font-semibold text-gray-900 mb-1 flex items-center gap-2">
+        <i class="fa-solid fa-video text-blue-600"></i>
+        실시간 강의 예약 (<span th:text="${#lists.size(liveReservations)}">0</span>)
+      </h2>
+      <p class="text-sm text-gray-600 font-mono">// 예약한 실시간 강의 목록</p>
+    </div>
+
+    <div th:if="${not #lists.isEmpty(liveReservations)}"
+         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div th:each="reservation : ${liveReservations}"
+           class="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl transition-all hover:border-blue-300 flex flex-col">
+        <div class="relative bg-gray-900 aspect-video flex flex-col justify-center px-6">
+          <div class="flex items-center gap-1.5 px-3 py-1 bg-red-500 text-white rounded-full w-fit mb-3">
+            <span class="w-2 h-2 bg-white rounded-full animate-pulse inline-block"></span>
+            <span class="text-[10px] font-bold tracking-wider">LIVE</span>
+          </div>
+          <h3 class="text-lg font-bold text-white line-clamp-2" th:text="${reservation.title}">강의명</h3>
+        </div>
+        <div class="p-6 flex flex-col flex-grow">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+              <i class="fa-solid fa-user-tie text-xs"></i>
+            </div>
+            <span class="text-sm text-gray-600 font-bold" th:text="${reservation.instructorName}">강사명</span>
+          </div>
+          <div class="space-y-2.5 mb-6 text-sm text-gray-500 font-medium">
+            <div class="flex items-center gap-3">
+              <i class="fa-solid fa-calendar text-blue-500/70 w-4"></i>
+              <span class="font-mono" th:text="${#temporals.format(reservation.startAt, 'yyyy-MM-dd')}"></span>
+            </div>
+            <div class="flex items-center gap-3">
+              <i class="fa-solid fa-clock text-blue-500/70 w-4"></i>
+              <span class="font-mono">
+                <span th:text="${#temporals.format(reservation.startAt, 'HH:mm')}"></span> ~
+                <span th:text="${#temporals.format(reservation.endAt, 'HH:mm')}"></span>
+              </span>
+            </div>
+            <div class="flex items-center gap-3">
+              <i class="fa-solid fa-users text-blue-500/70 w-4"></i>
+              <span class="font-mono"><span th:text="${reservation.currentCount}">0</span> / <span th:text="${reservation.maxCapacity}">0</span> 명 참여</span>
+            </div>
+          </div>
+          <button class="mt-auto w-full py-3 border-2 border-red-100 text-red-500 rounded-xl hover:bg-red-50 font-bold text-sm transition-colors">
+            예약 취소
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(liveReservations)}"
+         class="py-16 bg-gray-50 rounded-3xl border-2 border-gray-100 flex flex-col items-center justify-center text-center">
+      <div class="w-20 h-20 bg-gray-200/50 rounded-2xl flex items-center justify-center mb-6">
+        <i class="fa-solid fa-video text-gray-400 text-3xl"></i>
+      </div>
+      <h3 class="text-xl font-bold text-gray-900 mb-2">예약한 실시간 강의가 없습니다</h3>
+      <p class="text-gray-400 text-sm mb-8 font-medium">실시간 강의를 예약해보세요</p>
+
+      <a th:href="@{/live}" class="inline-flex items-center gap-2 px-8 py-3.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">
+        <i class="fa-solid fa-video text-sm"></i>
+        <span>실시간 강의 보기</span>
+      </a>
+    </div>
+  </div>
+
+</div> <div id="createModal" class="modal-overlay">
+  <div class="bg-white rounded-2xl p-8 w-full max-w-md mx-4 shadow-2xl">
+    <h2 class="text-xl font-bold text-gray-900 mb-6">수강평 작성</h2>
+    <form id="createForm" method="post">
+      <div class="mb-4">
+        <label class="block text-sm font-bold text-gray-700 mb-2">별점 <span class="text-red-500">*</span></label>
+        <div class="flex gap-1" id="createStars">
+          <span th:each="i : ${#numbers.sequence(1,5)}" class="text-3xl cursor-pointer text-gray-300 star-btn" th:attr="data-value=${i}">★</span>
+        </div>
+        <input type="hidden" id="createRating" name="rating" value="0"/>
+      </div>
+      <div class="mb-6">
+        <label class="block text-sm font-bold text-gray-700 mb-2">수강평 내용</label>
+        <textarea name="content" maxlength="100" rows="4" class="w-full border-2 border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:border-blue-400 resize-none" placeholder="후기를 남겨주세요"></textarea>
+      </div>
+      <div class="flex gap-3">
+        <button type="button" onclick="closeCreateModal()" class="flex-1 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-bold">취소</button>
+        <button type="submit" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">작성</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="updateModal" class="modal-overlay">
+  <div class="bg-white rounded-2xl p-8 w-full max-w-md mx-4 shadow-2xl">
+    <h2 class="text-xl font-bold text-gray-900 mb-6">수강평 수정</h2>
+    <form id="updateForm" method="post">
+      <div class="mb-4">
+        <label class="block text-sm font-bold text-gray-700 mb-2">별점 <span class="text-red-500">*</span></label>
+        <div class="flex gap-1" id="updateStars">
+          <span th:each="i : ${#numbers.sequence(1,5)}" class="text-3xl cursor-pointer text-gray-300 star-btn" th:attr="data-value=${i}">★</span>
+        </div>
+        <input type="hidden" id="updateRating" name="rating" value="0"/>
+      </div>
+      <div class="mb-6">
+        <label class="block text-sm font-bold text-gray-700 mb-2">수강평 내용</label>
+        <textarea id="updateContent" name="content" maxlength="100" rows="4" class="w-full border-2 border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:border-blue-400 resize-none"></textarea>
+      </div>
+      <div class="flex gap-3">
+        <button type="button" onclick="closeUpdateModal()" class="flex-1 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-bold">취소</button>
+        <button type="submit" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">수정</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // 별점 및 모달 스크립트
+  function initStars(containerId, hiddenInputId) {
+    const container = document.getElementById(containerId);
+    const input = document.getElementById(hiddenInputId);
+    const stars = container.querySelectorAll('.star-btn');
+    stars.forEach(star => {
+      star.addEventListener('mousemove', function(e) {
+        const rect = this.getBoundingClientRect();
+        const isHalf = e.clientX < rect.left + rect.width / 2;
+        const value = isHalf ? parseFloat(this.dataset.value) - 0.5 : parseFloat(this.dataset.value);
+        renderStars(stars, value);
+      });
+      star.addEventListener('click', function(e) {
+        const rect = this.getBoundingClientRect();
+        const isHalf = e.clientX < rect.left + rect.width / 2;
+        const value = isHalf ? parseFloat(this.dataset.value) - 0.5 : parseFloat(this.dataset.value);
+        input.value = value;
+        renderStars(stars, value);
+      });
+      star.addEventListener('mouseleave', function() { renderStars(stars, parseFloat(input.value)); });
+    });
+  }
+
+  function renderStars(stars, value) {
+    stars.forEach(star => {
+      const starVal = parseFloat(star.dataset.value);
+      if (value >= starVal) {
+        star.classList.add('text-yellow-400'); star.classList.remove('text-gray-300');
+        star.style.background = 'none'; star.style.webkitTextFillColor = '';
+      } else if (value >= starVal - 0.5) {
+        star.classList.remove('text-yellow-400', 'text-gray-300');
+        star.style.background = 'linear-gradient(to right, #facc15 50%, #d1d5db 50%)';
+        star.style.webkitBackgroundClip = 'text'; star.style.webkitTextFillColor = 'transparent';
+      } else {
+        star.classList.remove('text-yellow-400'); star.classList.add('text-gray-300');
+        star.style.background = 'none'; star.style.webkitTextFillColor = '';
+      }
+    });
+  }
+
+  function openCreateModal(btn) {
+    const courseId = btn.getAttribute('data-course-id');
+    document.getElementById('createForm').action = '/my-courses/' + courseId + '/reviews';
+    document.getElementById('createRating').value = '0';
+    renderStars(document.querySelectorAll('#createStars .star-btn'), 0);
+    document.getElementById('createModal').classList.add('open');
+    initStars('createStars', 'createRating');
+  }
+  function closeCreateModal() { document.getElementById('createModal').classList.remove('open'); }
+
+  function openUpdateModal(btn) {
+    const reviewId = btn.getAttribute('data-review-id');
+    const rating = parseFloat(btn.getAttribute('data-rating'));
+    const content = btn.getAttribute('data-content');
+    document.getElementById('updateForm').action = '/my-courses/reviews/' + reviewId + '/update';
+    document.getElementById('updateRating').value = rating;
+    document.getElementById('updateContent').value = content || '';
+    renderStars(document.querySelectorAll('#updateStars .star-btn'), rating);
+    document.getElementById('updateModal').classList.add('open');
+    initStars('updateStars', 'updateRating');
+  }
+  function closeUpdateModal() { document.getElementById('updateModal').classList.remove('open'); }
+
+  document.querySelectorAll('.modal-overlay').forEach(modal => {
+    modal.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
+  });
+</script>
+</body>
+</html>

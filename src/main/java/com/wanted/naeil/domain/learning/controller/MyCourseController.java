@@ -2,6 +2,7 @@ package com.wanted.naeil.domain.learning.controller;
 
 import com.wanted.naeil.domain.learning.dto.response.MyCourseResponse;
 import com.wanted.naeil.domain.learning.service.MyCourseService;
+import com.wanted.naeil.domain.live.dto.response.MyLiveReservationResponse;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.domain.user.repository.UserRepository;
 import com.wanted.naeil.global.auth.model.dto.AuthDetails;
@@ -25,6 +26,7 @@ public class MyCourseController {
     private final MyCourseService myCourseService;
     private final UserRepository userRepository;
 
+    // 내 강의 목록 조회
     @GetMapping
     public String myCoursePage(@AuthenticationPrincipal AuthDetails authDetails,
                                Model model) {
@@ -33,6 +35,7 @@ public class MyCourseController {
 
         User loginUser = getLoginUser(authDetails);
         List<MyCourseResponse> myCourses = myCourseService.getMyCourses(loginUser);
+        List<MyLiveReservationResponse> liveReservations = myCourseService.getLiveReservations(loginUser);
 
         double averageRate = myCourses.isEmpty() ? 0 :
                 myCourses.stream()
@@ -42,6 +45,7 @@ public class MyCourseController {
 
         model.addAttribute("myCourses", myCourses);
         model.addAttribute("averageRate", (int)averageRate);
+        model.addAttribute("liveReservations", liveReservations);
 
         log.info("[내 강의] 목록 조회 완료. 수강 강의 수: {}", myCourses.size());
 

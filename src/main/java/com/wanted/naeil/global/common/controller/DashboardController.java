@@ -1,5 +1,8 @@
 package com.wanted.naeil.global.common.controller;
 
+import com.wanted.naeil.domain.admin.dto.response.ApprovalResponse;
+import com.wanted.naeil.domain.admin.entity.enums.ApprovalRequestType;
+import com.wanted.naeil.domain.admin.service.AdminApprovalService;
 import com.wanted.naeil.domain.course.service.CourseService;
 import com.wanted.naeil.domain.mainpage.service.MainPageService;
 import com.wanted.naeil.domain.user.entity.User;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Controller
@@ -25,6 +29,7 @@ public class DashboardController {
     private final CourseService courseService;
     private final MainPageService mainPageService;
     private final UserRepository userRepository;
+    private final AdminApprovalService adminApprovalService;
 
     // 관리자 대시보드
     @GetMapping("/admin")
@@ -33,7 +38,12 @@ public class DashboardController {
         log.info("[Dashboard] 관리자({}) 대시보드 접속", authDetails != null ? authDetails.getUsername() : "unknown");
 
         ModelAndView mv = new ModelAndView("dashboard/adminDashboard");
+        List<ApprovalResponse> instructorApprovals =
+                adminApprovalService.getApprovals(ApprovalRequestType.INSTRUCTOR_REGISTER);
+
         if (authDetails != null) mv.addObject("user", authDetails.getLoginUserDTO());
+        mv.addObject("pendingInstructorApprovalCount", instructorApprovals.size());
+        mv.addObject("pendingInstructorApprovals", instructorApprovals.stream().limit(3).toList());
         return mv;
     }
 

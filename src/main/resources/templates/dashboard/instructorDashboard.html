@@ -72,7 +72,7 @@
                             <span>새 강의 등록</span>
                         </a>
 
-                        <a href="/instructor/settlement"
+                        <a href="/instructor/settlements"
                            class="inline-flex items-center gap-2 px-6 py-3 border-2 border-gray-300 bg-white text-gray-700 rounded-xl hover:border-blue-600 hover:bg-blue-50 hover:text-blue-600 transition-all font-bold">
                             <i data-lucide="wallet" class="w-5 h-5"></i>
                             <span>정산 관리 바로가기</span>
@@ -330,9 +330,10 @@
                 </div>
             </div>
 
-            <button type="button" class="w-full mt-6 py-3 border-2 border-yellow-400 rounded-xl font-bold text-yellow-700 bg-white hover:bg-yellow-50 transition-all">
+            <a th:href="@{/instructor/settlements}"
+               class="w-full mt-6 py-3 border-2 border-yellow-400 rounded-xl font-bold text-yellow-700 bg-white hover:bg-yellow-50 transition-all text-center block">
                 상세 내역 보기
-            </button>
+            </a>
         </div>
     </div>
 </div>
