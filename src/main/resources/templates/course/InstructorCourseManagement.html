@@ -98,7 +98,7 @@
                 반려
               </span>
 
-              <span th:if="${course.status != null and course.status.name() == 'CANCELLED'}"
+              <span th:if="${course.status != null and (course.status.name() == 'CANCELLED' or course.status.name() == 'REJECTED')}"
                     class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-bold">
                 요청취소
               </span>
@@ -153,7 +153,7 @@
             </button>
 
             <button type="button"
-                    th:if="${course.status != null and course.status.name() == 'CANCELLED'}"
+                    th:if="${course.status != null and (course.status.name() == 'CANCELLED' or course.status.name() == 'REJECTED')}"
                     th:data-id="${course.courseId}"
                     th:data-title="${course.title}"
                     onclick="updateCourseRegistrationStatus(this, 'PENDING')"
@@ -180,7 +180,7 @@
     <div th:if="${courses == null or #lists.isEmpty(courses)}"
          class="bg-white rounded-3xl border-2 border-dashed border-gray-200 py-24 text-center">
       <div class="w-28 h-28 bg-gray-100 rounded-3xl flex items-center justify-center mx-auto mb-8">
-        <span class="text-5xl">📚</span>
+        <i class="fa-solid fa-book-open text-gray-400 text-5xl"></i>
       </div>
 
       <h3 class="text-3xl font-black text-gray-900 mb-4">등록된 강의가 없습니다</h3>
@@ -216,40 +216,40 @@
         <div class="flex items-center justify-between gap-6">
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-3 mb-3">
-          <span th:if="${liveCourse.status != null and liveCourse.status.name() == 'PENDING'}"
-                class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-bold">
-            승인 대기
-          </span>
+              <span th:if="${liveCourse.status != null and liveCourse.status.name() == 'PENDING'}"
+                    class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-bold">
+                승인 대기
+              </span>
 
               <span th:if="${liveCourse.status != null and liveCourse.status.name() == 'APPROVED'}"
                     class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-bold">
-            승인 완료
-          </span>
+                승인 완료
+              </span>
 
               <span th:if="${liveCourse.status != null and liveCourse.status.name() == 'REJECTED'}"
                     class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-bold">
-            반려됨
-          </span>
+                반려됨
+              </span>
 
               <span th:if="${liveCourse.status != null and liveCourse.status.name() == 'IN_PROGRESS'}"
                     class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-bold">
-            방송 중
-          </span>
+                방송 중
+              </span>
 
               <span th:if="${liveCourse.status != null and liveCourse.status.name() == 'ENDED'}"
                     class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-bold">
-            종료됨
-          </span>
+                종료됨
+              </span>
 
               <span th:if="${liveCourse.status != null and liveCourse.status.name() == 'CANCELLED'}"
                     class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-bold">
-            요청 취소
-          </span>
+                요청 취소
+              </span>
 
               <span th:if="${liveCourse.status == null}"
                     class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-bold">
-            상태 없음
-          </span>
+                상태 없음
+              </span>
             </div>
 
             <h3 class="text-xl font-black text-gray-900 mb-3 group-hover:text-blue-600 transition-colors truncate"
@@ -258,28 +258,39 @@
             </h3>
 
             <div class="flex items-center gap-4 text-sm">
-          <span class="font-bold text-gray-700">
-            <i class="fa-solid fa-calendar text-gray-500 mr-1"></i>
-            <span th:text="${liveCourse.startAt != null ? #temporals.format(liveCourse.startAt, 'yyyy-MM-dd HH:mm') : '-'}">
-              2026-04-20 19:00
-            </span>
-          </span>
+              <span class="font-bold text-gray-700">
+                <i class="fa-solid fa-calendar text-gray-500 mr-1"></i>
+                <span th:text="${liveCourse.startAt != null ? #temporals.format(liveCourse.startAt, 'yyyy-MM-dd HH:mm') : '-'}">
+                  2026-04-20 19:00
+                </span>
+              </span>
 
               <span class="font-bold text-gray-700">
-            <i class="fa-solid fa-users text-gray-500 mr-1"></i>
-            <span th:text="${liveCourse.currentCount}">0</span>/<span th:text="${liveCourse.maxCapacity}">0</span>명
-          </span>
+                <i class="fa-solid fa-users text-gray-500 mr-1"></i>
+                <span th:text="${liveCourse.currentCount}">0</span>/<span th:text="${liveCourse.maxCapacity}">0</span>명
+              </span>
             </div>
           </div>
 
           <div class="flex items-center gap-3">
+            <button type="button"
+                    th:if="${liveCourse.status != null and (liveCourse.status.name() == 'PENDING' or liveCourse.status.name() == 'REJECTED')}"
+                    th:data-id="${liveCourse.liveId}"
+                    th:data-title="${liveCourse.title}"
+                    onclick="deleteLiveLecture(this)"
+                    class="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-red-300 text-red-600 transition-all hover:bg-red-50"
+                    title="삭제">
+              <i class="fa-regular fa-trash-can"></i>
+            </button>
+
             <a th:href="@{/instructor/live-lecture/{id}(id=${liveCourse.liveId})}"
+               href="/instructor/live-lecture/1"
                class="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-blue-300 text-blue-600 transition-all hover:bg-blue-50"
                title="조회">
               <i class="fa-regular fa-eye"></i>
             </a>
 
-            <a th:if="${liveCourse.status != null and liveCourse.status.name() == 'PENDING'}"
+            <a th:if="${liveCourse.status != null and (liveCourse.status.name() == 'PENDING' or liveCourse.status.name() == 'REJECTED')}"
                th:href="@{/instructor/live-lecture/{id}/edit(id=${liveCourse.liveId})}"
                href="/instructor/live-lecture/1/edit"
                class="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-green-300 text-green-600 transition-all hover:bg-green-50"
@@ -298,7 +309,7 @@
             </button>
 
             <button type="button"
-                    th:if="${liveCourse.status != null and liveCourse.status.name() == 'CANCELLED'}"
+                    th:if="${liveCourse.status != null and (liveCourse.status.name() == 'CANCELLED' or liveCourse.status.name() == 'REJECTED')}"
                     th:data-id="${liveCourse.liveId}"
                     th:data-title="${liveCourse.title}"
                     onclick="updateLiveLectureRegistrationStatus(this, 'PENDING')"
@@ -306,21 +317,10 @@
                     title="등록 요청">
               등록 요청
             </button>
-
-            <button type="button"
-                    th:if="${liveCourse.status != null and liveCourse.status.name() == 'APPROVED'}"
-                    th:data-id="${liveCourse.liveId}"
-                    th:data-title="${liveCourse.title}"
-                    onclick="openDeleteLiveModal(this)"
-                    class="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-red-300 text-red-600 transition-all hover:bg-red-50"
-                    title="삭제 요청">
-              <i class="fa-regular fa-trash-can"></i>
-            </button>
           </div>
         </div>
       </div>
     </div>
-
 
     <div th:if="${liveCourses == null or #lists.isEmpty(liveCourses)}"
          class="bg-white rounded-3xl border-2 border-dashed border-gray-200 py-24 text-center">
@@ -383,12 +383,8 @@
     </div>
 
     <div class="mb-6 rounded-xl border-2 border-gray-200 bg-gray-50 p-4">
-      <p class="text-sm font-bold text-gray-800">
-        삭제 요청은 관리자 승인 후 처리됩니다.
-      </p>
-      <p class="mt-1 text-sm text-gray-500">
-        승인 전까지 강의는 비활성화 상태로 유지됩니다.
-      </p>
+      <p class="text-sm font-bold text-gray-800">삭제 요청은 관리자 승인 후 처리됩니다.</p>
+      <p class="mt-1 text-sm text-gray-500">승인 전까지 강의는 비활성화 상태로 유지됩니다.</p>
     </div>
 
     <div class="flex gap-3">
@@ -407,65 +403,10 @@
   </div>
 </div>
 
-<div id="deleteLiveModal" class="modal-overlay">
-  <div class="bg-white rounded-2xl p-8 max-w-2xl w-full mx-4 shadow-xl">
-    <div class="flex items-center justify-between mb-6">
-      <h3 class="text-2xl font-black text-gray-900">실시간 강의 삭제 요청</h3>
-      <button type="button"
-              onclick="closeDeleteLiveModal()"
-              class="p-2 hover:bg-gray-100 rounded-lg">
-        <i class="fa-solid fa-x"></i>
-      </button>
-    </div>
-
-    <div class="bg-red-50 border-2 border-red-200 rounded-xl p-4 mb-6">
-      <div class="flex items-start gap-3">
-        <i class="fa-solid fa-triangle-exclamation text-red-600 mt-0.5"></i>
-        <div>
-          <p class="text-sm font-bold text-red-900 mb-1">삭제를 요청하시겠습니까?</p>
-          <p class="text-sm text-red-700 font-medium">삭제 시 예약한 수강생에게 알림이 발송됩니다.</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="bg-gray-50 rounded-xl p-6 mb-6 space-y-3">
-      <div class="flex justify-between">
-        <span class="text-sm font-bold text-gray-600">강의명</span>
-        <span id="del-live-title" class="text-sm font-bold text-gray-900"></span>
-      </div>
-    </div>
-
-    <div class="mb-6">
-      <label class="block text-sm font-bold text-gray-900 mb-2">
-        삭제 사유 <span class="text-red-600">*</span>
-      </label>
-      <textarea id="deleteLiveReason"
-                rows="4"
-                placeholder="삭제 요청 사유를 입력해주세요"
-                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none resize-none font-medium"></textarea>
-    </div>
-
-    <div class="flex gap-3">
-      <button type="button"
-              onclick="closeDeleteLiveModal()"
-              class="flex-1 px-6 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 font-bold text-gray-700">
-        취소
-      </button>
-
-      <button type="button"
-              onclick="submitDeleteLive()"
-              class="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 font-bold">
-        삭제 요청하기
-      </button>
-    </div>
-  </div>
-</div>
-
 <script>
   lucide.createIcons();
 
   let currentDeleteId = null;
-  let currentDeleteLiveId = null;
 
   function getCsrfHeaders() {
     const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
@@ -501,8 +442,10 @@
       body: formData
     });
 
+    const message = await response.text();
+
     if (!response.ok) {
-      alert('실시간 강의 등록 상태 변경에 실패했습니다.');
+      alert(message || '실시간 강의 등록 상태 변경에 실패했습니다.');
       return;
     }
 
@@ -510,10 +453,33 @@
             ? '실시간 강의 등록 요청이 취소되었습니다.'
             : '실시간 강의 등록 요청이 완료되었습니다.';
 
-    alert(successMessage);
+    alert(message || successMessage);
     location.reload();
   }
 
+  async function deleteLiveLecture(button) {
+    const liveId = button.dataset.id;
+    const title = button.dataset.title || '';
+
+    if (!confirm(`"${title}" 실시간 강의를 삭제하시겠습니까?\n삭제 후에는 되돌릴 수 없습니다.`)) {
+      return;
+    }
+
+    const response = await fetch(`/instructor/live-lecture/${liveId}`, {
+      method: 'DELETE',
+      headers: getCsrfHeaders()
+    });
+
+    const message = await response.text();
+
+    if (!response.ok) {
+      alert(message || '실시간 강의 삭제에 실패했습니다.');
+      return;
+    }
+
+    alert(message || '실시간 강의가 삭제되었습니다.');
+    location.reload();
+  }
 
   async function updateCourseRegistrationStatus(button, nextStatus) {
     const courseId = button.dataset.id;
@@ -536,8 +502,10 @@
       body: formData
     });
 
+    const message = await response.text();
+
     if (!response.ok) {
-      alert('강의 등록 상태 변경에 실패했습니다.');
+      alert(message || '강의 등록 상태 변경에 실패했습니다.');
       return;
     }
 
@@ -545,7 +513,7 @@
             ? '강의 등록 요청이 취소되었습니다.'
             : '강의 등록 요청이 완료되었습니다.';
 
-    alert(successMessage);
+    alert(message || successMessage);
     location.reload();
   }
 
@@ -570,50 +538,6 @@
     form.method = 'POST';
     form.action = `/instructor/course/${currentDeleteId}/delete-request`;
 
-    const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
-    const csrfParameter = document.querySelector('meta[name="_csrf_parameter"]')?.content;
-
-    if (csrfToken && csrfParameter) {
-      const csrfInput = document.createElement('input');
-      csrfInput.type = 'hidden';
-      csrfInput.name = csrfParameter;
-      csrfInput.value = csrfToken;
-      form.appendChild(csrfInput);
-    }
-
-    document.body.appendChild(form);
-    form.submit();
-  }
-
-  function openDeleteLiveModal(button) {
-    currentDeleteLiveId = button.dataset.id;
-    document.getElementById('del-live-title').textContent = button.dataset.title || '';
-    document.getElementById('deleteLiveReason').value = '';
-    document.getElementById('deleteLiveModal').classList.add('open');
-  }
-
-  function closeDeleteLiveModal() {
-    document.getElementById('deleteLiveModal').classList.remove('open');
-  }
-
-  function submitDeleteLive() {
-    const reason = document.getElementById('deleteLiveReason').value.trim();
-
-    if (!reason) {
-      alert('삭제 사유를 입력해주세요');
-      return;
-    }
-
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = `/instructor/live-lecture/${currentDeleteLiveId}/delete-request`;
-
-    const reasonInput = document.createElement('input');
-    reasonInput.type = 'hidden';
-    reasonInput.name = 'reason';
-    reasonInput.value = reason;
-
-    form.appendChild(reasonInput);
     document.body.appendChild(form);
     form.submit();
   }

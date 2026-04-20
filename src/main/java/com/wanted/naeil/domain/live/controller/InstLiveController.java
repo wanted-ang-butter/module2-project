@@ -142,6 +142,13 @@ public class InstLiveController {
         return mv;
     }
 
+    /**
+     * 실시간 강의 수정 form 조회
+     * @param authDetails
+     * @param liveId
+     * @param mv
+     * @return
+     */
     @GetMapping("/live-lecture/{liveId}/edit")
     public ModelAndView editLiveLecture(
             @AuthenticationPrincipal AuthDetails authDetails,
@@ -164,6 +171,13 @@ public class InstLiveController {
         return mv;
     }
 
+    /**
+     * 실시간 강의 수정 기능
+     * @param authDetails
+     * @param liveId
+     * @param request : 수정 사항을 묶어놓은 request
+     * @return
+     */
     @PatchMapping("/live-lecture/{liveId}")
     public ResponseEntity<String> updateInstructorLiveLecture(
             @AuthenticationPrincipal AuthDetails authDetails,
@@ -187,6 +201,32 @@ public class InstLiveController {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (IllegalStateException e) {
             log.warn("[LiveLectureUpdate] 수정 불가 상태 - liveId: {}, message: {}", liveId, e.getMessage());
+            return ResponseEntity.status(409).body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/live-lecture/{liveId}")
+    public ResponseEntity<String> deleteInstructorLiveLecture(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @PathVariable Long liveId
+    ) {
+        if (authDetails == null) {
+            throw new AccessDeniedException("로그인이 필요합니다.");
+        }
+
+        Long instructorId = authDetails.getLoginUserDTO().getUserId();
+
+        log.info("[실시간 강의 삭제] 실시간 강의 삭제 요청 - instructorId: {}, liveId: {}",
+                instructorId, liveId);
+
+        try {
+            liveLectureService.deleteLiveLecture(instructorId, liveId);
+            return ResponseEntity.ok("실시간 강의가 삭제되었습니다.");
+        } catch (IllegalArgumentException e) {
+            log.warn("[실시간 강의 삭제] 잘못된 삭제 요청 - liveId: {}, message: {}", liveId, e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (IllegalStateException e) {
+            log.warn("[LiveLectureDelete] 삭제 불가 상태 - liveId: {}, message: {}", liveId, e.getMessage());
             return ResponseEntity.status(409).body(e.getMessage());
         }
     }
