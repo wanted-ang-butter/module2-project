@@ -3,8 +3,10 @@ package com.wanted.naeil.domain.live.service;
 import com.wanted.naeil.domain.admin.entity.AdminApproval;
 import com.wanted.naeil.domain.admin.repository.AdminApprovalRepository;
 import com.wanted.naeil.domain.live.dto.request.CreateLiveLectureRequest;
+import com.wanted.naeil.domain.live.dto.response.InstructorLiveDetailResponse;
 import com.wanted.naeil.domain.live.dto.response.InstructorLiveLectureResponse;
 import com.wanted.naeil.domain.live.entity.LiveLecture;
+import com.wanted.naeil.domain.live.entity.enums.LiveLectureStatus;
 import com.wanted.naeil.domain.live.repository.LiveLectureRepository;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.domain.user.entity.enums.Role;
@@ -41,25 +43,8 @@ public class LiveLectureService {
             throw new AccessDeniedException("강사 권한이 있는 사용자만 강의를 등록할 수 있습니다.");
         }
 
-        // 제목 체크
-        if (request.getTitle() == null || request.getTitle().trim().isEmpty()) {
-            throw new IllegalArgumentException("강의 제목 필수 입력 값입니다.");
-        }
-
-        // 설명 체크
-        if (request.getDescription() == null || request.getDescription().trim().isEmpty()) {
-            throw new IllegalArgumentException("강의 설명은 필수 입력 값입니다.");
-        }
-
-        // 수강 정원 체크
-        if (request.getMaxCapacity() == null || request.getMaxCapacity() < 1) {
-            throw new IllegalArgumentException("올바른 수강 정원 값을 입력해주세요.");
-        }
-
-        // 방송 url 체크
-        if (request.getStreamingUrl() == null || request.getStreamingUrl().trim().isEmpty()) {
-            throw new IllegalArgumentException("방송 URL은 필수 입력 값 입니다.");
-        }
+        // 필수값 확인 메서드 공동 메서드로 변경
+        validateLiveLectureRequiredValues(request);
 
         // 시간 관련 검증
         validateLiveLectureTime(request);
@@ -86,7 +71,7 @@ public class LiveLectureService {
     }
 
     // 나의 실시간 강의 목록 조회
-    @Transactional
+    @Transactional(readOnly = true)
     public List<InstructorLiveLectureResponse> getInstructorLiveLectures(Long instructorId) {
 
         User instructor = userRepository.findById(instructorId)
@@ -99,6 +84,65 @@ public class LiveLectureService {
         return liveLectureRepository.findByInstructorIdOrderByCreatedAtDesc(instructorId).stream()
                 .map(InstructorLiveLectureResponse::of)
                 .toList();
+    }
+
+    // 강사 - 실시간 강의 상세 조회
+    @Transactional(readOnly = true)
+    public InstructorLiveDetailResponse getInstructorLiveLectureDetail(Long instructorId, Long liveId) {
+
+        log.info("[실시간 강의] 상세 조회 Service 로직 시작!");
+
+        User instructor = userRepository.findById(instructorId)
+                .orElseThrow(() -> new IllegalArgumentException("강사 정보를 찾을 수 없습니다. ID: " + instructorId));
+
+        LiveLecture liveLecture = liveLectureRepository.findById(liveId)
+                .orElseThrow(() -> new IllegalArgumentException("실시간 강의를 찾을 수 없습니다. ID: " + liveId));
+
+
+        validateLiveLectureOwnerOrAdmin(instructor, liveLecture);
+
+        return InstructorLiveDetailResponse.of(liveLecture);
+    }
+
+    // 강사 - 실시간 강의 수정
+    @Transactional
+    public void updateInstructorLiveLecture(Long instructorId, Long liveId, @Valid CreateLiveLectureRequest request) {
+
+        log.info("[실시간 강의] 실시간 강의 수정 Service 로직 시작!");
+
+        User instructor = userRepository.findById(instructorId)
+                .orElseThrow(() -> new IllegalArgumentException("강사 정보를 찾을 수 없습니다. ID: " + instructorId));
+
+        LiveLecture liveLecture = liveLectureRepository.findById(liveId)
+                .orElseThrow(() -> new IllegalArgumentException("실시간 강의를 찾을 수 없습니다. ID: " + liveId));
+
+        // 강사 본인 or 관리자만 처리
+        validateLiveLectureOwnerOrAdmin(instructor, liveLecture);
+
+        // 승인 대기 상태일 때만 수정 가능
+        LiveLectureStatus status = liveLecture.getStatus();
+
+        if (status != LiveLectureStatus.PENDING) {
+            throw new IllegalStateException("승인 대기 상태만 수정할 수 있습니다.");
+        }
+
+        // 필수 값 확인
+        validateLiveLectureRequiredValues(request);
+
+        // 시간 검증
+        validateLiveLectureTime(request);
+
+        liveLecture.update(
+                request.getTitle().trim(),
+                request.getDescription().trim(),
+                request.getMaxCapacity(),
+                request.getReservationStartAt(),
+                request.getStartAt(),
+                request.getEndAt(),
+                request.getStreamingUrl().trim()
+        );
+
+        log.info("[LiveLectureUpdate] 실시간 강의 수정 완료 - liveId: {}", liveId);
     }
 
 
@@ -135,6 +179,43 @@ public class LiveLectureService {
 
         if (!reservationStartAt.isBefore(startAt)) {
             throw new IllegalArgumentException("예약 시작 일시는 강의 시작 일시보다 빨라야 합니다.");
+        }
+    }
+
+    private void validateLiveLectureRequiredValues(CreateLiveLectureRequest request) {
+        if (request.getTitle() == null || request.getTitle().trim().isEmpty()) {
+            throw new IllegalArgumentException("실시간 강의 제목은 필수 입력 값입니다.");
+        }
+
+        if (request.getDescription() == null || request.getDescription().trim().isEmpty()) {
+            throw new IllegalArgumentException("실시간 강의 설명은 필수 입력 값입니다.");
+        }
+
+        if (request.getMaxCapacity() == null || request.getMaxCapacity() < 1) {
+            throw new IllegalArgumentException("수강 정원은 1명 이상이어야 합니다.");
+        }
+
+        if (request.getMaxCapacity() > 100) {
+            throw new IllegalArgumentException("신청 가능한 최대 수강 정원은 100명입니다.");
+        }
+
+        if (request.getStreamingUrl() == null || request.getStreamingUrl().trim().isEmpty()) {
+            throw new IllegalArgumentException("방송 URL은 필수 입력 값입니다.");
+        }
+    }
+
+
+    private void validateLiveLectureOwnerOrAdmin(User user, LiveLecture liveLecture) {
+        if (user.getRole() == Role.ADMIN) {
+            return;
+        }
+
+        if (user.getRole() != Role.INSTRUCTOR) {
+            throw new AccessDeniedException("강사 또는 관리자만 실시간 강의를 조회할 수 있습니다.");
+        }
+
+        if (!liveLecture.getInstructor().getId().equals(user.getId())) {
+            throw new AccessDeniedException("본인이 등록한 실시간 강의만 조회할 수 있습니다.");
         }
     }
 }

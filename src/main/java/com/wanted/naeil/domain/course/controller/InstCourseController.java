@@ -209,7 +209,17 @@ public class InstCourseController {
         redirectAttributes.addFlashAttribute("message", "강의 삭제 요청이 접수되었습니다.");
         return "redirect:/instructor/course-management";
     }
-    
+    // 강사 강의 상세 조회
+    @GetMapping("/course/{courseId}/detail")
+    public ModelAndView courseDetailPage(@PathVariable Long courseId,
+                                         ModelAndView mv,
+                                         @AuthenticationPrincipal AuthDetails authDetails) {
+        Long instructorId = authDetails.getLoginUserDTO().getUserId();
+        mv.addObject("user", authDetails.getLoginUserDTO());
+        mv.addObject("course", courseService.getInstructorCourseDetail(instructorId, courseId));
+        mv.setViewName("course/InstructorCourseDetail");
+        return mv;
+    }
 
     // 성공시 redirect 페이지
     // TODO : 병합 후 강사의 내 강의 페이지로 수정하기

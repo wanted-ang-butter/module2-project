@@ -61,11 +61,11 @@
                         </div>
                     </div>
                 </div>
+                <a th:href="@{/auth/logout}" class="flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-red-50 transition-all group">
+                    <i class="fa-solid fa-right-from-bracket text-gray-600 group-hover:text-red-600 text-sm"></i>
+                    <span class="font-medium text-gray-700 group-hover:text-red-600 text-sm">로그아웃</span>
+                </a>
             </nav>
-            <a th:href="@{/auth/logout}" class="flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-red-50 transition-all group">
-                <i class="fa-solid fa-right-from-bracket text-gray-600 group-hover:text-red-600 text-sm"></i>
-                <span class="font-medium text-gray-700 group-hover:text-red-600 text-sm">로그아웃</span>
-            </a>
         </div>
     </div>
 </header>
@@ -97,6 +97,7 @@
     <!-- Main -->
     <main class="flex-1">
         <div class="mb-8">
+            <button onclick="history.back()" class="flex items-center gap-2 px-4 py-2 border-2 border-gray-200 rounded-xl text-gray-700 hover:bg-gray-100 font-medium text-sm mb-4"><i class="fa-solid fa-arrow-left text-sm"></i>뒤로가기</button>
             <h1 class="text-4xl font-black text-gray-900 mb-2">코스 신청 검토</h1>
             <p class="text-lg text-gray-600 font-medium">강사가 신청한 강의를 검토하고 승인 여부를 결정합니다</p>
         </div>
@@ -164,12 +165,25 @@
                                   th:text="${approval.status.name() == 'PENDING'} ? '승인 대기' : (${approval.status.name() == 'APPROVED'} ? '승인 완료' : '반려')"></span>
                         </td>
                         <td class="px-4 py-3 whitespace-nowrap">
-                            <div class="flex gap-1.5" th:if="${approval.status.name() == 'PENDING'}">
-                                <form method="post" th:action="@{/admin/approvals/{id}/approve(id=${approval.approvalId})}">
+                            <div class="flex gap-1.5 items-center">
+                                <!-- 검토 버튼 (전체) -->
+                                <button type="button"
+                                        th:attr="data-id=${approval.approvalId},
+                                                 data-title=${approval.title},
+                                                 data-instructor=${approval.instuctorName},
+                                                 data-category=${approval.categoryName},
+                                                 data-price=${approval.price},
+                                                 data-date=${approval.createdAt != null ? #temporals.format(approval.createdAt, 'yyyy-MM-dd') : '-'},
+                                                 data-status=${approval.status.name()}"
+                                        onclick="openDetailModal(this)"
+                                        class="px-2.5 py-1.5 border-2 border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 font-bold text-xs">검토</button>
+                                <!-- 승인/반려 (PENDING만) -->
+                                <form method="post" th:if="${approval.status.name() == 'PENDING'}"
+                                      th:action="@{/admin/approvals/{id}/approve(id=${approval.approvalId})}">
                                     <input type="hidden" name="redirect" value="/admin/course-management/approval"/>
                                     <button type="submit" class="px-2.5 py-1.5 border-2 border-green-300 text-green-600 rounded-lg hover:bg-green-50 font-bold text-xs">승인</button>
                                 </form>
-                                <button type="button"
+                                <button type="button" th:if="${approval.status.name() == 'PENDING'}"
                                         th:attr="data-id=${approval.approvalId}, data-title=${approval.title}"
                                         onclick="openRejectModal(this.dataset.id, this.dataset.title)"
                                         class="px-2.5 py-1.5 border-2 border-red-300 text-red-600 rounded-lg hover:bg-red-50 font-bold text-xs">반려</button>
@@ -180,6 +194,49 @@
             </table>
         </div>
     </main>
+</div>
+
+<!-- Detail Modal -->
+<div id="detail-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" style="display:none">
+    <div class="bg-white rounded-2xl w-full max-w-lg mx-4 shadow-2xl overflow-y-auto max-h-[90vh]">
+        <div class="p-8">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-black text-gray-900">코스 신청 상세</h3>
+                <button onclick="closeDetailModal()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl text-sm">
+                    <span class="text-gray-500 font-medium">상태</span>
+                    <span id="d-status" class="px-3 py-1 rounded-full text-sm font-bold"></span>
+                </div>
+                <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl text-sm">
+                    <span class="text-gray-500 font-medium">코스명</span>
+                    <span id="d-title" class="font-bold text-gray-900 text-right"></span>
+                </div>
+                <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl text-sm">
+                    <span class="text-gray-500 font-medium">강사명</span>
+                    <span id="d-instructor" class="font-bold text-gray-900"></span>
+                </div>
+                <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl text-sm">
+                    <span class="text-gray-500 font-medium">카테고리</span>
+                    <span id="d-category" class="font-bold text-gray-900"></span>
+                </div>
+                <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl text-sm">
+                    <span class="text-gray-500 font-medium">가격</span>
+                    <span id="d-price" class="font-bold text-gray-900"></span>
+                </div>
+                <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl text-sm">
+                    <span class="text-gray-500 font-medium">신청일</span>
+                    <span id="d-date" class="font-bold text-gray-900"></span>
+                </div>
+            </div>
+            <div class="mt-8">
+                <button onclick="closeDetailModal()" class="w-full py-3 border-2 border-gray-200 rounded-xl font-bold text-gray-700 hover:bg-gray-50">닫기</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Reject Modal -->
@@ -210,12 +267,31 @@
                 : 'px-4 py-2 rounded-full font-bold text-sm bg-white border-2 border-gray-200 text-gray-700 hover:border-blue-300';
         });
     }
+    function openDetailModal(btn) {
+        const statusMap = { PENDING: '승인 대기', APPROVED: '승인 완료', REJECTED: '반려' };
+        const statusClass = { PENDING: 'bg-yellow-100 text-yellow-700', APPROVED: 'bg-green-100 text-green-700', REJECTED: 'bg-red-100 text-red-700' };
+        const s = btn.dataset.status;
+        const statusEl = document.getElementById('d-status');
+        statusEl.textContent = statusMap[s] || s;
+        statusEl.className = 'px-3 py-1 rounded-full text-sm font-bold ' + (statusClass[s] || '');
+        document.getElementById('d-title').textContent = btn.dataset.title || '-';
+        document.getElementById('d-instructor').textContent = btn.dataset.instructor || '-';
+        document.getElementById('d-category').textContent = btn.dataset.category || '-';
+        document.getElementById('d-price').textContent = btn.dataset.price ? '₩' + parseInt(btn.dataset.price).toLocaleString() : '-';
+        document.getElementById('d-date').textContent = btn.dataset.date || '-';
+        document.getElementById('detail-modal').style.display = 'flex';
+    }
+    function closeDetailModal() { document.getElementById('detail-modal').style.display = 'none'; }
+    document.getElementById('detail-modal').addEventListener('click', function(e) {
+        if (e.target === this) this.style.display = 'none';
+    });
+
     function openRejectModal(id, title) {
         document.getElementById('reject-title').textContent = '"' + title + '" 신청을 반려하시겠습니까?';
         document.getElementById('reject-form').action = '/admin/approvals/' + id + '/reject';
-        document.getElementById('reject-modal').classList.remove('hidden');
+        document.getElementById('reject-modal').style.display = 'flex';
     }
-    function closeRejectModal() { document.getElementById('reject-modal').classList.add('hidden'); }
+    function closeRejectModal() { document.getElementById('reject-modal').style.display = 'none'; }
     function toggleAdminMenu() { document.getElementById('adminMenu').classList.toggle('hidden'); }
     function toggleMemberMenu() { document.getElementById('memberSubMenu').classList.toggle('hidden'); }
     function toggleCourseMenu() { document.getElementById('courseSubMenu').classList.toggle('hidden'); }
