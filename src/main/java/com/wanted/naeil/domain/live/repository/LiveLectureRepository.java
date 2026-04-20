@@ -2,11 +2,16 @@ package com.wanted.naeil.domain.live.repository;
 
 import com.wanted.naeil.domain.live.entity.LiveLecture;
 import com.wanted.naeil.domain.live.entity.enums.LiveLectureStatus;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface LiveLectureRepository extends JpaRepository<LiveLecture, Long> {
 
@@ -24,6 +29,11 @@ public interface LiveLectureRepository extends JpaRepository<LiveLecture, Long> 
             List<LiveLectureStatus> statuses,
             LocalDateTime now
     );
+
+    // 비관적 락 추가
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select l from LiveLecture l where l.id = :liveId")
+    Optional<LiveLecture> findByIdForUpdate(@Param("liveId") Long liveId);
 
 
 }

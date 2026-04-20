@@ -7,8 +7,11 @@ import com.wanted.naeil.domain.live.dto.response.InstructorLiveDetailResponse;
 import com.wanted.naeil.domain.live.dto.response.InstructorLiveLectureResponse;
 import com.wanted.naeil.domain.live.dto.response.LiveLectureListResponse;
 import com.wanted.naeil.domain.live.entity.LiveLecture;
+import com.wanted.naeil.domain.live.entity.LiveReservation;
 import com.wanted.naeil.domain.live.entity.enums.LiveLectureStatus;
+import com.wanted.naeil.domain.live.entity.enums.LiveReservationStatus;
 import com.wanted.naeil.domain.live.repository.LiveLectureRepository;
+import com.wanted.naeil.domain.live.repository.LiveReservationRepository;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.domain.user.entity.enums.Role;
 import com.wanted.naeil.domain.user.repository.UserRepository;
@@ -20,7 +23,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -28,8 +34,10 @@ import java.util.List;
 public class LiveLectureService {
 
     private final LiveLectureRepository liveLectureRepository;
+    private final LiveReservationRepository liveReservationRepository;
     private final UserRepository userRepository;
     private final AdminApprovalRepository adminApprovalRepository;
+
 
     // 실시간 강의 등록
     @Transactional
@@ -178,26 +186,122 @@ public class LiveLectureService {
 
     // 실시간 강의 전체 조회 - 유저
     @Transactional(readOnly = true)
-    public List<LiveLectureListResponse> getLiveLectureList() {
+    public List<LiveLectureListResponse> getLiveLectureList(Long userId) {
 
         log.info("[LiveLectureList] 사용자 실시간 강의 전체 조회 시작");
 
+        // 승인완료, 방송 중 강의만 담기
         List<LiveLectureStatus> visibleStatuses = List.of(
                 LiveLectureStatus.APPROVED,
                 LiveLectureStatus.IN_PROGRESS
         );
 
-        return liveLectureRepository.findByStatusInAndEndAtAfterOrderByStartAtAsc(
-                        visibleStatuses,
-                        LocalDateTime.now()
-                ).stream()
-                .map(LiveLectureListResponse::of)
-                .toList();
+        // 종료 전인 실시간 강의 조회
+        List<LiveLecture> liveLectures = liveLectureRepository.findByStatusInAndEndAtAfterOrderByStartAtAsc(
+                visibleStatuses,
+                LocalDateTime.now()
+        );
 
+        // 내가 예약한 강의 조회 및 add
+        Set<Long> reservedLiveIds = new HashSet<>();
+
+        if (userId != null) {
+            List<Long> reservedIds = liveReservationRepository
+                    .findLiveIdsByUserIdAndStatus(userId, LiveReservationStatus.RESERVED);
+            reservedLiveIds.addAll(reservedIds);
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+
+        return liveLectures.stream()
+                .map(liveLecture -> toLiveLectureListResponse(
+                        liveLecture,
+                        reservedLiveIds.contains(liveLecture.getId()), // 내가 예약한 강의인가 확인
+                        now
+                ))
+                .toList();
+    }
+
+    // 실시간 강의 예약 기능 - 유저
+    @Transactional
+    public void reserveLiveLecture(Long userId, Long liveId) {
+
+        log.info("[LiveLectureReserve] 실시간 강의 예약 시작 - userId: {}, liveId: {}", userId, liveId);
+
+        LiveLecture liveLecture = liveLectureRepository.findByIdForUpdate(liveId)
+                .orElseThrow(() -> new IllegalArgumentException("실시간 강의를 찾을 수 없습니다. ID: " + liveId));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자 정보를 찾을 수 없습니다. ID: " + userId));
+
+        if (user.getRole() != Role.USER) {
+            throw new AccessDeniedException("강의를 예약하려면 로그인을 해주세요.");
+        }
+
+        boolean alreadyReserved = liveReservationRepository.existsByUser_IdAndLiveLecture_IdAndStatus(
+                userId,
+                liveId,
+                LiveReservationStatus.RESERVED
+        );
+
+        if (alreadyReserved) {
+            throw new IllegalStateException("이미 예약하신 강의입니다.");
+        }
+
+        // 예약 시간 검증
+        validateLiveLectureReservable(liveLecture);
+
+        LiveReservation reservation = LiveReservation.builder()
+                .user(user)
+                .liveLecture(liveLecture)
+                .build();
+
+        liveReservationRepository.save(reservation);
+
+        liveLecture.incrementReservation();
+
+        log.info("[LiveLectureReserve] 실시간 강의 예약 완료 - userId: {}, liveId: {}", userId, liveId);
     }
 
 
     // ====== 내부 편의 메서드 =======
+
+    // 강의 예약 변환 메서드
+    private LiveLectureListResponse toLiveLectureListResponse(
+            LiveLecture liveLecture,
+            boolean isMyReserved,
+            LocalDateTime now
+    ) {
+        int currentCount = liveLecture.getCurrentCount();
+        int maxCapacity = liveLecture.getMaxCapacity();
+
+        int reservationRate = calculateReservationRate(currentCount, maxCapacity);
+        boolean isClosingSoon = reservationRate >= 80;
+        boolean isLive = isLiveNow(liveLecture.getStartAt(), liveLecture.getEndAt(), now);
+        boolean isFull = currentCount >= maxCapacity;
+        boolean isEnded = liveLecture.getEndAt() != null && !now.isBefore(liveLecture.getEndAt());
+
+        boolean reservableStatus = liveLecture.getStatus() == LiveLectureStatus.APPROVED
+                || liveLecture.getStatus() == LiveLectureStatus.IN_PROGRESS;
+
+        boolean reservable = reservableStatus
+                && !isEnded
+                && !isFull
+                && !isMyReserved;
+
+        return LiveLectureListResponse.of(
+                liveLecture,
+                reservationRate,
+                isClosingSoon,
+                isLive,
+                isFull,
+                reservable,
+                isMyReserved
+        );
+    }
+
+
+    // 실시간 강의 등록 시간값 검증
     private void validateLiveLectureTime(CreateLiveLectureRequest request) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startAt = request.getStartAt();
@@ -233,6 +337,7 @@ public class LiveLectureService {
         }
     }
 
+    // 실시간 강의 필수 값 검증
     private void validateLiveLectureRequiredValues(CreateLiveLectureRequest request) {
         if (request.getTitle() == null || request.getTitle().trim().isEmpty()) {
             throw new IllegalArgumentException("실시간 강의 제목은 필수 입력 값입니다.");
@@ -255,6 +360,7 @@ public class LiveLectureService {
         }
     }
 
+    // 본인 강의 검증
     private void validateLiveLectureOwnerOrAdmin(User user, LiveLecture liveLecture) {
         if (user.getRole() == Role.ADMIN) {
             return;
@@ -267,5 +373,42 @@ public class LiveLectureService {
         if (!liveLecture.getInstructor().getId().equals(user.getId())) {
             throw new AccessDeniedException("본인이 등록한 실시간 강의만 조회할 수 있습니다.");
         }
+    }
+
+    // 실시간 강의 예약 검증
+    private void validateLiveLectureReservable(LiveLecture liveLecture) {
+
+        LocalDateTime now = LocalDateTime.now();
+
+        LiveLectureStatus status = liveLecture.getStatus();
+
+        if (status != LiveLectureStatus.APPROVED && status != LiveLectureStatus.IN_PROGRESS) {
+            throw new IllegalStateException("예약 가능한 실시간 강의가 아닙니다.");
+        }
+
+        if (liveLecture.getEndAt() == null || !now.isBefore(liveLecture.getEndAt())) {
+            throw new IllegalStateException("이미 종료된 실시간 강의는 예약할 수 없습니다.");
+        }
+
+        if (liveLecture.getCurrentCount() >= liveLecture.getMaxCapacity()) {
+            throw new IllegalStateException("정원이 초과되어 예약이 마감되었습니다.");
+        }
+    }
+
+    // 예약률 계산
+    private int calculateReservationRate(int currentCount, int maxCapacity) {
+        if (maxCapacity <= 0) {
+            return 0;
+        }
+        return currentCount * 100 / maxCapacity;
+    }
+
+    // 실시간 강의 여부 검증
+    private boolean isLiveNow(LocalDateTime startAt, LocalDateTime endAt, LocalDateTime now) {
+        if (startAt == null || endAt == null) {
+            return false;
+        }
+
+        return !now.isBefore(startAt) && now.isBefore(endAt);
     }
 }

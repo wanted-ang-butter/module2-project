@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>정산 관리</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Pretendard", sans-serif;
+            background-color: #f8f9fb;
+            color: #111827;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        button {
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        .page-wrap {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 32px 24px 80px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 15px;
+            color: #4b5563;
+            margin-bottom: 22px;
+        }
+
+        .page-title {
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 1.2;
+            margin: 0 0 10px;
+            color: #111827;
+        }
+
+        .page-subtitle {
+            margin: 0 0 34px;
+            font-size: 24px;
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 22px;
+            margin-bottom: 44px;
+        }
+
+        .summary-card {
+            background: #fff;
+            border-radius: 22px;
+            padding: 28px 24px;
+            border: 2px solid #e5e7eb;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .summary-card .label {
+            margin: 0 0 18px;
+            font-size: 22px;
+            font-weight: 700;
+            color: #374151;
+        }
+
+        .summary-card h3 {
+            margin: 0 0 10px;
+            font-size: 34px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+        }
+
+        .summary-card span {
+            font-size: 20px;
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .summary-card.blue {
+            border-color: #bfd7ff;
+        }
+
+        .summary-card.blue h3 {
+            color: #111827;
+        }
+
+        .summary-card.red {
+            border-color: #f5c2c7;
+        }
+
+        .summary-card.red h3 {
+            color: #ef4444;
+        }
+
+        .summary-card.green {
+            border-color: #b7ebc4;
+        }
+
+        .summary-card.green h3 {
+            color: #16a34a;
+        }
+
+        .summary-card.purple {
+            border-color: #dbc7ff;
+        }
+
+        .summary-card.purple h3 {
+            color: #111827;
+        }
+
+        .section-title {
+            font-size: 42px;
+            font-weight: 800;
+            margin: 0 0 24px;
+            color: #111827;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 12px 22px;
+            border-radius: 999px;
+            font-size: 18px;
+            font-weight: 700;
+            border: 1px solid #d1d5db;
+            background: #fff;
+            color: #4b5563;
+        }
+
+        .filter-tab.active {
+            background: #2563eb;
+            color: #fff;
+            border-color: #2563eb;
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.24);
+        }
+
+        .settlement-list {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        .settlement-card {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 24px;
+            padding: 28px 30px 24px;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 26px;
+        }
+
+        .card-header h3 {
+            margin: 0 0 8px;
+            font-size: 30px;
+            font-weight: 800;
+            color: #111827;
+        }
+
+        .card-header p {
+            margin: 0;
+            font-size: 18px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 120px;
+            padding: 10px 16px;
+            border-radius: 999px;
+            font-size: 17px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .status-badge.ready {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .status-badge.pending {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .status-badge.approved {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .status-badge.rejected {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .status-badge.canceled {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .settlement-info {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 28px;
+            padding-bottom: 26px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .settlement-info span {
+            display: block;
+            font-size: 17px;
+            color: #6b7280;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .settlement-info strong {
+            font-size: 24px;
+            font-weight: 800;
+            color: #111827;
+        }
+
+        .settlement-info .fee {
+            color: #ef4444;
+        }
+
+        .settlement-info .amount {
+            color: #16a34a;
+        }
+
+        .card-actions {
+            margin-top: 22px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .card-actions form {
+            margin: 0;
+        }
+
+        .btn-detail,
+        .btn-request,
+        .btn-cancel {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 110px;
+            height: 46px;
+            padding: 0 18px;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 800;
+            transition: 0.2s ease;
+        }
+
+        .btn-detail {
+            border: 2px solid #60a5fa;
+            color: #2563eb;
+            background: #fff;
+        }
+
+        .btn-detail:hover {
+            background: #eff6ff;
+        }
+
+        .btn-request {
+            background: #2563eb;
+            color: #fff;
+        }
+
+        .btn-request:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-cancel {
+            border: 2px solid #f87171;
+            color: #ef4444;
+            background: #fff;
+        }
+
+        .btn-cancel:hover {
+            background: #fef2f2;
+        }
+
+        .empty-box {
+            background: #fff;
+            border: 1px dashed #d1d5db;
+            border-radius: 20px;
+            padding: 48px 24px;
+            text-align: center;
+            color: #6b7280;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1100px) {
+            .summary-cards,
+            .settlement-info {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-wrap {
+                padding: 24px 16px 60px;
+            }
+
+            .page-title {
+                font-size: 34px;
+            }
+
+            .page-subtitle {
+                font-size: 18px;
+            }
+
+            .summary-cards,
+            .settlement-info {
+                grid-template-columns: 1fr;
+            }
+
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .status-badge {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page-wrap">
+
+    <a href="javascript:history.back()" class="back-link">〈 이전으로</a>
+
+    <h1 class="page-title">정산 관리</h1>
+    <p class="page-subtitle">정산 내역을 확인하고 정산을 신청할 수 있습니다</p>
+
+    <section class="summary-cards">
+        <div class="summary-card blue">
+            <p class="label">이번 달 총 매출</p>
+            <h3 th:text="'₩' + ${#numbers.formatInteger(currentMonthSales, 3, 'COMMA')}">₩3,100,000</h3>
+            <span>전체 매출</span>
+        </div>
+
+        <div class="summary-card red">
+            <p class="label">이번 달 수수료</p>
+            <h3 th:text="'₩' + ${#numbers.formatInteger(currentMonthFee, 3, 'COMMA')}">₩930,000</h3>
+            <span>플랫폼 수수료</span>
+        </div>
+
+        <div class="summary-card green">
+            <p class="label">정산 가능 금액</p>
+            <h3 th:text="'₩' + ${#numbers.formatInteger(availableAmount, 3, 'COMMA')}">₩2,170,000</h3>
+            <span>출금 가능</span>
+        </div>
+
+        <div class="summary-card purple">
+            <p class="label">누적 정산 완료</p>
+            <h3 th:text="'₩' + ${#numbers.formatInteger(totalCompletedAmount, 3, 'COMMA')}">₩18,500,000</h3>
+            <span>총 정산액</span>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="section-title">정산 내역</h2>
+
+        <div class="filter-tabs">
+            <button type="button" class="filter-tab active">전체</button>
+            <button type="button" class="filter-tab">정산 가능</button>
+            <button type="button" class="filter-tab">정산 대기</button>
+            <button type="button" class="filter-tab">정산 완료</button>
+        </div>
+
+        <div class="settlement-list" th:if="${settlements != null and !#lists.isEmpty(settlements)}">
+            <div class="settlement-card" th:each="settlement : ${settlements}">
+                <div class="card-header">
+                    <div>
+                        <h3 th:text="${settlement.settlementMonth} + ' 정산'">2026-04 정산</h3>
+                        <p th:text="'정산번호: SET-' + ${settlement.id}">정산번호: SET-001</p>
+                    </div>
+
+                    <span class="status-badge"
+                          th:classappend="${settlement.status.name() == 'READY'} ? ' ready' :
+                                          (${settlement.status.name() == 'PENDING'} ? ' pending' :
+                                          (${settlement.status.name() == 'APPROVED'} ? ' approved' :
+                                          (${settlement.status.name() == 'REJECTED'} ? ' rejected' : ' canceled')))">
+
+                        <span th:switch="${settlement.status.name()}">
+                            <span th:case="'READY'">정산 가능</span>
+                            <span th:case="'PENDING'">정산 대기 중</span>
+                            <span th:case="'APPROVED'">정산 완료</span>
+                            <span th:case="'REJECTED'">반려</span>
+                            <span th:case="'CANCELED'">취소됨</span>
+                        </span>
+                    </span>
+                </div>
+
+                <div class="settlement-info">
+                    <div>
+                        <span>총 판매 금액</span>
+                        <strong th:text="'₩' + ${#numbers.formatInteger(settlement.totalSalesAmount, 3, 'COMMA')}">₩1,850,000</strong>
+                    </div>
+
+                    <div>
+                        <span>수수료 (30%)</span>
+                        <strong class="fee"
+                                th:text="'-₩' + ${#numbers.formatInteger(settlement.platformFee, 3, 'COMMA')}">-₩555,000</strong>
+                    </div>
+
+                    <div>
+                        <span>정산 금액</span>
+                        <strong class="amount"
+                                th:text="'₩' + ${#numbers.formatInteger(settlement.finalAmount, 3, 'COMMA')}">₩1,295,000</strong>
+                    </div>
+
+                    <div>
+                        <span th:text="${settlement.status.name() == 'APPROVED'} ? '정산일' : '신청일'">신청일</span>
+                        <strong th:text="${settlement.completedAt != null ?
+                                #temporals.format(settlement.completedAt, 'yyyy-MM-dd') :
+                                (settlement.createdAt != null ? #temporals.format(settlement.createdAt, 'yyyy-MM-dd') : '-')}">
+                            2026-04-05
+                        </strong>
+                    </div>
+                </div>
+
+                <div class="card-actions">
+                    <a th:href="@{'/instructor/settlements/' + ${settlement.id}}" class="btn-detail">상세 보기</a>
+
+                    <form th:if="${settlement.status.name() == 'READY'}"
+                          th:action="@{'/instructor/settlements/' + ${settlement.id} + '/request'}"
+                          method="post">
+                        <button type="submit" class="btn-request">정산 신청</button>
+                    </form>
+
+                    <form th:if="${settlement.status.name() == 'PENDING'}"
+                          th:action="@{'/instructor/settlements/' + ${settlement.id} + '/cancel'}"
+                          method="post">
+                        <button type="submit" class="btn-cancel">정산 취소</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="empty-box" th:if="${settlements == null or #lists.isEmpty(settlements)}">
+            표시할 정산 내역이 없습니다.
+        </div>
+    </section>
+</div>
+</body>
+</html>
