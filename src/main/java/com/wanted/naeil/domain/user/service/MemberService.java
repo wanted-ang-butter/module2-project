@@ -55,6 +55,9 @@ private final LocalFileService localFileService;
         if (userRepository.existsByNickname(signupDTO.getNickname())) {
             throw new DuplicateKeyException("이미 사용 중인 닉네임입니다.");
         }
+        if (userRepository.existsByPhone(signupDTO.getPhone())) {
+            throw new DuplicateKeyException("이미 사용 중인 전화번호입니다.");
+        }
 
       //파일 업로드 로직
         String profileImgPath = null;
