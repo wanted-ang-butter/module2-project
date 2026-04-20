@@ -34,6 +34,7 @@ public class MyCourseController {
         log.info("[내 강의] 목록 조회 시작");
 
         User loginUser = getLoginUser(authDetails);
+        model.addAttribute("user", authDetails.getLoginUserDTO());
         List<MyCourseResponse> myCourses = myCourseService.getMyCourses(loginUser);
         List<MyLiveReservationResponse> liveReservations = myCourseService.getLiveReservations(loginUser);
 

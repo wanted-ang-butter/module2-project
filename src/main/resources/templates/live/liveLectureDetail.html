@@ -27,7 +27,9 @@
 <body>
 <div th:replace="~{fragments/instructorHeader :: instructorHeader}"></div>
 
-<div class="max-w-6xl mx-auto px-6 py-12">
+<div class="max-w-6xl mx-auto px-6 py-12"
+     th:attr="data-live-id=${liveCourse.liveId}">
+
 
     <a th:href="@{/instructor/course-management}"
        href="/instructor/course-management"
@@ -306,73 +308,39 @@
         <div class="bg-white border-2 border-gray-200 rounded-2xl p-8 shadow-sm">
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-2xl font-black text-gray-900">
-                    예약생 목록
+                    예약자 목록
                     <span class="text-blue-600">
-                        (<span th:text="${reservations != null ? #lists.size(reservations) : 0}">0</span>명)
-                    </span>
+                    (<span id="reservationCount">0</span>명)
+                </span>
                 </h2>
             </div>
 
-            <div th:if="${reservations != null and not #lists.isEmpty(reservations)}" class="space-y-3">
-                <div th:each="reservation : ${reservations}"
-                     class="bg-gray-50 border-2 border-gray-200 rounded-xl p-5">
-                    <div class="flex items-center justify-between">
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-3 mb-2">
-                                <h3 class="text-lg font-black text-gray-900"
-                                    th:text="${reservation.name}">
-                                    예약자 이름
-                                </h3>
-
-                                <span th:if="${reservation.status != null and reservation.status.name() == 'RESERVED'}"
-                                      class="px-2.5 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">
-                                    예약 완료
-                                </span>
-
-                                <span th:if="${reservation.status != null and reservation.status.name() == 'CANCELED'}"
-                                      class="px-2.5 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold">
-                                    취소됨
-                                </span>
-
-                                <span th:if="${reservation.status == null}"
-                                      class="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-bold">
-                                    상태 없음
-                                </span>
-                            </div>
-
-                            <div class="flex flex-wrap items-center gap-4 text-sm">
-                                <div class="flex items-center gap-2">
-                                    <i class="fa-solid fa-envelope text-gray-500 text-xs"></i>
-                                    <span class="text-gray-600 font-medium"
-                                          th:text="${reservation.email}">
-                                        user@example.com
-                                    </span>
-                                </div>
-
-                                <div class="flex items-center gap-2">
-                                    <i class="fa-solid fa-calendar text-gray-500 text-xs"></i>
-                                    <span class="text-gray-600 font-medium">
-                                        예약일:
-                                        <span th:text="${reservation.reservedAt != null ? #temporals.format(reservation.reservedAt, 'yyyy-MM-dd HH:mm') : '-'}">
-                                            2026-04-18 10:00
-                                        </span>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div id="reservationLoading" class="text-center py-16 hidden">
+                <i class="fa-solid fa-spinner fa-spin text-blue-500 text-4xl mb-4 block"></i>
+                <p class="text-gray-500 font-bold">예약자 목록을 불러오는 중입니다</p>
             </div>
 
-            <div th:if="${reservations == null or #lists.isEmpty(reservations)}" class="text-center py-16">
+            <div id="reservationList" class="space-y-3"></div>
+
+            <div id="reservationEmpty" class="text-center py-16 hidden">
                 <i class="fa-solid fa-users text-gray-300 text-5xl mb-4 block"></i>
                 <p class="text-gray-500 font-bold">예약한 수강생이 없습니다</p>
             </div>
+
+            <div id="reservationError" class="text-center py-16 hidden">
+                <i class="fa-solid fa-triangle-exclamation text-red-300 text-5xl mb-4 block"></i>
+                <p class="text-red-500 font-bold">예약자 목록 조회에 실패했습니다</p>
+            </div>
         </div>
     </div>
+
 </div>
 
 <script>
+    const root = document.querySelector('[data-live-id]');
+    const liveId = root.dataset.liveId;
+    let reservationsLoaded = false;
+
     function switchTab(tab) {
         ['info', 'reservations'].forEach(t => {
             document.getElementById('tab-' + t).classList.remove('active');
@@ -385,7 +353,152 @@
 
         const activeBtn = document.getElementById('tab-btn-' + tab);
         activeBtn.className = 'px-6 py-3 font-bold transition-all text-blue-600 border-b-2 border-blue-600 -mb-[2px]';
+
+        if (tab === 'reservations') {
+            loadReservations();
+        }
+    }
+
+    async function loadReservations() {
+
+        showReservationLoading();
+
+        try {
+            const response = await fetch(`/instructor/live-lecture/${liveId}/reservations`);
+
+            if (!response.ok) {
+                showReservationError();
+                return;
+            }
+
+            const reservations = await response.json();
+            renderReservations(reservations);
+            reservationsLoaded = true;
+        } catch (error) {
+            showReservationError();
+        }
+    }
+
+    function renderReservations(reservations) {
+        const reservationList = document.getElementById('reservationList');
+        const reservationCount = document.getElementById('reservationCount');
+
+        hideReservationStates();
+
+        reservationCount.textContent = reservations.length;
+        reservationList.innerHTML = '';
+
+        if (reservations.length === 0) {
+            document.getElementById('reservationEmpty').classList.remove('hidden');
+            return;
+        }
+
+        reservations.forEach(reservation => {
+            reservationList.insertAdjacentHTML('beforeend', createReservationItem(reservation));
+        });
+    }
+
+    function createReservationItem(reservation) {
+        const statusText = getReservationStatusText(reservation.status);
+        const statusClass = getReservationStatusClass(reservation.status);
+        const reservedDate = formatDate(reservation.reservedAt);
+
+        return `
+            <div class="bg-gray-50 border-2 border-gray-200 rounded-xl p-5">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-3 mb-2">
+                            <h3 class="text-lg font-black text-gray-900">
+                                ${escapeHtml(reservation.studentName)}
+                            </h3>
+
+                            <span class="${statusClass}">
+                                ${statusText}
+                            </span>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-4 text-sm">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-envelope text-gray-500 text-xs"></i>
+                                <span class="text-gray-600 font-medium">
+                                    ${escapeHtml(reservation.email)}
+                                </span>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-calendar text-gray-500 text-xs"></i>
+                                <span class="text-gray-600 font-medium">
+                                    예약일 ${reservedDate}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function getReservationStatusText(status) {
+        if (status === 'RESERVED') {
+            return '확정';
+        }
+
+        if (status === 'CANCELED') {
+            return '취소';
+        }
+
+        return '알 수 없음';
+    }
+
+    function getReservationStatusClass(status) {
+        if (status === 'RESERVED') {
+            return 'px-2.5 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold';
+        }
+
+        if (status === 'CANCELED') {
+            return 'px-2.5 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold';
+        }
+
+        return 'px-2.5 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-bold';
+    }
+
+    function formatDate(dateTime) {
+        if (!dateTime) {
+            return '-';
+        }
+
+        return dateTime.substring(0, 10);
+    }
+
+    function showReservationLoading() {
+        hideReservationStates();
+        document.getElementById('reservationLoading').classList.remove('hidden');
+    }
+
+    function showReservationError() {
+        hideReservationStates();
+        document.getElementById('reservationError').classList.remove('hidden');
+    }
+
+    function hideReservationStates() {
+        document.getElementById('reservationLoading').classList.add('hidden');
+        document.getElementById('reservationEmpty').classList.add('hidden');
+        document.getElementById('reservationError').classList.add('hidden');
+    }
+
+    function escapeHtml(value) {
+        if (value === null || value === undefined) {
+            return '';
+        }
+
+        return String(value)
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
     }
 </script>
+
 </body>
 </html>

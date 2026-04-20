@@ -150,9 +150,18 @@
               <span class="font-mono"><span th:text="${reservation.currentCount}">0</span> / <span th:text="${reservation.maxCapacity}">0</span> 명 참여</span>
             </div>
           </div>
-          <button class="mt-auto w-full py-3 border-2 border-red-100 text-red-500 rounded-xl hover:bg-red-50 font-bold text-sm transition-colors">
-            예약 취소
-          </button>
+          <form th:action="@{/live-lecture/{liveId}/reservations/cancel(liveId=${reservation.liveId})}"
+                method="post"
+                class="mt-auto">
+            <input type="hidden" name="redirect" value="my-courses">
+
+            <button type="submit"
+                    onclick="return confirm('실시간 강의 예약을 취소하시겠습니까?')"
+                    class="w-full py-3 border-2 border-red-100 text-red-500 rounded-xl hover:bg-red-50 font-bold text-sm transition-colors">
+              예약 취소
+            </button>
+          </form>
+
         </div>
       </div>
     </div>

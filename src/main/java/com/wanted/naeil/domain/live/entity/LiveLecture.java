@@ -80,6 +80,15 @@ public class LiveLecture extends BaseTimeEntity {
         this.currentCount++;
     }
 
+    // 예약 인원 감소
+    public void decrementReservation() {
+        if (this.currentCount <= 0) {
+            throw new IllegalStateException("예약 인원이 이미 0명입니다.");
+        }
+
+        this.currentCount--;
+    }
+
     // 상태 변경 메서드
     public void changeStatus(LiveLectureStatus status) {
         this.status = status;
