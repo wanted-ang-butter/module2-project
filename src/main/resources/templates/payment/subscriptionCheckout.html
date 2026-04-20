@@ -1,161 +1,735 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Nae-Il | 멤버십 결제</title>
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>멤버십 결제</title>
+    <link rel="icon" href="/favicon.ico">
 
     <style>
-        .grid-bg {
-            background-image:
-                    linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
-            background-size: 40px 40px;
+        :root {
+            --primary: #5b5ce6;
+            --primary-dark: #4f46e5;
+            --green: #66c37a;
+            --text-main: #111827;
+            --text-sub: #6b7280;
+            --border: #e5e7eb;
+            --bg: #f5f6fa;
+            --white: #ffffff;
+            --danger: #c0392b;
+            --danger-border: #f2c7c2;
+            --danger-bg: #fbf1f0;
+            --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Pretendard", "Noto Sans KR", sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .topbar {
+            width: 100%;
+            background: rgba(255,255,255,0.96);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .topbar-inner {
+            max-width: 1360px;
+            margin: 0 auto;
+            padding: 18px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-width: 250px;
+        }
+
+        .brand-logo {
+            width: 58px;
+            height: 58px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #5b5ce6, #66c37a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: 800;
+            box-shadow: 0 10px 24px rgba(91, 92, 230, 0.22);
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .brand-title {
+            font-size: 19px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .brand-subtitle {
+            font-size: 12px;
+            color: var(--text-sub);
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 34px;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .nav a {
+            font-size: 15px;
+            font-weight: 700;
+            color: #374151;
+        }
+
+        .nav a:hover {
+            color: var(--primary-dark);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logout-link {
+            font-size: 15px;
+            font-weight: 700;
+            color: #374151;
+        }
+
+        .profile-info {
+            text-align: right;
+        }
+
+        .profile-name {
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .profile-email {
+            font-size: 13px;
+            color: var(--text-sub);
+            margin-top: 2px;
+        }
+
+        .profile-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #5b5ce6, #66c37a);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: 800;
+            overflow: hidden;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .page {
+            max-width: 1360px;
+            margin: 0 auto;
+            padding: 34px 28px 80px;
+        }
+
+        .back-row {
+            margin-bottom: 18px;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            height: 42px;
+            padding: 0 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: white;
+            color: #374151;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .page-title {
+            font-size: 42px;
+            font-weight: 900;
+            margin: 0 0 28px;
+            letter-spacing: -0.03em;
+        }
+
+        .checkout-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.1fr;
+            gap: 26px;
+            align-items: start;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 800;
+            margin: 0 0 14px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 22px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            padding: 26px;
+        }
+
+        .plan-card {
+            min-height: 340px;
+        }
+
+        .plan-name {
+            font-size: 36px;
+            font-weight: 900;
+            margin: 4px 0 14px;
+        }
+
+        .plan-price {
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .plan-price .price-main {
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--primary);
+        }
+
+        .plan-price .price-unit {
+            font-size: 16px;
+            color: var(--text-sub);
+            font-weight: 700;
+            margin-left: 4px;
+        }
+
+        .divider {
+            width: 100%;
+            height: 1px;
+            background: #f0f1f5;
+            margin: 20px 0;
+        }
+
+        .benefit-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #374151;
+        }
+
+        .benefit-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            color: #374151;
+        }
+
+        .benefit-dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #dcfce7;
+            color: #16a34a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+
+        .payment-card {
+            min-height: 340px;
+        }
+
+        .info-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #f0f1f5;
+            gap: 16px;
+        }
+
+        .info-row:last-of-type {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-size: 15px;
+            color: var(--text-sub);
+            font-weight: 600;
+        }
+
+        .info-value {
+            font-size: 18px;
+            font-weight: 800;
+            color: #111827;
+        }
+
+        .final-price {
+            color: var(--primary);
+            font-size: 32px;
+            font-weight: 900;
+        }
+
+        .credit-warning-box {
+            margin-top: 20px;
+            margin-bottom: 18px;
+            padding: 26px 28px;
+            border-radius: 22px;
+            border: 2px solid var(--danger-border);
+            background: var(--danger-bg);
+        }
+
+        .credit-warning-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--danger);
+            margin-bottom: 16px;
+        }
+
+        .warning-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--danger);
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+
+        .credit-charge-link {
+            border: none;
+            background: transparent;
+            padding: 0;
+            color: var(--danger);
+            font-size: 22px;
+            font-weight: 900;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .payment-button {
+            width: 100%;
+            height: 58px;
+            border: none;
+            border-radius: 16px;
+            background: linear-gradient(90deg, #5b5ce6 0%, #7dc96f 100%);
+            color: white;
+            font-size: 22px;
+            font-weight: 900;
+            cursor: pointer;
+            margin-top: 8px;
+            box-shadow: 0 10px 22px rgba(91, 92, 230, 0.18);
+            transition: opacity 0.2s ease;
+        }
+
+        .payment-button:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .payment-note {
+            margin-top: 12px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-sub);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(17, 24, 39, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+
+        .modal-box {
+            width: 100%;
+            max-width: 900px;
+            background: #f7f7f8;
+            border-radius: 34px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
+            border: 1px solid #d9d9df;
+        }
+
+        .modal-message {
+            padding: 48px 56px 52px;
+            text-align: center;
+            font-size: 28px;
+            font-weight: 500;
+            line-height: 1.55;
+            color: #374151;
+            background: #f7f7f8;
+            word-break: keep-all;
+        }
+
+        .modal-footer {
+            border-top: 1px solid #d9d9df;
+            padding: 44px 48px 48px;
+            background: #f7f7f8;
+        }
+
+        .modal-confirm-button {
+            width: 100%;
+            height: 96px;
+            border: none;
+            border-radius: 28px;
+            background: linear-gradient(90deg, #4f5fe8 0%, #4aa84c 100%);
+            color: white;
+            font-size: 30px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 10px 24px rgba(79, 95, 232, 0.18);
+        }
+
+        @media (max-width: 1100px) {
+            .nav {
+                display: none;
+            }
+
+            .checkout-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .topbar-inner,
+            .page {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+
+            .page-title {
+                font-size: 34px;
+            }
+
+            .profile-info {
+                display: none;
+            }
+
+            .plan-name {
+                font-size: 30px;
+            }
+
+            .final-price {
+                font-size: 26px;
+            }
+
+            .modal-message {
+                font-size: 22px;
+                padding: 36px 28px 40px;
+            }
+
+            .modal-footer {
+                padding: 28px;
+            }
+
+            .modal-confirm-button {
+                height: 78px;
+                font-size: 24px;
+            }
+
+            .credit-warning-title {
+                font-size: 20px;
+            }
+
+            .credit-charge-link {
+                font-size: 18px;
+            }
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900 min-h-screen">
+<body>
 
-<div class="fixed inset-0 grid-bg opacity-30 pointer-events-none"></div>
+<header class="topbar">
+    <div class="topbar-inner">
+        <a th:href="@{/}" class="brand">
+            <div class="brand-logo">↗</div>
+            <div class="brand-text">
+                <div class="brand-title">내일 NAE-IL</div>
+                <div class="brand-subtitle">내일의 일, My Work</div>
+            </div>
+        </a>
 
-<div th:replace="fragments/userHeader :: userHeader"></div>
+        <nav class="nav">
+            <a th:href="@{/courses}">전체 강의</a>
+            <a th:href="@{/live-courses}">실시간 강의</a>
+            <a th:href="@{/dashboard/my-courses}">내 강의</a>
+            <a th:href="@{/community}">커뮤니티</a>
+            <a th:href="@{/cart}">장바구니</a>
+            <a th:href="@{/credit/charge}">크레딧</a>
+        </nav>
 
-<main class="max-w-6xl mx-auto px-6 py-12">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        <div class="topbar-right">
+            <a class="logout-link" th:href="@{/auth/logout}">로그아웃</a>
 
-        <!-- 왼쪽: 선택한 플랜 -->
-        <section>
-            <h2 class="text-2xl font-bold mb-6">선택한 플랜</h2>
-
-            <!-- MONTHLY -->
-            <div th:if="${planType == 'MONTHLY'}"
-                 class="bg-white rounded-[28px] border border-slate-200 shadow-[0_8px_24px_rgba(15,23,42,0.08)] p-6 md:p-8">
-
-                <h3 class="text-3xl font-black text-slate-950 mb-6">1개월 이용권</h3>
-
-                <div class="flex items-end gap-2 flex-wrap mb-8">
-                    <span class="text-4xl md:text-5xl font-black text-[#5664f5] leading-none">99,000</span>
-                    <span class="text-3xl md:text-4xl font-black text-[#7a4df5] leading-none">크레딧</span>
-                    <span class="text-lg md:text-xl font-bold text-slate-500">/ 월</span>
-                </div>
-
-                <div class="border-t border-slate-200 pt-6">
-                    <p class="text-xl font-black mb-5 text-slate-800">포함 혜택</p>
-
-                    <div class="space-y-4 text-lg font-semibold text-slate-700">
-                        <div class="flex items-center gap-3">
-                            <i class="fa-solid fa-circle-check text-green-500"></i>
-                            <span>매월 코스 3개 수강</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <i class="fa-solid fa-circle-check text-green-500"></i>
-                            <span>실시간 강의 선예매</span>
-                        </div>
-                    </div>
-                </div>
+            <div class="profile-info">
+                <div class="profile-name" th:text="${loginUser.nickname} + '님'">테스트입니다님</div>
+                <div class="profile-email" th:text="${loginUser.email}">user2@user.user</div>
             </div>
 
-            <!-- YEARLY -->
-            <div th:if="${planType == 'YEARLY'}"
-                 class="relative bg-white border-[2px] border-[#5b78ff] rounded-[28px] p-6 md:p-8 shadow-[0_10px_28px_rgba(91,120,255,0.12)] overflow-hidden">
+            <div class="profile-avatar">
+                <img th:if="${loginUser.profileImg != null and !#strings.isEmpty(loginUser.profileImg)}"
+                     th:src="${loginUser.profileImg}" alt="프로필 이미지">
+                <span th:if="${loginUser.profileImg == null or #strings.isEmpty(loginUser.profileImg)}"
+                      th:text="${#strings.substring(loginUser.nickname, 0, 1)}">테</span>
+            </div>
+        </div>
+    </div>
+</header>
 
-                <div class="absolute top-0 right-0 px-5 py-2.5 rounded-bl-[20px] bg-gradient-to-r from-blue-500 to-green-500 text-white text-sm md:text-base font-black shadow-lg">
-                    <i class="fa-solid fa-sparkles mr-2"></i>추천
+<main class="page">
+    <div class="back-row">
+        <button type="button" class="back-button" onclick="goBack()">← 이전으로</button>
+    </div>
+
+    <h1 class="page-title">멤버십 결제</h1>
+
+    <section class="checkout-layout">
+        <div>
+            <h2 class="section-title">선택한 플랜</h2>
+            <div class="card plan-card">
+                <div class="plan-name" th:text="${planName}">1개월 이용권</div>
+
+                <div class="plan-price">
+                    <span class="price-main" th:text="${#numbers.formatInteger(price, 3, 'COMMA')} + ' 크레딧'">99,000 크레딧</span>
+                    <span class="price-unit" th:text="${planType == 'YEARLY'} ? '/ 년' : '/ 월'">/ 월</span>
                 </div>
 
-                <h3 class="text-3xl font-black text-slate-950 mb-4">12개월 이용권</h3>
+                <div class="divider"></div>
 
-                <span class="inline-flex items-center px-4 py-2 rounded-full bg-green-100 text-green-700 text-sm md:text-base font-black mb-5">
-            약 17% 할인
-        </span>
-
-                <div class="flex items-end gap-2 flex-wrap mb-2">
-                    <span class="text-4xl md:text-5xl font-black text-[#5b62f6] leading-none">82,500</span>
-                    <span class="text-3xl md:text-4xl font-black text-[#7c4df6] leading-none">크레딧</span>
-                    <span class="text-lg md:text-xl font-bold text-slate-500">/ 월</span>
-                </div>
-
-                <p class="text-sm md:text-base font-semibold text-slate-400 mb-8">
-                    연 990,000 크레딧 결제
-                </p>
-
-                <div class="space-y-4 text-lg font-semibold text-slate-700">
-                    <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-circle-check text-green-500"></i>
-                        <span>매월 코스 3개 수강</span>
+                <div class="benefit-title">포함 혜택</div>
+                <div class="benefit-list">
+                    <div class="benefit-item">
+                        <div class="benefit-dot">✓</div>
+                        <span>매월 코스 3개 무료 수강</span>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-circle-check text-green-500"></i>
+                    <div class="benefit-item">
+                        <div class="benefit-dot">✓</div>
                         <span>실시간 강의 선예매</span>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-circle-check text-green-500"></i>
-                        <span>장기 이용 할인</span>
-                    </div>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <!-- 오른쪽: 결제 정보 -->
-        <section>
-            <h2 class="text-2xl font-bold mb-6">결제 정보</h2>
-
-            <div class="bg-white rounded-[28px] border border-slate-200 shadow-[0_8px_24px_rgba(15,23,42,0.08)] p-6 md:p-8">
-                <div class="space-y-6">
-
-                    <div class="flex items-center justify-between border-b border-slate-200 pb-5">
-                        <span class="text-lg md:text-xl font-semibold text-slate-600">선택 플랜</span>
-                        <span class="text-xl md:text-2xl font-black text-slate-950"
-                              th:text="${planType == 'MONTHLY' ? '1개월 이용권' : '12개월 이용권'}">
-                            1개월 이용권
-                        </span>
+        <div>
+            <h2 class="section-title">결제 정보</h2>
+            <div class="card payment-card">
+                <div class="info-list">
+                    <div class="info-row">
+                        <div class="info-label">선택 플랜</div>
+                        <div class="info-value" th:text="${planName}">1개월 이용권</div>
                     </div>
 
-                    <div class="flex items-center justify-between border-b border-slate-200 pb-5">
-                        <span class="text-lg md:text-xl font-semibold text-slate-600">이용 기간</span>
-                        <span class="text-xl md:text-2xl font-black text-slate-950"
-                              th:text="${planType == 'MONTHLY' ? '1개월' : '12개월'}">
-                            1개월
-                        </span>
+                    <div class="info-row">
+                        <div class="info-label">이용 기간</div>
+                        <div class="info-value" th:text="${planType == 'YEARLY'} ? '12개월' : '1개월'">1개월</div>
                     </div>
 
-                    <div class="flex items-center justify-between pt-1 gap-4">
-                        <span class="text-2xl md:text-3xl font-black text-slate-950">최종 결제 금액</span>
-                        <span class="text-2xl md:text-3xl font-black text-[#5664f5] text-right leading-tight">
-                            <span th:text="${planType == 'MONTHLY' ? '99,000' : '990,000'}">99,000</span> 크레딧
-                        </span>
-                    </div>
-
-                    <div class="pt-2">
-                        <p class="text-xl md:text-2xl font-black mb-3">결제 수단</p>
-                        <div class="h-16 rounded-[18px] border-2 border-blue-200 bg-blue-50 flex items-center px-5 gap-3 text-lg md:text-xl font-black text-slate-950">
-                            <i class="fa-regular fa-credit-card text-[#5664f5]"></i>
-                            <span>신용/체크카드</span>
+                    <div class="info-row">
+                        <div class="info-label">보유 크레딧</div>
+                        <div class="info-value" th:text="${#numbers.formatInteger(balance, 3, 'COMMA')} + ' 크레딧'">
+                            0 크레딧
                         </div>
                     </div>
 
-                    <form th:action="@{/payments/subscriptions}" method="post" class="pt-1">
-                        <input type="hidden" name="planType" th:value="${planType}">
-                        <input type="hidden" name="price" th:value="${planType == 'MONTHLY' ? 99000 : 990000}">
+                    <div class="info-row" th:if="${!hasEnoughCredit}">
+                        <div class="info-label">부족한 크레딧</div>
+                        <div class="info-value" th:text="${#numbers.formatInteger(lackCreditAmount, 3, 'COMMA')} + ' 크레딧'">
+                            0 크레딧
+                        </div>
+                    </div>
 
-                        <button type="submit"
-                                class="w-full h-16 md:h-18 rounded-[20px] bg-gradient-to-r from-blue-500 to-green-500 text-white text-2xl md:text-3xl font-black hover:opacity-95 transition shadow-lg">
-                            결제하기
-                        </button>
-                    </form>
+                    <div class="info-row">
+                        <div class="info-label">최종 결제 금액</div>
+                        <div class="final-price" th:text="${#numbers.formatInteger(price, 3, 'COMMA')} + ' 크레딧'">
+                            99,000 크레딧
+                        </div>
+                    </div>
+                </div>
 
-                    <p class="text-center text-sm md:text-base font-semibold text-slate-500">
-                        언제든 해지 가능 · 자동 갱신 안내 문자 발송
-                    </p>
+                <div id="creditWarningBox"
+                     class="credit-warning-box"
+                     th:style="${hasEnoughCredit} ? 'display:none;' : 'display:block;'">
+                    <div class="credit-warning-title">
+                        <span class="warning-icon">!</span>
+                        크레딧이 부족합니다
+                    </div>
+                    <button type="button" class="credit-charge-link" onclick="goToCreditPage()">
+                        크레딧 충전하기 →
+                    </button>
+                </div>
+
+                <button type="button"
+                        class="payment-button"
+                        th:attr="onclick=|subscribe('${planType}')|"
+                        th:disabled="${!hasEnoughCredit}">
+                    결제하기
+                </button>
+
+                <div class="payment-note">
+                    언제든 해지 가능 · 자동 갱신 안내 문자 발송
                 </div>
             </div>
-        </section>
-
-    </div>
+        </div>
+    </section>
 </main>
+
+<div id="paymentSuccessModal" class="modal-overlay" style="display: none;">
+    <div class="modal-box">
+        <div class="modal-message" id="paymentSuccessMessage">
+            1개월 이용권 결제가 완료되었습니다! 이제 매월 3개의 강의를 자유롭게 수강하실 수 있습니다.
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="modal-confirm-button" onclick="closePaymentSuccessModal()">
+                확인
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function goBack() {
+        window.history.back();
+    }
+
+    async function subscribe(planType) {
+        try {
+            hideCreditWarning();
+
+            const response = await fetch('/subscription', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    planType: planType,
+                    autoRenew: true
+                })
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+
+                if (errorText.includes('크레딧이 부족합니다')) {
+                    showCreditWarning();
+                    return;
+                }
+
+                if (errorText.includes('이미 이용 중인 구독이 존재합니다.')) {
+                    alert('이미 이용중인 구독이 존재합니다.');
+                    return;
+                }
+
+                throw new Error(errorText || '구독 결제 실패');
+            }
+
+            const paymentId = await response.json();
+            console.log('결제 완료 paymentId:', paymentId);
+
+            const planName = planType === 'YEARLY' ? '12개월 이용권' : '1개월 이용권';
+            openPaymentSuccessModal(planName);
+
+        } catch (error) {
+            console.error(error);
+            alert('결제 처리 중 오류가 발생했습니다.');
+        }
+    }
+
+    function openPaymentSuccessModal(planName) {
+        const message = `${planName} 결제가 완료되었습니다! 이제 매월 3개의 강의를 자유롭게 수강하실 수 있습니다.`;
+        document.getElementById('paymentSuccessMessage').innerText = message;
+        document.getElementById('paymentSuccessModal').style.display = 'flex';
+    }
+
+    function closePaymentSuccessModal() {
+        document.getElementById('paymentSuccessModal').style.display = 'none';
+    }
+
+    function showCreditWarning() {
+        document.getElementById('creditWarningBox').style.display = 'block';
+    }
+
+    function hideCreditWarning() {
+        document.getElementById('creditWarningBox').style.display = 'none';
+    }
+
+    function goToCreditPage() {
+        window.location.href = '/credit/charge';
+    }
+</script>
 
 </body>
 </html>
