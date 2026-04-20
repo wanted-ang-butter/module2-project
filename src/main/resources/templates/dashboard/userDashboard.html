@@ -11,16 +11,21 @@
         .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .notice-dropdown, .profile-dropdown { display: none; }
-        .notice-dropdown.open, .profile-dropdown.open { display: block; }
+        .notice-dropdown { display: none; }
+        .notice-dropdown.open { display: block; }
+        .profile-dropdown { display: none; }
+        .profile-dropdown.open { display: block; }
     </style>
 </head>
 <body class="bg-white">
 
+<!-- Header -->
 <header class="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
     <div class="max-w-7xl mx-auto px-6 py-4">
         <div class="flex items-center justify-between">
-            <a th:href="@{/}" class="flex items-center gap-3 group">
+
+            <!-- Logo -->
+            <a th:href="@{/dashboard/user}" class="flex items-center gap-3 group">
                 <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-green-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
                     <i class="fa-solid fa-terminal text-white text-sm"></i>
                 </div>
@@ -30,55 +35,196 @@
                 </div>
             </a>
 
+            <!-- Nav -->
             <nav class="flex items-center gap-1 flex-nowrap">
                 <a th:href="@{/course}" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
                     <i class="fa-solid fa-book-open w-4 h-4"></i><span class="text-xs font-medium">전체 강의</span>
                 </a>
+                <a th:href="@{/live}" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+                    <i class="fa-solid fa-calendar w-4 h-4"></i><span class="text-xs font-medium">실시간 강의</span>
+                </a>
+                <a th:href="@{/my-courses}" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+                    <i class="fa-solid fa-video w-4 h-4"></i><span class="text-xs font-medium">내 강의</span>
+                </a>
+                <a th:href="@{/community/qna}" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+                    <i class="fa-solid fa-comment w-4 h-4"></i><span class="text-xs font-medium">커뮤니티</span>
+                </a>
+                <a th:href="@{/cart}" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+                    <i class="fa-solid fa-cart-shopping w-4 h-4"></i><span class="text-xs font-medium">장바구니</span>
+                </a>
+                <a th:href="@{/credit}" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+                    <i class="fa-solid fa-wallet w-4 h-4"></i><span class="text-xs font-medium">크레딧</span>
+                </a>
             </nav>
 
+            <!-- Right -->
             <div class="flex items-center gap-4">
+
+                <!-- 로그아웃 -->
                 <a th:href="@{/auth/logout}" class="flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-red-50 transition-all group">
                     <i class="fa-solid fa-right-from-bracket text-gray-600 group-hover:text-red-600 text-sm"></i>
                     <span class="font-medium text-gray-700 group-hover:text-red-600 text-sm">로그아웃</span>
                 </a>
+
+                <!-- 사용자 정보 -->
                 <div class="text-right" th:if="${user}">
                     <p class="text-sm font-medium text-gray-900" th:text="${user.nickname}">사용자</p>
                     <p class="text-xs font-mono text-gray-500" th:text="${user.role}">ROLE</p>
                 </div>
+
+                <!-- 공지 드롭다운 -->
+                <div class="relative" id="noticeDropdownWrapper">
+                    <button onclick="toggleNoticeDropdown()" class="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+                        <i class="fa-solid fa-bullhorn text-white text-sm"></i>
+                    </button>
+                    <div id="noticeDropdown" class="notice-dropdown absolute right-0 mt-2 w-48 bg-white border-2 border-gray-200 rounded-xl shadow-xl z-50">
+                        <div class="py-2">
+                            <a th:href="@{/notice}" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                                <i class="fa-solid fa-bullhorn text-gray-600"></i>
+                                <span class="text-sm font-medium text-gray-900">공지사항</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 프로필 드롭다운 -->
+                <div class="relative" id="profileDropdownWrapper">
+                    <button onclick="toggleProfileDropdown()" class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+                        <span class="text-white font-mono text-xs font-bold">{ }</span>
+                    </button>
+                    <div id="profileDropdown" class="profile-dropdown absolute right-0 mt-2 w-56 bg-white border-2 border-gray-200 rounded-xl shadow-xl z-50">
+                        <div class="py-2">
+                            <a th:href="@{/my-courses}" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                                <i class="fa-solid fa-video text-gray-600"></i>
+                                <span class="text-sm font-medium text-gray-900">내 강의</span>
+                            </a>
+                            <a th:href="@{/user/me}" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                                <i class="fa-solid fa-gear text-gray-600"></i>
+                                <span class="text-sm font-medium text-gray-900">계정 설정</span>
+                            </a>
+                            <a th:href="@{/subscriber/mySubscriber}" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                                <i class="fa-solid fa-user text-gray-600"></i>
+                                <span class="text-sm font-medium text-gray-900">나의 구독</span>
+                            </a>
+                            <a th:href="@{/user/me/instructor-application/history}" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                                <i class="fa-solid fa-chalkboard-user text-gray-600"></i>
+                                <span class="text-sm font-medium text-gray-900">강사 신청</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
 </header>
 
+<!-- Subscription Banner -->
+<section class="w-full bg-[#111827] py-12">
+    <div class="max-w-7xl mx-auto px-6 text-center">
+        <h2 class="text-3xl font-black text-white mb-3">지금 시작하세요</h2>
+        <p class="text-base text-white/90 mb-6">구독권 구매 시 매달 3개의 강의를 무료로 수강할 수 있습니다</p>
+        <a th:href="@{/pricing}" class="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-xl hover:shadow-xl transition-all font-bold">
+            <span>구독하기</span>
+        </a>
+    </div>
+</section>
+
 <div class="max-w-7xl mx-auto px-6 py-12">
+
+    <!-- Hero Section -->
     <div class="relative mb-16 overflow-hidden">
         <div class="absolute inset-0 grid-bg opacity-40"></div>
         <div class="relative bg-gradient-to-br from-blue-50 via-white to-green-50 rounded-3xl p-12 border border-gray-200 shadow-lg">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div class="flex-1">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-200 rounded-full mb-6 shadow-sm">
+                        <span class="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse inline-block"></span>
+                        <span class="text-sm font-bold text-gray-700">학습 중</span>
+                    </div>
                     <h1 class="text-4xl md:text-5xl font-black text-gray-900 mb-4 leading-tight">
                         안녕하세요,<br />
                         <span class="bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent"
                               th:text="${user != null ? user.nickname : '개발자'}">개발자</span>님
                     </h1>
+                    <p class="text-xl text-gray-700 mb-3 font-semibold">오늘도 새로운 것을 배워볼까요?</p>
+                    <p class="text-sm text-gray-500 font-medium mb-8">지속적인 학습으로 성장하는 내일</p>
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                        <a th:href="@{/my-courses}" class="inline-flex items-center gap-2 px-7 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:shadow-xl hover:shadow-blue-200 transition-all group font-bold">
+                            <span>강의 이어보기</span>
+                            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                        </a>
+                        <a th:href="@{/course}" class="inline-flex items-center gap-2 px-7 py-4 border-2 border-gray-300 bg-white rounded-xl hover:border-blue-600 hover:text-blue-600 transition-all font-bold">
+                            <span>전체 강의 보기</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="hidden lg:flex justify-center items-center">
+                    <div class="relative w-80 h-80">
+                        <img src="https://images.unsplash.com/photo-1772371272179-3ecc656fc677?w=400&q=80" alt="Friendly developer" class="w-full h-full object-contain drop-shadow-2xl" />
+                        <div class="absolute -bottom-6 left-1/2 -translate-x-1/2 w-48 h-8 bg-gray-400/20 rounded-full blur-xl"></div>
+                        <div class="absolute -top-8 -right-8 w-32 h-32 bg-gradient-to-br from-blue-400 to-cyan-300 rounded-full blur-3xl opacity-40 animate-pulse"></div>
+                        <div class="absolute -bottom-8 -left-8 w-40 h-40 bg-gradient-to-br from-green-400 to-emerald-300 rounded-full blur-3xl opacity-40 animate-pulse" style="animation-delay:1s"></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+        <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 hover:shadow-xl transition-all hover:border-blue-300">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-sm font-bold text-gray-700">수강중인 강의</h3>
+                <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-arrow-trend-up text-blue-600"></i>
+                </div>
+            </div>
+            <p class="text-4xl font-black text-gray-900 mb-2" th:text="${enrolledCount != null ? enrolledCount : 0}">0</p>
+            <p class="text-sm text-gray-600 font-semibold">개의 강의 학습중</p>
+        </div>
+        <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 hover:shadow-xl transition-all hover:border-green-300">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-sm font-bold text-gray-700">평균 진행률</h3>
+                <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-wand-magic-sparkles text-green-500"></i>
+                </div>
+            </div>
+            <p class="text-4xl font-black text-gray-900 mb-2">
+                <span th:text="${averageProgress != null ? averageProgress : 0}">0</span>%
+            </p>
+            <p class="text-sm text-gray-600 font-semibold">전체 강의 평균</p>
+        </div>
+    </div>
+
+    <!-- Recommended Courses -->
     <section class="mb-16">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">추천 강의</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" th:if="${recommendedCourses != null}">
-            <div th:each="course : ${recommendedCourses}" class="bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300">
-                <a th:href="@{/course/{id}(id=${course.id})}" class="block">
-                    <img th:src="${course.thumbnail}" class="w-full aspect-video object-cover" />
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900 mb-1">추천 강의</h2>
+                <p class="text-sm text-gray-600 font-mono">// 당신을 위한 맞춤 강의</p>
+            </div>
+            <a th:href="@{/course}" class="text-sm font-medium text-blue-600 hover:underline">전체보기 →</a>
+        </div>
+        <div th:if="${recommendedCourses != null and not #lists.isEmpty(recommendedCourses)}"
+             class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div th:each="course : ${recommendedCourses}"
+                 class="bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-blue-300 hover:-translate-y-1 transition-all duration-300">
+                <a th:href="@{/course/{id}(id=${course.courseId})}" class="block">
+                    <div class="relative aspect-video overflow-hidden bg-gray-100">
+                        <img th:src="${course.thumbnail}" th:alt="${course.title}" class="w-full h-full object-cover" />
+                    </div>
                     <div class="p-5">
-                        <span class="inline-block px-2.5 py-1 text-xs font-bold rounded-full bg-blue-50 text-blue-700 mb-3"
-                              th:text="${course.category.name}">카테고리</span>
+                        <span class="inline-block px-2.5 py-1 text-xs font-bold rounded-full bg-blue-50 text-blue-700 border border-blue-200 mb-3"
+                              th:text="${course.category}">카테고리</span>
                         <h3 class="text-lg font-black text-gray-900 mb-2 line-clamp-2" th:text="${course.title}">강의 제목</h3>
-                        <p class="text-sm text-gray-600 mb-4 font-bold" th:text="${course.instructor.nickname}">강사명</p>
-                        <div class="flex items-center justify-between pt-3 border-t">
-                            <span class="font-bold text-gray-900">★ 4.5</span>
+                        <p class="text-sm text-gray-500 mb-3 line-clamp-2 font-medium" th:text="${course.description}">강의 설명</p>
+                        <p class="text-sm text-gray-600 mb-4 font-bold" th:text="${course.instructorName}">강사명</p>
+                        <div class="flex items-center justify-between pt-3 border-t border-gray-200">
+                            <div class="flex items-center gap-3 text-sm">
+                                <span class="font-bold text-gray-900">★ <span th:text="${course.rating}">4.5</span></span>
+                                <span class="text-gray-600"><i class="fa-solid fa-users text-gray-400"></i> <span th:text="${#numbers.formatInteger(course.studentCount, 1, 'COMMA')}">1,234</span></span>
+                            </div>
                             <span class="text-base font-bold text-gray-900">
                                 <span th:text="${#numbers.formatInteger(course.price, 1, 'COMMA')}">10,000</span> 크레딧
                             </span>
@@ -87,37 +233,166 @@
                 </a>
             </div>
         </div>
-    </section>
-
-    <section class="mb-16">
-        <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
-            <button th:each="cat : ${categories}"
-                    th:data-category="${cat.name}"
-                    onclick="selectCategory(this, this.getAttribute('data-category'))"
-                    class="category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap bg-white border border-gray-300 text-gray-700">
-                [[${cat.name}]]
-            </button>
+        <div th:if="${recommendedCourses == null or #lists.isEmpty(recommendedCourses)}" class="text-center py-16">
+            <p class="text-gray-500 font-mono text-sm">추천 강의가 없습니다</p>
         </div>
     </section>
+
+    <!-- Categories Filter Pills -->
+    <section class="mb-16">
+        <div class="flex items-center gap-3 mb-8">
+            <div class="w-1 h-8 bg-gradient-to-b from-blue-500 to-green-500 rounded-full"></div>
+            <h2 class="text-2xl font-bold text-gray-900">카테고리</h2>
+        </div>
+        <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+            <button onclick="selectCategory(this,'전체')" class="category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap flex-shrink-0 bg-[#111827] text-white">전체</button>
+            <button onclick="selectCategory(this,'Frontend')" class="category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap flex-shrink-0 bg-white border border-gray-300 text-gray-700">Frontend</button>
+            <button onclick="selectCategory(this,'Backend')" class="category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap flex-shrink-0 bg-white border border-gray-300 text-gray-700">Backend</button>
+            <button onclick="selectCategory(this,'Programming')" class="category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap flex-shrink-0 bg-white border border-gray-300 text-gray-700">Programming</button>
+            <button onclick="selectCategory(this,'Data Science')" class="category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap flex-shrink-0 bg-white border border-gray-300 text-gray-700">Data Science</button>
+            <button onclick="selectCategory(this,'Design')" class="category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap flex-shrink-0 bg-white border border-gray-300 text-gray-700">Design</button>
+            <button onclick="selectCategory(this,'DevOps')" class="category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap flex-shrink-0 bg-white border border-gray-300 text-gray-700">DevOps</button>
+        </div>
+    </section>
+
+    <!-- Popular Courses -->
+    <section class="mb-16">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900 mb-1">인기 강의</h2>
+                <p class="text-sm text-gray-600 font-mono">// 가장 많은 학생들이 수강하는 강의</p>
+            </div>
+            <a th:href="@{/course}" class="text-sm font-medium text-blue-600 hover:underline">전체보기 →</a>
+        </div>
+        <div th:if="${popularCourses != null and not #lists.isEmpty(popularCourses)}"
+             class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div th:each="course : ${popularCourses}"
+                 class="bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-blue-300 hover:-translate-y-1 transition-all duration-300">
+                <a th:href="@{/course/{id}(id=${course.courseId})}" class="block">
+                    <div class="aspect-video overflow-hidden bg-gray-100">
+                        <img th:src="${course.thumbnail}" th:alt="${course.title}" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="p-5">
+                        <span class="inline-block px-2.5 py-1 text-xs font-bold rounded-full bg-blue-50 text-blue-700 border border-blue-200 mb-3"
+                              th:text="${course.category}">카테고리</span>
+                        <h3 class="text-lg font-black text-gray-900 mb-2 line-clamp-2" th:text="${course.title}">강의 제목</h3>
+                        <p class="text-sm text-gray-500 mb-4 line-clamp-2" th:text="${course.description}">강의 설명</p>
+                        <div class="flex items-center justify-between pt-3 border-t border-gray-200">
+                            <span class="text-sm font-bold text-gray-900">★ <span th:text="${course.rating}">4.5</span></span>
+                            <span class="text-sm font-bold text-gray-900">
+                                <span th:text="${#numbers.formatInteger(course.price, 1, 'COMMA')}">10,000</span> 크레딧
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div th:if="${popularCourses == null or #lists.isEmpty(popularCourses)}" class="text-center py-16">
+            <p class="text-gray-500 font-mono text-sm">해당 카테고리의 강의가 없습니다</p>
+        </div>
+    </section>
+
+    <!-- New Courses -->
+    <section class="mb-16">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900 mb-1">신규 강의</h2>
+                <p class="text-sm text-gray-600 font-mono">// 새롭게 추가된 최신 강의</p>
+            </div>
+            <a th:href="@{/course}" class="text-sm font-medium text-blue-600 hover:underline">전체보기 →</a>
+        </div>
+        <div th:if="${newCourses != null and not #lists.isEmpty(newCourses)}"
+             class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div th:each="course : ${newCourses}"
+                 class="bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-blue-300 hover:-translate-y-1 transition-all duration-300">
+                <a th:href="@{/course/{id}(id=${course.courseId})}" class="block">
+                    <div class="aspect-video overflow-hidden bg-gray-100">
+                        <img th:src="${course.thumbnail}" th:alt="${course.title}" class="w-full h-full object-cover" />
+                    </div>
+                    <div class="p-5">
+                        <span class="inline-block px-2.5 py-1 text-xs font-bold rounded-full bg-blue-50 text-blue-700 border border-blue-200 mb-3"
+                              th:text="${course.category}">카테고리</span>
+                        <h3 class="text-lg font-black text-gray-900 mb-2 line-clamp-2" th:text="${course.title}">강의 제목</h3>
+                        <p class="text-sm text-gray-500 mb-4 line-clamp-2" th:text="${course.description}">강의 설명</p>
+                        <div class="flex items-center justify-between pt-3 border-t border-gray-200">
+                            <span class="text-sm font-bold text-gray-900">★ <span th:text="${course.rating}">4.5</span></span>
+                            <span class="text-sm font-bold text-gray-900">
+                                <span th:text="${#numbers.formatInteger(course.price, 1, 'COMMA')}">10,000</span> 크레딧
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div th:if="${newCourses == null or #lists.isEmpty(newCourses)}" class="text-center py-16">
+            <p class="text-gray-500 font-mono text-sm">해당 카테고리의 강의가 없습니다</p>
+        </div>
+    </section>
+
+    <!-- Category-Based Course Sections -->
+    <div th:if="${categories != null}" th:each="category : ${categories}">
+        <section th:if="${not #lists.isEmpty(category.courses)}" class="mb-16">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-500 to-green-500">
+                        <i class="fa-solid fa-layer-group text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900" th:text="${category.name}">카테고리명</h2>
+                        <p class="text-sm text-gray-600 font-mono">// <span th:text="${category.name}">카테고리명</span> 분야의 강의</p>
+                    </div>
+                </div>
+                <a th:href="@{/course(category=${category.name})}" class="text-sm font-medium text-blue-600 hover:underline">전체보기 →</a>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div th:each="course : ${category.courses}"
+                     class="bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-blue-300 transition-all duration-300">
+                    <a th:href="@{/course/{id}(id=${course.courseId})}" class="block">
+                        <div class="aspect-video overflow-hidden bg-gray-100">
+                            <img th:src="${course.thumbnail}" th:alt="${course.title}" class="w-full h-full object-cover" />
+                        </div>
+                        <div class="p-5">
+                            <span class="inline-block px-2.5 py-1 text-xs font-bold rounded-full bg-blue-50 text-blue-700 border border-blue-200 mb-3"
+                                  th:text="${course.category}">카테고리</span>
+                            <h3 class="text-lg font-black text-gray-900 mb-2 line-clamp-2" th:text="${course.title}">강의 제목</h3>
+                            <div class="flex items-center justify-between pt-3 border-t border-gray-200 mt-4">
+                                <span class="text-sm font-bold text-gray-900">★ <span th:text="${course.rating}">4.5</span></span>
+                                <span class="text-sm font-bold text-gray-900">
+                                    <span th:text="${#numbers.formatInteger(course.price, 1, 'COMMA')}">10,000</span> 크레딧
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
 
 </div>
 
 <script>
-    // 기존 스크립트 기능 유지
-    function toggleNoticeDropdown() { document.getElementById('noticeDropdown').classList.toggle('open'); }
-    function toggleProfileDropdown() { document.getElementById('profileDropdown').classList.toggle('open'); }
-
-    // 보안 문제 해결을 위한 카테고리 선택 함수 보완
-    function selectCategory(btn, categoryName) {
+    function toggleNoticeDropdown() {
+        document.getElementById('noticeDropdown').classList.toggle('open');
+    }
+    function toggleProfileDropdown() {
+        document.getElementById('profileDropdown').classList.toggle('open');
+    }
+    document.addEventListener('click', function(e) {
+        if (!document.getElementById('noticeDropdownWrapper').contains(e.target)) {
+            document.getElementById('noticeDropdown').classList.remove('open');
+        }
+        if (!document.getElementById('profileDropdownWrapper').contains(e.target)) {
+            document.getElementById('profileDropdown').classList.remove('open');
+        }
+    });
+    function selectCategory(btn, category) {
         document.querySelectorAll('.category-pill').forEach(el => {
             el.classList.remove('bg-[#111827]', 'text-white');
             el.classList.add('bg-white', 'border', 'border-gray-300', 'text-gray-700');
         });
         btn.classList.remove('bg-white', 'border', 'border-gray-300', 'text-gray-700');
         btn.classList.add('bg-[#111827]', 'text-white');
-
-        // 여기에 카테고리 필터링 로직(페이지 이동 등)을 추가할 수 있습니다.
-        console.log("Selected Category:", categoryName);
+        console.log("Selected Category:", category);
     }
 </script>
 </body>

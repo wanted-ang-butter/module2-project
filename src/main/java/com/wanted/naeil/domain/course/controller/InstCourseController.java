@@ -1,5 +1,9 @@
 package com.wanted.naeil.domain.course.controller;
 
+import com.wanted.naeil.domain.course.dto.request.CourseStatusUpdateRequest;
+import com.wanted.naeil.domain.course.dto.request.CourseUpdateRequest;
+import com.wanted.naeil.domain.live.dto.response.InstructorLiveLectureResponse;
+import com.wanted.naeil.domain.live.service.LiveLectureService;
 import com.wanted.naeil.global.auth.model.dto.AuthDetails;
 import com.wanted.naeil.domain.course.dto.request.CourseCreateRequest;
 import com.wanted.naeil.domain.course.dto.response.CourseEditResponse;
@@ -9,12 +13,16 @@ import com.wanted.naeil.domain.course.repository.CategoryRepository;
 import com.wanted.naeil.domain.course.service.CourseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -25,14 +33,17 @@ import java.util.List;
 public class InstCourseController {
 
     private final CourseService courseService;
+    private final LiveLectureService liveLectureService;
     private final CategoryRepository  categoryRepository;
 
     // 코스 등록 조회
     @GetMapping("/course")
-    public ModelAndView CreateCoursePage(ModelAndView mv) {
+    public ModelAndView CreateCoursePage(ModelAndView mv,
+                                         @AuthenticationPrincipal AuthDetails authDetails) {
         log.info(" [Courses] 강의 생성 페이지 조회 시작");
 
         // TODO : 임시로 리포에서 바로 불러옴, 추후 서비스 로직 호출해서 하는걸로 수정
+        mv.addObject("user", authDetails.getLoginUserDTO());
         mv.addObject("createCourseRequest", new CourseCreateRequest());
         mv.addObject("categories", categoryRepository.findAll());
 
@@ -90,11 +101,14 @@ public class InstCourseController {
 
         List<InstructorCourseResponse> courses =
                 courseService.getInstructorCourses(instructorId);
+
+        List<InstructorLiveLectureResponse> liveCourses =
+                liveLectureService.getInstructorLiveLectures(instructorId);
         // 헤더 정보
         mv.addObject("user", authDetails.getLoginUserDTO());
         mv.addObject("courses", courses);
         // TODO : 실시간 강의 등록하면 인자 넣기
-        mv.addObject("liveCourses", List.of());
+        mv.addObject("liveCourses", liveCourses);
         mv.setViewName("course/InstructorCourseManagement");
 
         return mv;
@@ -118,6 +132,83 @@ public class InstCourseController {
     }
 
     // 강의 수정 기능
+    @PatchMapping(value = "/course/{courseId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseBody
+    public ResponseEntity<Void> updateCourse(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @PathVariable Long courseId,
+            @Valid @ModelAttribute CourseUpdateRequest request
+            ) {
+        Long instructorId = authDetails.getLoginUserDTO().getUserId();
+
+        log.info("[CourseUpdate] 강의 기본 정보 수정 요청 - instructorId: {}, courseId: {}", instructorId, courseId);
+
+        courseService.updateCourse(instructorId, courseId, request);
+
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 코스 상태 변경 : 활성화 <-> 비활성화
+     * @param authDetails : 현재 로그인 정보
+     * @param courseId : 수정할 코스
+     * @param request : 사용자의 입력 상태값
+     * @return : ResponseEntity여서 상태만 변경
+     */
+    @PatchMapping(value = "/course/{courseId}/status", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseBody
+    public ResponseEntity<Void> updateCourseStatus(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @PathVariable Long courseId,
+            @Valid @ModelAttribute CourseStatusUpdateRequest request
+    ) {
+        Long instructorId = authDetails.getLoginUserDTO().getUserId();
+
+        log.info("[CourseStatusUpdate] 강의 상태 변경 요청 - instructorId: {}, courseId: {}, status: {}",
+                instructorId, courseId, request.getStatus());
+
+        courseService.updateCourseStatus(instructorId, courseId, request);
+
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 코스 등록 요청 상대 변경 : 승인 대기 <-> 승인 대기 요청 취소
+     * @param authDetails
+     * @param courseId
+     * @param request : 사용자 입력 상태
+     * @return : ResponseEntity여서 상태만 변경
+     */
+    @PatchMapping("/course/{courseId}/registration-status")
+    @ResponseBody
+    public ResponseEntity<Void> cancelCourseRegistration(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @PathVariable Long courseId,
+            @Valid @ModelAttribute CourseStatusUpdateRequest request
+    ) {
+        Long instructorId = authDetails.getLoginUserDTO().getUserId();
+
+        log.info("[CourseCancelRequest] 강의 등록 요청 취소 요청 - instructorId: {}, courseId: {}",
+                instructorId, courseId);
+
+        courseService.updateCourseRegistrationStatus(instructorId, courseId, request.getStatus());
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/course/{courseId}/delete-request")
+    public String requestCourseDelete(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @PathVariable Long courseId,
+            RedirectAttributes redirectAttributes
+    ) {
+        Long instructorId = authDetails.getLoginUserDTO().getUserId();
+
+        courseService.requestCourseDelete(instructorId, courseId);
+
+        redirectAttributes.addFlashAttribute("message", "강의 삭제 요청이 접수되었습니다.");
+        return "redirect:/instructor/course-management";
+    }
     
 
     // 성공시 redirect 페이지

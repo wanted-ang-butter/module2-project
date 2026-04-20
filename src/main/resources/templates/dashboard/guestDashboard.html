@@ -296,7 +296,7 @@
                 </div>
                 <h2 class="text-2xl font-black" th:text="${category.name}">카테고리명</h2>
             </div>
-            <a th:href="@{/course(category=${category.id})}" href="/course"
+            <a th:href="@{/course(category=${category.name})}" href="/course"
                class="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-bold group">
                 전체보기
                 <i class="fa-solid fa-chevron-right text-xs"></i>

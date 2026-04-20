@@ -3,12 +3,12 @@ package com.wanted.naeil.domain.user.service;
 
 import com.wanted.naeil.domain.payment.entity.Credit;
 import com.wanted.naeil.domain.payment.repository.CreditRepository;
-import com.wanted.naeil.domain.user.dto.request.FindIdRequest;
-import com.wanted.naeil.domain.user.dto.request.FindPasswordRequest;
+import com.wanted.naeil.domain.user.controller.UpdateEmailRequest;
+import com.wanted.naeil.domain.user.dto.request.*;
 import com.wanted.naeil.domain.user.dto.response.FindIdResponse;
 import com.wanted.naeil.domain.user.dto.response.FindPasswordResponse;
 import com.wanted.naeil.domain.user.dto.response.LoginUserDTO;
-import com.wanted.naeil.domain.user.dto.request.SignupDTO;
+import com.wanted.naeil.domain.user.dto.response.AccountSettingResponse;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.domain.user.repository.UserRepository;
 import com.wanted.naeil.global.util.file.LocalFileService;
@@ -77,7 +77,6 @@ private final LocalFileService localFileService;
                 .birthDate(signupDTO.getBirthDate())
                 .profileImg(profileImgPath)
                 .build();
-
 
 
         // 4. DB 저장
@@ -157,6 +156,93 @@ private final LocalFileService localFileService;
         return FindPasswordResponse.builder()
                 .tempPassword(tempPassword)
                 .build();
+    }
+
+    // 마이 페이지 조회
+    public AccountSettingResponse getMyPage(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
+        return AccountSettingResponse.builder()
+                .username(user.getUsername())
+                .name(user.getName())
+                .nickname(user.getNickname())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .profileImg(user.getProfileImg())
+                .role(user.getRole())
+                .build();
+    }
+
+    // 프로필 이미지 업로드
+    @Transactional
+    public void updateProfileImg(String username, UpdateProfileImgRequest request) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
+        validateProfileImg(request.getProfileImg());
+        String profileImgPath = localFileService.uploadSingleFile(request.getProfileImg(), "profiles");
+        user.updateProfileImg(profileImgPath);
+    }
+
+
+    // 프로필 이미지 삭제
+    @Transactional
+    public void deleteProfileImg(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
+        if (user.getProfileImg() != null) {
+            localFileService.deleteFile(user.getProfileImg());
+        }
+        user.updateProfileImg(null);
+    }
+
+    // 닉네임 변경
+    @Transactional
+    public void updateNickname(String username, UpdateNicknameRequest request) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
+        if (userRepository.existsByNickname(request.getNickname())) {
+            throw new DuplicateKeyException("이미 사용 중인 닉네임입니다.");
+        }
+        user.updateNickname(request.getNickname());
+    }
+
+    // 비밀번호 변경
+    @Transactional
+    public void updatePassword(String username, UpdatePasswordRequest request) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
+        if (!encoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
+        }
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new IllegalArgumentException("새 비밀번호가 일치하지 않습니다.");
+        }
+        user.updatePassword(encoder.encode(request.getNewPassword()));
+    }
+
+    // 이메일 변경
+    @Transactional
+    public void updateEmail(String username, UpdateEmailRequest request) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new DuplicateKeyException("이미 사용 중인 이메일입니다.");
+        }
+        user.updateEmail(request.getEmail());
+    }
+
+    @Transactional
+    public void withdraw(String username, WithdrawRequest request) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
+
+        // 1. 비밀번호 검증
+        if (!encoder.matches(request.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // 2. status를 INACTIVE로 변경
+        user.deactivate();
     }
 
 

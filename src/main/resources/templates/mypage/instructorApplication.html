@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>강사 신청 | Nae-Il</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <style>
+        .notice-dropdown { display: none; }
+        .notice-dropdown.open { display: block; }
+        .profile-dropdown { display: none; }
+        .profile-dropdown.open { display: block; }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+<!-- 헤더 -->
+<header class="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+            <a th:href="@{/}" href="/" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="fa-solid fa-terminal text-white text-sm"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-900 tracking-tight">
+                        내일 <span class="text-gray-500 font-normal">Nae-il</span>
+                    </h1>
+                    <p class="text-[10px] font-semibold text-gray-500 tracking-wide">내일의 일, My Work</p>
+                </div>
+            </a>
+
+            <nav class="flex items-center gap-1 flex-nowrap">
+                <a th:href="@{/courses}" href="/courses" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+                    <i class="fa-solid fa-book-open w-4 h-4"></i>
+                    <span class="text-xs font-medium">전체 강의</span>
+                </a>
+                <a th:href="@{/live}" href="/live" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+                    <i class="fa-solid fa-calendar w-4 h-4"></i>
+                    <span class="text-xs font-medium">실시간 강의</span>
+                </a>
+                <a th:href="@{/my-courses}" href="/my-courses" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+                    <i class="fa-solid fa-video w-4 h-4"></i>
+                    <span class="text-xs font-medium">내 강의</span>
+                </a>
+                <a th:href="@{/community/qna}" href="/community/qna" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+                    <i class="fa-solid fa-comment w-4 h-4"></i>
+                    <span class="text-xs font-medium">커뮤니티</span>
+                </a>
+                <a th:href="@{/cart}" href="/cart" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+                    <i class="fa-solid fa-cart-shopping w-4 h-4"></i>
+                    <span class="text-xs font-medium">장바구니</span>
+                </a>
+                <a th:href="@{/credit}" href="/credit" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+                    <i class="fa-solid fa-wallet w-4 h-4"></i>
+                    <span class="text-xs font-medium">크레딧</span>
+                </a>
+            </nav>
+
+            <div class="flex items-center gap-4">
+                <a th:href="@{/auth/logout}" href="/auth/logout"
+                   class="flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-red-50 transition-all group">
+                    <i class="fa-solid fa-right-from-bracket text-gray-600 group-hover:text-red-600 text-sm"></i>
+                    <span class="font-medium text-gray-700 group-hover:text-red-600 text-sm">로그아웃</span>
+                </a>
+                <div class="text-right" th:if="${user}">
+                    <p class="text-sm font-medium text-gray-900" th:text="${user.name}">사용자</p>
+                    <p class="text-xs font-mono text-gray-500" th:text="${user.email}">email</p>
+                </div>
+                <div class="relative" id="noticeDropdownWrapper">
+                    <button onclick="toggleNoticeDropdown()"
+                            class="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+                        <i class="fa-solid fa-bullhorn text-white text-sm"></i>
+                    </button>
+                    <div id="noticeDropdown" class="notice-dropdown absolute right-0 mt-2 w-48 bg-white border-2 border-gray-200 rounded-xl shadow-xl z-50">
+                        <div class="py-2">
+                            <a href="/notice" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                                <i class="fa-solid fa-bullhorn text-gray-600"></i>
+                                <span class="text-sm font-medium text-gray-900">공지사항</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative" id="profileDropdownWrapper">
+                    <button onclick="toggleProfileDropdown()"
+                            class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+                        <span class="text-white font-mono text-xs font-bold">{ }</span>
+                    </button>
+                    <div id="profileDropdown" class="profile-dropdown absolute right-0 mt-2 w-56 bg-white border-2 border-gray-200 rounded-xl shadow-xl z-50">
+                        <div class="py-2">
+                            <a href="/my-courses" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                                <i class="fa-solid fa-video text-gray-600"></i>
+                                <span class="text-sm font-medium text-gray-900">내 강의</span>
+                            </a>
+                            <a href="/user/me" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                                <i class="fa-solid fa-gear text-gray-600"></i>
+                                <span class="text-sm font-medium text-gray-900">계정 설정</span>
+                            </a>
+                            <a href="/subscriber/mySubscriber" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                                <i class="fa-solid fa-user text-gray-600"></i>
+                                <span class="text-sm font-medium text-gray-900">나의 구독</span>
+                            </a>
+                            <a href="/user/me/instructor-application/history" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                                <i class="fa-solid fa-chalkboard-user text-gray-600"></i>
+                                <span class="text-sm font-medium text-gray-900">강사 신청</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="max-w-7xl mx-auto px-6 py-12">
+    <div class="grid grid-cols-12 gap-8">
+
+        <!-- Left Sidebar -->
+        <div class="col-span-3">
+            <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 sticky top-24">
+                <nav class="space-y-2">
+                    <a th:href="@{/my-courses}" href="/my-courses"
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 font-medium transition-all">
+                        <i class="fa-solid fa-video w-5 h-5"></i>
+                        <span class="text-sm">내 강의</span>
+                    </a>
+                    <a th:href="@{/user/me}" href="/user/me"
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 font-medium transition-all">
+                        <i class="fa-solid fa-gear w-5 h-5"></i>
+                        <span class="text-sm">계정 설정</span>
+                    </a>
+                    <a th:href="@{/subscriber/mySubscriber}" href="/subscriber/mySubscriber"
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 font-medium transition-all">
+                        <i class="fa-solid fa-user w-5 h-5"></i>
+                        <span class="text-sm">나의 구독</span>
+                    </a>
+                    <a th:href="@{/user/me/apply-instructor}" href="/user/me/apply-instructor"
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600 font-bold transition-all">
+                        <i class="fa-solid fa-pen-to-square w-5 h-5"></i>
+                        <span class="text-sm">강사 신청</span>
+                    </a>
+                    <a th:href="@{/user/me/instructor-application/history}" href="/user/me/instructor-application/history"
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-gray-50 font-medium transition-all">
+                        <i class="fa-solid fa-chalkboard-user w-5 h-5"></i>
+                        <span class="text-sm">강사 신청 내역</span>
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-span-9">
+            <div class="bg-white border-2 border-gray-200 rounded-2xl p-8">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-black text-gray-900 mb-2">강사 신청</h2>
+                    <p class="text-gray-600 font-medium">강사로 활동하기 위한 정보를 입력해주세요</p>
+                </div>
+
+                <!-- 에러/성공 메시지 -->
+                <div th:if="${errorMessage}" class="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-xl">
+                    <p class="text-sm font-bold text-red-600" th:text="${errorMessage}"></p>
+                </div>
+                <div th:if="${successMessage}" class="mb-6 p-4 bg-green-50 border-2 border-green-200 rounded-xl">
+                    <p class="text-sm font-bold text-green-600" th:text="${successMessage}"></p>
+                </div>
+
+                <form th:action="@{/user/me/apply-instructor}" method="POST" enctype="multipart/form-data" class="space-y-6">
+
+                    <!-- 제목 -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-900 mb-2">제목 <span class="text-red-500">*</span></label>
+                        <input type="text" name="title" placeholder="신청 제목을 입력하세요"
+                               class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600 focus:outline-none transition-colors font-medium"/>
+                    </div>
+
+                    <!-- 분야 (카테고리 선택) -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-900 mb-2">분야 <span class="text-red-500">*</span></label>
+                        <select name="categoryId"
+                                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600 focus:outline-none transition-colors font-medium bg-white">
+                            <option value="">분야를 선택하세요</option>
+                            <option th:each="category : ${categories}"
+                                    th:value="${category.id}"
+                                    th:text="${category.name}">카테고리</option>
+                        </select>
+                    </div>
+
+                    <!-- 소개 -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-900 mb-2">소개 <span class="text-red-500">*</span></label>
+                        <textarea name="introduction" rows="4" placeholder="본인 소개를 입력하세요"
+                                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600 focus:outline-none transition-colors font-medium resize-none"></textarea>
+                    </div>
+
+                    <!-- 경력 -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-900 mb-2">경력 <span class="text-red-500">*</span></label>
+                        <textarea name="career" rows="4" placeholder="예: 5년 이상 개발 경력, 관련 프로젝트 경험 등"
+                                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600 focus:outline-none transition-colors font-medium resize-none"></textarea>
+                    </div>
+
+                    <!-- 계좌번호 -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-900 mb-2">계좌번호 <span class="text-red-500">*</span></label>
+                        <input type="text" name="accountNumber" placeholder="예: 은행명 000-0000-0000"
+                               class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-600 focus:outline-none transition-colors font-medium"/>
+                    </div>
+
+                    <!-- 증빙 자료 -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-900 mb-2">증빙 자료 <span class="text-red-500">*</span></label>
+                        <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-blue-500 hover:bg-blue-50 transition-colors cursor-pointer"
+                             onclick="document.getElementById('proofFiles').click()">
+                            <i class="fa-solid fa-upload text-gray-400 text-3xl mb-3 block"></i>
+                            <p class="text-sm font-medium text-gray-600">파일을 선택하거나 드래그하여 업로드</p>
+                            <p class="text-xs text-gray-400 mt-1">PDF, DOC, DOCX, JPG, PNG (최대 10MB)</p>
+                            <input type="file" id="proofFiles" name="proofFiles"
+                                   accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                   multiple
+                                   class="hidden" onchange="showFileNames(this, 'proofFileName')"/>
+                        </div>
+                        <p id="proofFileName" class="text-sm text-blue-600 font-medium mt-2 hidden"></p>
+                    </div>
+
+                    <!-- 얼굴 사진 -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-900 mb-2">얼굴 사진 <span class="text-red-500">*</span></label>
+                        <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-blue-500 hover:bg-blue-50 transition-colors cursor-pointer"
+                             onclick="document.getElementById('faceImg').click()">
+                            <i class="fa-solid fa-image text-gray-400 text-3xl mb-3 block"></i>
+                            <p class="text-sm font-medium text-gray-600">얼굴 사진을 업로드하세요</p>
+                            <p class="text-xs text-gray-400 mt-1">JPG, PNG (최대 5MB)</p>
+                            <input type="file" id="faceImg" name="faceImg"
+                                   accept=".jpg,.jpeg,.png"
+                                   class="hidden" onchange="showFileNames(this, 'faceImgName')"/>
+                        </div>
+                        <p id="faceImgName" class="text-sm text-blue-600 font-medium mt-2 hidden"></p>
+                    </div>
+
+                    <!-- 버튼 -->
+                    <div class="flex gap-4 pt-4">
+                        <button type="submit"
+                                class="flex-1 px-6 py-4 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-xl font-bold hover:shadow-xl hover:shadow-blue-200 transition-all">
+                            제출하기
+                        </button>
+                        <a th:href="@{/user/me/instructor-application/history}" href="/user/me/instructor-application/history"
+                           class="px-8 py-4 border-2 border-gray-300 rounded-xl hover:border-blue-600 hover:text-blue-600 transition-all font-bold">
+                            취소
+                        </a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="border-t border-gray-200 bg-white mt-16">
+    <div class="max-w-7xl mx-auto px-6 py-8">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-terminal text-blue-600"></i>
+                <span class="text-sm font-bold text-gray-600">© 2026 Nae-Il. 코딩으로 만드는 내일</span>
+            </div>
+            <div class="flex items-center gap-6 text-sm text-gray-600">
+                <a href="#" class="hover:text-blue-600 transition-colors">이용약관</a>
+                <a href="#" class="hover:text-blue-600 transition-colors">개인정보처리방침</a>
+                <a href="#" class="hover:text-blue-600 transition-colors">고객센터</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script>
+    function toggleNoticeDropdown() {
+        const el = document.getElementById('noticeDropdown');
+        if (el) el.classList.toggle('open');
+    }
+    function toggleProfileDropdown() {
+        const el = document.getElementById('profileDropdown');
+        if (el) el.classList.toggle('open');
+    }
+    document.addEventListener('click', function(e) {
+        const noticeWrapper = document.getElementById('noticeDropdownWrapper');
+        const profileWrapper = document.getElementById('profileDropdownWrapper');
+        if (noticeWrapper && !noticeWrapper.contains(e.target)) {
+            document.getElementById('noticeDropdown').classList.remove('open');
+        }
+        if (profileWrapper && !profileWrapper.contains(e.target)) {
+            document.getElementById('profileDropdown').classList.remove('open');
+        }
+    });
+
+    function showFileNames(input, targetId) {
+        const target = document.getElementById(targetId);
+        if (input.files && input.files.length > 0) {
+            const names = Array.from(input.files).map(f => f.name).join(', ');
+            target.textContent = '선택된 파일: ' + names;
+            target.classList.remove('hidden');
+        }
+    }
+</script>
+</body>
+</html>
