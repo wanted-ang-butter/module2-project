@@ -52,6 +52,7 @@ public class SecurityConfig {
                     auth.requestMatchers("/dashboard/instructor").hasAnyAuthority("ADMIN", "INSTRUCTOR");
                     auth.requestMatchers("/dashboard/user").hasAnyAuthority("ADMIN", "INSTRUCTOR", "SUBSCRIBER", "USER");
                     auth.requestMatchers("/auth/login", "/auth/signup", "/auth/fail", "/auth/find-id", "/auth/find-password", "/", "/dashboard/guest", "/subscription/**").permitAll();
+                    auth.requestMatchers("/my-courses/**").authenticated();
                     auth.anyRequest().authenticated();
                 })
                 .requestCache(cache -> cache.disable())
