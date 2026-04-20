@@ -15,6 +15,7 @@ public class CreditController {
 
     private final CreditService creditService;
 
+    // 크레딧
     @GetMapping("/charge")
     public String showChargePage(@AuthenticationPrincipal AuthDetails authDetails,
                                  @RequestParam(value = "success", required = false) String success,
@@ -33,6 +34,7 @@ public class CreditController {
         return "payment/credit";
     }
 
+    // 크레딧 충전하기
     @PostMapping("/charge")
     public String chargeCredit(@AuthenticationPrincipal AuthDetails authDetails,
                                @RequestParam("amount") int amount) {
