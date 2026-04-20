@@ -5,6 +5,7 @@ import com.wanted.naeil.domain.admin.repository.AdminApprovalRepository;
 import com.wanted.naeil.domain.live.dto.request.CreateLiveLectureRequest;
 import com.wanted.naeil.domain.live.dto.response.InstructorLiveDetailResponse;
 import com.wanted.naeil.domain.live.dto.response.InstructorLiveLectureResponse;
+import com.wanted.naeil.domain.live.dto.response.LiveLectureListResponse;
 import com.wanted.naeil.domain.live.entity.LiveLecture;
 import com.wanted.naeil.domain.live.entity.enums.LiveLectureStatus;
 import com.wanted.naeil.domain.live.repository.LiveLectureRepository;
@@ -173,6 +174,22 @@ public class LiveLectureService {
         liveLectureRepository.delete(liveLecture);
 
         log.info("[LiveLectureDelete] 실시간 강의 삭제 완료 - liveId: {}", liveId);
+    }
+
+    // 실시간 강의 전체 조회 - 유저
+    @Transactional(readOnly = true)
+    public List<LiveLectureListResponse> getLiveLectureList() {
+
+        log.info("[LiveLectureList] 사용자 실시간 강의 전체 조회 시작");
+
+        List<LiveLectureStatus> beforeLiveEnd = List.of(
+                LiveLectureStatus.APPROVED,
+                LiveLectureStatus.IN_PROGRESS
+        );
+
+        return liveLectureRepository.findByStatusInOrderByStartAtAsc(beforeLiveEnd).stream()
+                .map(LiveLectureListResponse::of)
+                .toList();
     }
 
 
