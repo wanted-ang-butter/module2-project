@@ -182,14 +182,18 @@ public class LiveLectureService {
 
         log.info("[LiveLectureList] 사용자 실시간 강의 전체 조회 시작");
 
-        List<LiveLectureStatus> beforeLiveEnd = List.of(
+        List<LiveLectureStatus> visibleStatuses = List.of(
                 LiveLectureStatus.APPROVED,
                 LiveLectureStatus.IN_PROGRESS
         );
 
-        return liveLectureRepository.findByStatusInOrderByStartAtAsc(beforeLiveEnd).stream()
+        return liveLectureRepository.findByStatusInAndEndAtAfterOrderByStartAtAsc(
+                        visibleStatuses,
+                        LocalDateTime.now()
+                ).stream()
                 .map(LiveLectureListResponse::of)
                 .toList();
+
     }
 
 
