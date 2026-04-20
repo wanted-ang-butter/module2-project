@@ -78,6 +78,9 @@ public class DashboardController {
             mv.addObject("enrolledCount", mainPageService.getEnrolledCount(loginUser));
             mv.addObject("averageProgress", mainPageService.getAverageProgress(loginUser));
             mv.addObject("recommendedCourses", mainPageService.getRecommendedCourses(loginUser));
+            mv.addObject("popularCourses", mainPageService.getPopularCourses(null));
+            mv.addObject("newCourses", mainPageService.getNewCourses(null));
+            mv.addObject("categories", mainPageService.getCategoryCourses());
         }
         return mv;
     }
