@@ -278,8 +278,15 @@
         document.getElementById('d-date').textContent = el.dataset.date || '-';
 
         const proof = document.getElementById('d-proof');
-        proof.href = el.dataset.proof || '#';
-        proof.textContent = el.dataset.proof ? '파일 보기' : '없음';
+        if (el.dataset.proof && el.dataset.proof !== 'null') {
+            proof.href = el.dataset.proof;
+            proof.textContent = '파일 보기';
+            proof.style.pointerEvents = 'auto';
+        } else {
+            proof.removeAttribute('href');
+            proof.textContent = '없음';
+            proof.style.pointerEvents = 'none';
+        }
 
         document.getElementById('approve-form').action = '/admin/approvals/' + selectedId + '/approve';
         document.getElementById('reject-form').action = '/admin/approvals/' + selectedId + '/reject';
@@ -290,10 +297,10 @@
     }
 
     function openRejectModal() {
-        document.getElementById('reject-modal').classList.remove('hidden');
+        document.getElementById('reject-modal').style.display = 'flex';
     }
     function closeRejectModal() {
-        document.getElementById('reject-modal').classList.add('hidden');
+        document.getElementById('reject-modal').style.display = 'none';
     }
     function toggleAdminMenu() { document.getElementById('adminMenu').classList.toggle('hidden'); }
     function toggleMemberMenu() { document.getElementById('memberSubMenu').classList.toggle('hidden'); }
