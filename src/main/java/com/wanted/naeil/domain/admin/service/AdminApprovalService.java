@@ -10,6 +10,7 @@ import com.wanted.naeil.domain.course.repository.CourseRepository;
 import com.wanted.naeil.domain.live.entity.LiveLecture;
 import com.wanted.naeil.domain.live.entity.enums.LiveLectureStatus;
 import com.wanted.naeil.domain.live.repository.LiveLectureRepository;
+import com.wanted.naeil.domain.settlement.entity.Settlement;
 import com.wanted.naeil.domain.user.entity.InstructorApplications;
 import com.wanted.naeil.domain.user.entity.enums.Role;
 import com.wanted.naeil.domain.user.entity.User;
@@ -59,6 +60,7 @@ public class AdminApprovalService {
                                     approval.getInstructorApplications();
                             builder.applicationId(applications.getId())
                                     .applicantName(applications.getUser().getName())
+                                    .role(applications.getUser().getRole())
                                     .title(applications.getTitle())
                                     .categoryName(applications.getCategory().getName())
                                     .introduction(applications.getIntroduction())
@@ -76,7 +78,19 @@ public class AdminApprovalService {
                                     .instuctorName(lecture.getInstructor().getName());
                         }
                         case SETTLEMENT_REGISTER -> {
-                            builder.instuctorName(approval.getSettlement().getInstructor().getName());
+                            Settlement s = approval.getSettlement();
+                            builder.instuctorName(s.getInstructor().getName())
+                                    .requestedAmount(s.getRequestedAmount())
+                                    .platformFee(s.getPlatformFee())
+                                    .finalAmount(s.getFinalAmount())
+                                    .settlementMonth(s.getSettlementMonth())
+                                    .settlementDetails(s.getDetails().stream()
+                                            .map(d -> ApprovalResponse.SettlementDetailInfo.builder()
+                                                    .courseName(d.getCourse().getTitle())
+                                                    .saleCount(d.getSaleCount())
+                                                    .totalSalesAmount(d.getTotalSalesAmount())
+                                                    .build())
+                                            .collect(Collectors.toList()));
                         }
                     }
                     return builder.build();

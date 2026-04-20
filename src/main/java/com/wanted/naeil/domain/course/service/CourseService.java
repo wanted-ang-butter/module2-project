@@ -309,6 +309,14 @@ public class CourseService {
         log.info("[CourseDeleteRequest] 강의 삭제 요청 완료 - instructorId: {}, courseId: {}",
                 instructorId, courseId);
     }
+    // 강사용 강의 상세 조회
+    @Transactional(readOnly = true)
+    public CourseDetailsResponse getInstructorCourseDetail(Long instructorId, Long courseId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 강의입니다."));
+        validateCourseOwner(course, instructorId);
+        return getCourseDetail(courseId);
+    }
 
     // ==== 내부 편의 메서드 ====
     private void validateCourseOwner(Course course, Long instructorId) {
