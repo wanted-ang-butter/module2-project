@@ -53,6 +53,8 @@ public class LiveLecture extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private LiveLectureStatus status; // RESERVED, CANCELED
 
+    // 비지니스 메서드
+
     @Builder
     public LiveLecture(User instructor, String title, String description, int maxCapacity,
                        LocalDateTime reservationStartAt,
@@ -81,5 +83,23 @@ public class LiveLecture extends BaseTimeEntity {
     // 상태 변경 메서드
     public void changeStatus(LiveLectureStatus status) {
         this.status = status;
+    }
+
+    // 수정 업데이트
+    public void update( String title, String description, int maxCapacity,
+            LocalDateTime reservationStartAt, LocalDateTime startAt,
+            LocalDateTime endAt, String streamingUrl
+    ) {
+        if (maxCapacity < this.currentCount) {
+            throw new IllegalArgumentException("수강 정원은 현재 예약 수보다 작을 수 없습니다.");
+        }
+
+        this.title = title;
+        this.description = description;
+        this.maxCapacity = maxCapacity;
+        this.reservationStartAt = reservationStartAt;
+        this.startAt = startAt;
+        this.endAt = endAt;
+        this.streamingUrl = streamingUrl;
     }
 }
