@@ -18,6 +18,6 @@ public interface AdminApprovalRepository extends JpaRepository<AdminApproval, Lo
             ApprovalStatus status
     );
 
-    // 승재 추가 : 강사 신청 승인 철회 로직
+    // 승재 추가 : 강사 스스로 강사 신청 철회
     void deleteByInstructorApplications(InstructorApplications instructorApplications);
 }
