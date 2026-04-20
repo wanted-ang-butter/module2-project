@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>내일 Nae-il | 전체 강의</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
@@ -12,8 +13,21 @@
     </style>
 </head>
 <body>
+<th:block th:if="${user == null or user.role == null}">
+    <div th:replace="~{fragments/guestHeader :: guestHeader}"></div>
+</th:block>
 
-<div th:replace="fragments/userHeader :: userHeader"></div>
+<th:block th:if="${user != null and user.role != null and user.role.name() == 'USER'}">
+    <div th:replace="~{fragments/userHeader :: userHeader}"></div>
+</th:block>
+
+<th:block th:if="${user != null and user.role != null and user.role.name() == 'INSTRUCTOR'}">
+    <div th:replace="~{fragments/instructorHeader :: instructorHeader}"></div>
+</th:block>
+
+<th:block th:if="${user != null and user.role != null and user.role.name() == 'ADMIN'}">
+    <div th:replace="~{fragments/adminHeader :: adminHeader}"></div>
+</th:block>
 
 <main class="max-w-7xl mx-auto px-6 py-12">
     <a th:href="@{/dashboard}"
