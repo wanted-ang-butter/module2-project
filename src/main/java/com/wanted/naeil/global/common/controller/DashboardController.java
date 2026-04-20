@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.NoSuchElementException;
@@ -73,13 +74,14 @@ public class DashboardController {
 
     // 비로그인 대시보드
     @GetMapping("/guest")
-    public ModelAndView guestDashboard() {
+    public ModelAndView guestDashboard(@RequestParam(required = false) String category) {
 
         log.info("[Dashboard] 비로그인 사용자 guest 대시보드 접속");
         ModelAndView mv = new ModelAndView("dashboard/guestDashboard");
-        mv.addObject("popularCourses", mainPageService.getPopularCourses(null));
-        mv.addObject("newCourses", mainPageService.getNewCourses(null));
+        mv.addObject("popularCourses", mainPageService.getPopularCourses(category));
+        mv.addObject("newCourses", mainPageService.getNewCourses(category));
         mv.addObject("categories", mainPageService.getCategoryCourses());
+        mv.addObject("selectedCategory", category);
         return mv;
     }
 }

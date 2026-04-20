@@ -42,7 +42,7 @@ public class SecurityConfig {
                                          AuthSuccessHandler authSuccessHandler) throws Exception {
 
         http.authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/auth/login", "/auth/signup", "/auth/fail", "/auth/find-id", "/auth/find-password",  "/", "/dashboard/guest").permitAll();
+                    auth.requestMatchers("/auth/login", "/auth/signup", "/auth/fail", "/auth/find-id", "/auth/find-password",  "/", "/dashboard", "/dashboard/guest", "/course/**", "/community/**", "/error").permitAll();
                     auth.requestMatchers("/admin/**").hasAnyAuthority("ADMIN");
                     auth.requestMatchers("/instructor/**").hasAnyAuthority("ADMIN", "INSTRUCTOR");
                     auth.requestMatchers("/subscribe/**").hasAnyAuthority("ADMIN", "INSTRUCTOR", "SUBSCRIBER");
@@ -52,7 +52,9 @@ public class SecurityConfig {
                     auth.requestMatchers("/dashboard/instructor").hasAnyAuthority("ADMIN", "INSTRUCTOR");
                     auth.requestMatchers("/dashboard/user").hasAnyAuthority("ADMIN", "INSTRUCTOR", "SUBSCRIBER", "USER");
                     auth.anyRequest().authenticated();
-                }).formLogin(login -> {
+                })
+                .requestCache(cache -> cache.disable())
+                .formLogin(login -> {
                     login.loginPage("/auth/login");
                     login.usernameParameter("user");
                     login.passwordParameter("pass");

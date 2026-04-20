@@ -143,13 +143,15 @@
     </div>
     <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
         <!-- 전체 버튼 -->
-        <button onclick="selectCategory('')"
+        <button data-category=""
+                onclick="selectCategory('')"
                 th:class="${selectedCategory == null} ? 'category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap flex-shrink-0 bg-[#111827] text-white' : 'category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap flex-shrink-0 bg-white border border-gray-300 text-gray-700 hover:border-gray-400'">
             전체
         </button>
         <!-- DB에서 카테고리 목록 동적 렌더링 -->
         <div th:each="category : ${categories}">
-            <button th:onclick="'selectCategory(\'' + ${category.name} + '\')'"
+            <button th:data-category="${category.name}"
+                    onclick="selectCategory(this.getAttribute('data-category'))"
                     th:class="${selectedCategory == category.name} ? 'category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap flex-shrink-0 bg-[#111827] text-white' : 'category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap flex-shrink-0 bg-white border border-gray-300 text-gray-700 hover:border-gray-400'"
                     th:text="${category.name}">카테고리</button>
         </div>
@@ -172,7 +174,8 @@
     <div class="flex gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
         <div th:each="course : ${popularCourses}" class="snap-start flex-none">
             <a th:href="@{/course/{id}(id=${course.courseId})}" href="#"
-               class="flex-none w-72 bg-white rounded-xl overflow-hidden cursor-pointer border border-gray-100 hover:border-blue-200 transition-all duration-300 hover:shadow-xl group block">
+               th:data-category="${course.category}"
+               class="course-card flex-none w-72 bg-white rounded-xl overflow-hidden cursor-pointer border border-gray-100 hover:border-blue-200 transition-all duration-300 hover:shadow-xl group block">
                 <div class="relative h-40 overflow-hidden bg-gray-100">
                     <img th:src="${course.thumbnail}" th:alt="${course.title}"
                          src="#" alt="강의 썸네일"
@@ -230,7 +233,8 @@
     <div class="flex gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
         <div th:each="course : ${newCourses}" class="snap-start flex-none">
             <a th:href="@{/course/{id}(id=${course.courseId})}" href="#"
-               class="flex-none w-72 bg-white rounded-xl overflow-hidden cursor-pointer border border-gray-100 hover:border-blue-200 transition-all duration-300 hover:shadow-xl group block">
+               th:data-category="${course.category}"
+               class="course-card flex-none w-72 bg-white rounded-xl overflow-hidden cursor-pointer border border-gray-100 hover:border-blue-200 transition-all duration-300 hover:shadow-xl group block">
                 <div class="relative h-40 overflow-hidden bg-gray-100">
                     <img th:src="${course.thumbnail}" th:alt="${course.title}"
                          src="#" alt="강의 썸네일"
@@ -305,7 +309,8 @@
         <div class="flex gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
             <div th:each="course : ${category.courses}" class="snap-start flex-none">
                 <a th:href="@{/course/{id}(id=${course.courseId})}" href="#"
-                   class="flex-none w-72 bg-white rounded-xl overflow-hidden cursor-pointer border border-gray-100 hover:border-blue-200 transition-all duration-300 hover:shadow-xl group block">
+                   th:data-category="${course.category}"
+                   class="course-card flex-none w-72 bg-white rounded-xl overflow-hidden cursor-pointer border border-gray-100 hover:border-blue-200 transition-all duration-300 hover:shadow-xl group block">
                     <div class="relative h-40 overflow-hidden bg-gray-100">
                         <img th:src="${course.thumbnail}" th:alt="${course.title}"
                              src="#" alt="썸네일"
@@ -375,10 +380,34 @@
         if (query) window.location.href = '/course/search?q=' + encodeURIComponent(query);
     }
 
+    // 수정 후
     function selectCategory(category) {
-        window.location.href = '/?category=' + encodeURIComponent(category);
-        // 서버사이드 필터링으로 페이지 이동해요.
-        // category가 빈 문자열이면 전체 조회예요.
+        document.querySelectorAll('.category-pill').forEach(el => {
+            el.classList.remove('bg-[#111827]', 'text-white');
+            el.classList.add('bg-white', 'border', 'border-gray-300', 'text-gray-700');
+        });
+
+        // 현재 선택된 버튼 찾아서 활성화
+        document.querySelectorAll('.category-pill').forEach(btn => {
+            const btnCategory = btn.getAttribute('data-category') || '';
+            if (btnCategory === category) {
+                btn.classList.remove('bg-white', 'border', 'border-gray-300', 'text-gray-700');
+                btn.classList.add('bg-[#111827]', 'text-white');
+            }
+        });
+        // 전체 버튼은 별도 처리
+        if (category === '') {
+            document.querySelector('.category-pill').classList.remove('bg-white', 'border', 'border-gray-300', 'text-gray-700');
+            document.querySelector('.category-pill').classList.add('bg-[#111827]', 'text-white');
+        }
+
+        document.querySelectorAll('.course-card').forEach(card => {
+            if (category === '' || card.dataset.category === category) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
     }
 </script>
 </body>

@@ -267,7 +267,8 @@
         <div th:if="${popularCourses != null and not #lists.isEmpty(popularCourses)}"
              class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div th:each="course : ${popularCourses}"
-                 class="bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-blue-300 hover:-translate-y-1 transition-all duration-300">
+                 th:data-category="${course.category}"
+                 class="course-card bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-blue-300 hover:-translate-y-1 transition-all duration-300">
                 <a th:href="@{/course/{id}(id=${course.courseId})}" class="block">
                     <div class="aspect-video overflow-hidden bg-gray-100">
                         <img th:src="${course.thumbnail}" th:alt="${course.title}" class="w-full h-full object-cover" />
@@ -304,7 +305,8 @@
         <div th:if="${newCourses != null and not #lists.isEmpty(newCourses)}"
              class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div th:each="course : ${newCourses}"
-                 class="bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-blue-300 hover:-translate-y-1 transition-all duration-300">
+                 th:data-category="${course.category}"
+                 class="course-card bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-blue-300 hover:-translate-y-1 transition-all duration-300">
                 <a th:href="@{/course/{id}(id=${course.courseId})}" class="block">
                     <div class="aspect-video overflow-hidden bg-gray-100">
                         <img th:src="${course.thumbnail}" th:alt="${course.title}" class="w-full h-full object-cover" />
@@ -346,7 +348,8 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div th:each="course : ${category.courses}"
-                     class="bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-blue-300 transition-all duration-300">
+                     th:data-category="${course.category}"
+                     class="course-card bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-blue-300 transition-all duration-300">
                     <a th:href="@{/course/{id}(id=${course.courseId})}" class="block">
                         <div class="aspect-video overflow-hidden bg-gray-100">
                             <img th:src="${course.thumbnail}" th:alt="${course.title}" class="w-full h-full object-cover" />
@@ -392,7 +395,14 @@
         });
         btn.classList.remove('bg-white', 'border', 'border-gray-300', 'text-gray-700');
         btn.classList.add('bg-[#111827]', 'text-white');
-        console.log("Selected Category:", category);
+
+        document.querySelectorAll('.course-card').forEach(card => {
+            if (category === '전체' || card.dataset.category === category) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
     }
 </script>
 </body>
