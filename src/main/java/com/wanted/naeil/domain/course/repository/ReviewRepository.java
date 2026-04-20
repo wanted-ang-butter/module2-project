@@ -8,6 +8,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
-
+    
+    // 내 강의
     Optional<Review> findByUserAndCourse(User user, Course course);
+
+    boolean existsByUserAndCourse(User user, Course course);
 }
