@@ -1,6 +1,7 @@
 package com.wanted.naeil.domain.live.controller;
 
 import com.wanted.naeil.domain.live.dto.request.CreateLiveLectureRequest;
+import com.wanted.naeil.domain.live.dto.response.InstructorLiveDetailResponse;
 import com.wanted.naeil.domain.live.service.LiveLectureService;
 import com.wanted.naeil.domain.user.entity.enums.Role;
 import com.wanted.naeil.global.auth.model.dto.AuthDetails;
@@ -11,12 +12,11 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -101,12 +101,35 @@ public class InstLiveController {
             redirectAttributes.addFlashAttribute("message", message);
             mv.setViewName("redirect:/instructor/course/complete");
         } catch (Exception e) {
-            mv.addObject("errorMessage", "실시간 강의 등록 중 오류가 발생했습니다: " + e.getMessage());
             mv.addObject("user", authDetails.getLoginUserDTO());
             mv.addObject("createLiveLectureRequest", request);
-            mv.addObject("errorMessage", "강의 등록 중 오류가 발생했습니다: " + e.getMessage());
+            mv.addObject("errorMessage", "실시간 강의 등록 중 오류가 발생했습니다: " + e.getMessage());
             mv.setViewName("live/liveLectureCreate");
         }
+
+        return mv;
+    }
+
+    @GetMapping("/live-lecture/{liveId}")
+    public ModelAndView getInstructorLiveLectureDetail(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @PathVariable Long liveId,
+            ModelAndView mv
+    ) {
+        if (authDetails == null) {
+            throw new AccessDeniedException("로그인이 필요합니다.");
+        }
+
+        Long instructorId = authDetails.getLoginUserDTO().getUserId();
+
+        InstructorLiveDetailResponse response =
+                liveLectureService.getInstructorLiveLectureDetail(instructorId, liveId);
+
+        mv.addObject("user", authDetails.getLoginUserDTO());
+        mv.addObject("liveCourse", response);
+        // TODO : 추후 예약자 명단 페이지 추가
+        mv.addObject("reservations", List.of());
+        mv.setViewName("live/liveLectureDetail");
 
         return mv;
     }

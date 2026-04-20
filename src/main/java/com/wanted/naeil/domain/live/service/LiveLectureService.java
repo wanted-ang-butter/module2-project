@@ -3,6 +3,7 @@ package com.wanted.naeil.domain.live.service;
 import com.wanted.naeil.domain.admin.entity.AdminApproval;
 import com.wanted.naeil.domain.admin.repository.AdminApprovalRepository;
 import com.wanted.naeil.domain.live.dto.request.CreateLiveLectureRequest;
+import com.wanted.naeil.domain.live.dto.response.InstructorLiveDetailResponse;
 import com.wanted.naeil.domain.live.dto.response.InstructorLiveLectureResponse;
 import com.wanted.naeil.domain.live.entity.LiveLecture;
 import com.wanted.naeil.domain.live.repository.LiveLectureRepository;
@@ -86,7 +87,7 @@ public class LiveLectureService {
     }
 
     // 나의 실시간 강의 목록 조회
-    @Transactional
+    @Transactional(readOnly = true)
     public List<InstructorLiveLectureResponse> getInstructorLiveLectures(Long instructorId) {
 
         User instructor = userRepository.findById(instructorId)
@@ -99,6 +100,24 @@ public class LiveLectureService {
         return liveLectureRepository.findByInstructorIdOrderByCreatedAtDesc(instructorId).stream()
                 .map(InstructorLiveLectureResponse::of)
                 .toList();
+    }
+
+    // 강사 - 실시간 강의 상세 조회
+    @Transactional(readOnly = true)
+    public InstructorLiveDetailResponse getInstructorLiveLectureDetail(Long instructorId, Long liveId) {
+
+        log.info("[실시간 강의] 상세 조회 Service 로직 시작!");
+
+        User instructor = userRepository.findById(instructorId)
+                .orElseThrow(() -> new IllegalArgumentException("강사 정보를 찾을 수 없습니다. ID: " + instructorId));
+
+        LiveLecture liveLecture = liveLectureRepository.findById(liveId)
+                .orElseThrow(() -> new IllegalArgumentException("실시간 강의를 찾을 수 없습니다. ID: " + liveId));
+
+
+        validateLiveLectureOwnerOrAdmin(instructor, liveLecture);
+
+        return InstructorLiveDetailResponse.of(liveLecture);
     }
 
 
@@ -135,6 +154,20 @@ public class LiveLectureService {
 
         if (!reservationStartAt.isBefore(startAt)) {
             throw new IllegalArgumentException("예약 시작 일시는 강의 시작 일시보다 빨라야 합니다.");
+        }
+    }
+
+    private void validateLiveLectureOwnerOrAdmin(User user, LiveLecture liveLecture) {
+        if (user.getRole() == Role.ADMIN) {
+            return;
+        }
+
+        if (user.getRole() != Role.INSTRUCTOR) {
+            throw new AccessDeniedException("강사 또는 관리자만 실시간 강의를 조회할 수 있습니다.");
+        }
+
+        if (!liveLecture.getInstructor().getId().equals(user.getId())) {
+            throw new AccessDeniedException("본인이 등록한 실시간 강의만 조회할 수 있습니다.");
         }
     }
 }
