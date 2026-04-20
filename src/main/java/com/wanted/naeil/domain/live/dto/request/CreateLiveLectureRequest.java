@@ -1,4 +1,4 @@
-package com.wanted.naeil.domain.live.dto;
+package com.wanted.naeil.domain.live.dto.request;
 
 import jakarta.validation.constraints.*;
 import lombok.Getter;

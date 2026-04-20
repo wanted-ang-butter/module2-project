@@ -2,6 +2,8 @@ package com.wanted.naeil.domain.course.controller;
 
 import com.wanted.naeil.domain.course.dto.request.CourseStatusUpdateRequest;
 import com.wanted.naeil.domain.course.dto.request.CourseUpdateRequest;
+import com.wanted.naeil.domain.live.dto.response.InstructorLiveLectureResponse;
+import com.wanted.naeil.domain.live.service.LiveLectureService;
 import com.wanted.naeil.global.auth.model.dto.AuthDetails;
 import com.wanted.naeil.domain.course.dto.request.CourseCreateRequest;
 import com.wanted.naeil.domain.course.dto.response.CourseEditResponse;
@@ -31,6 +33,7 @@ import java.util.List;
 public class InstCourseController {
 
     private final CourseService courseService;
+    private final LiveLectureService liveLectureService;
     private final CategoryRepository  categoryRepository;
 
     // 코스 등록 조회
@@ -98,11 +101,14 @@ public class InstCourseController {
 
         List<InstructorCourseResponse> courses =
                 courseService.getInstructorCourses(instructorId);
+
+        List<InstructorLiveLectureResponse> liveCourses =
+                liveLectureService.getInstructorLiveLectures(instructorId);
         // 헤더 정보
         mv.addObject("user", authDetails.getLoginUserDTO());
         mv.addObject("courses", courses);
         // TODO : 실시간 강의 등록하면 인자 넣기
-        mv.addObject("liveCourses", List.of());
+        mv.addObject("liveCourses", liveCourses);
         mv.setViewName("course/InstructorCourseManagement");
 
         return mv;

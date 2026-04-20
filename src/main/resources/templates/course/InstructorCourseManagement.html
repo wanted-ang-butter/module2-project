@@ -212,60 +212,115 @@
     </div>
 
     <div th:if="${liveCourses != null and not #lists.isEmpty(liveCourses)}" class="space-y-4">
-      <div th:each="course : ${liveCourses}"
+      <div th:each="liveCourse : ${liveCourses}"
            class="bg-white border-2 border-gray-200 rounded-2xl p-6 hover:shadow-xl hover:border-blue-300 transition-all group">
         <div class="flex items-center justify-between gap-6">
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-3 mb-3">
-              <span th:text="${course.status}"
+          <span th:if="${liveCourse.status != null and liveCourse.status.name() == 'PENDING'}"
+                class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-bold">
+            승인 대기
+          </span>
+
+              <span th:if="${liveCourse.status != null and liveCourse.status.name() == 'APPROVED'}"
+                    class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-bold">
+            승인 완료
+          </span>
+
+              <span th:if="${liveCourse.status != null and liveCourse.status.name() == 'REJECTED'}"
+                    class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-bold">
+            반려됨
+          </span>
+
+              <span th:if="${liveCourse.status != null and liveCourse.status.name() == 'IN_PROGRESS'}"
                     class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-bold">
-                예정중
-              </span>
+            방송 중
+          </span>
+
+              <span th:if="${liveCourse.status != null and liveCourse.status.name() == 'ENDED'}"
+                    class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-bold">
+            종료됨
+          </span>
+
+              <span th:if="${liveCourse.status != null and liveCourse.status.name() == 'CANCELLED'}"
+                    class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-bold">
+            요청 취소
+          </span>
+
+              <span th:if="${liveCourse.status == null}"
+                    class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-bold">
+            상태 없음
+          </span>
             </div>
 
-            <h3 class="text-xl font-black text-gray-900 mb-3 group-hover:text-blue-600 transition-colors"
-                th:text="${course.title}">
+            <h3 class="text-xl font-black text-gray-900 mb-3 group-hover:text-blue-600 transition-colors truncate"
+                th:text="${liveCourse.title}">
               실시간 강의명
             </h3>
 
             <div class="flex items-center gap-4 text-sm">
-              <span class="font-bold text-gray-700">
-                <i class="fa-solid fa-calendar text-gray-500 mr-1"></i>
-                <span th:text="${course.datetime}">2026-04-20 19:00</span>
-              </span>
+          <span class="font-bold text-gray-700">
+            <i class="fa-solid fa-calendar text-gray-500 mr-1"></i>
+            <span th:text="${liveCourse.startAt != null ? #temporals.format(liveCourse.startAt, 'yyyy-MM-dd HH:mm') : '-'}">
+              2026-04-20 19:00
+            </span>
+          </span>
 
               <span class="font-bold text-gray-700">
-                <i class="fa-solid fa-users text-gray-500 mr-1"></i>
-                <span th:text="${course.registeredCount}">0</span>/<span th:text="${course.capacity}">0</span>명
-              </span>
+            <i class="fa-solid fa-users text-gray-500 mr-1"></i>
+            <span th:text="${liveCourse.currentCount}">0</span>/<span th:text="${liveCourse.maxCapacity}">0</span>명
+          </span>
             </div>
           </div>
 
           <div class="flex items-center gap-3">
-            <a th:href="@{/instructor/live-course/{id}(id=${course.id})}"
+            <a th:href="@{/instructor/live-lecture/{id}(id=${liveCourse.liveId})}"
                class="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-blue-300 text-blue-600 transition-all hover:bg-blue-50"
                title="조회">
               <i class="fa-regular fa-eye"></i>
             </a>
 
-            <a th:href="@{/instructor/live-course/edit/{id}(id=${course.id})}"
+            <a th:if="${liveCourse.status != null and (liveCourse.status.name() == 'PENDING' or liveCourse.status.name() == 'APPROVED' or liveCourse.status.name() == 'REJECTED' or liveCourse.status.name() == 'CANCELLED')}"
+               th:href="@{/instructor/live-lecture/{id}/edit(id=${liveCourse.liveId})}"
                class="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-green-300 text-green-600 transition-all hover:bg-green-50"
                title="수정">
               <i class="fa-regular fa-pen-to-square"></i>
             </a>
 
             <button type="button"
-                    th:data-id="${course.id}"
-                    th:data-title="${course.title}"
+                    th:if="${liveCourse.status != null and liveCourse.status.name() == 'PENDING'}"
+                    th:data-id="${liveCourse.liveId}"
+                    th:data-title="${liveCourse.title}"
+                    onclick="updateLiveLectureRegistrationStatus(this, 'CANCELLED')"
+                    class="flex h-12 items-center justify-center rounded-xl border-2 border-yellow-300 px-4 text-yellow-700 transition-all hover:bg-yellow-50 font-bold whitespace-nowrap"
+                    title="등록 요청 취소">
+              요청 취소
+            </button>
+
+            <button type="button"
+                    th:if="${liveCourse.status != null and liveCourse.status.name() == 'CANCELLED'}"
+                    th:data-id="${liveCourse.liveId}"
+                    th:data-title="${liveCourse.title}"
+                    onclick="updateLiveLectureRegistrationStatus(this, 'PENDING')"
+                    class="flex h-12 items-center justify-center rounded-xl border-2 border-blue-300 px-4 text-blue-700 transition-all hover:bg-blue-50 font-bold whitespace-nowrap"
+                    title="등록 요청">
+              등록 요청
+            </button>
+
+            <button type="button"
+                    th:if="${liveCourse.status != null and liveCourse.status.name() == 'APPROVED'}"
+                    th:data-id="${liveCourse.liveId}"
+                    th:data-title="${liveCourse.title}"
                     onclick="openDeleteLiveModal(this)"
                     class="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-red-300 text-red-600 transition-all hover:bg-red-50"
-                    title="삭제">
+                    title="삭제 요청">
               <i class="fa-regular fa-trash-can"></i>
             </button>
           </div>
         </div>
       </div>
     </div>
+
 
     <div th:if="${liveCourses == null or #lists.isEmpty(liveCourses)}"
          class="bg-white rounded-3xl border-2 border-dashed border-gray-200 py-24 text-center">
@@ -425,6 +480,41 @@
     };
   }
 
+  async function updateLiveLectureRegistrationStatus(button, nextStatus) {
+    const liveId = button.dataset.id;
+    const title = button.dataset.title || '';
+
+    const confirmMessage = nextStatus === 'CANCELLED'
+            ? `"${title}" 실시간 강의 등록 요청을 취소하시겠습니까?`
+            : `"${title}" 실시간 강의를 다시 등록 요청하시겠습니까?`;
+
+    if (!confirm(confirmMessage)) {
+      return;
+    }
+
+    const formData = new FormData();
+    formData.set('status', nextStatus);
+
+    const response = await fetch(`/instructor/live-lecture/${liveId}/registration-status`, {
+      method: 'PATCH',
+      headers: getCsrfHeaders(),
+      body: formData
+    });
+
+    if (!response.ok) {
+      alert('실시간 강의 등록 상태 변경에 실패했습니다.');
+      return;
+    }
+
+    const successMessage = nextStatus === 'CANCELLED'
+            ? '실시간 강의 등록 요청이 취소되었습니다.'
+            : '실시간 강의 등록 요청이 완료되었습니다.';
+
+    alert(successMessage);
+    location.reload();
+  }
+
+
   async function updateCourseRegistrationStatus(button, nextStatus) {
     const courseId = button.dataset.id;
     const title = button.dataset.title || '';
@@ -516,7 +606,7 @@
 
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = `/instructor/live-course/${currentDeleteLiveId}/delete-request`;
+    form.action = `/instructor/live-lecture/${currentDeleteLiveId}/delete-request`;
 
     const reasonInput = document.createElement('input');
     reasonInput.type = 'hidden';

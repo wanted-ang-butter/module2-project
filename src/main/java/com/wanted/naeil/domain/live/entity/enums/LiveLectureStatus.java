@@ -10,7 +10,8 @@ public enum LiveLectureStatus {
     APPROVED("승인 완료"),
     REJECTED("반려됨"),
     IN_PROGRESS("방송 중"),
-    ENDED("종료됨");
+    ENDED("종료됨"),
+    CANCELLED("요청 취소");
 
     private final String description;
 }
