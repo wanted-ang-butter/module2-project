@@ -15,11 +15,11 @@ public class CreditController {
 
     private final CreditService creditService;
 
-    // 크레딧
+    // 크레딧 충전 페이지 조회
     @GetMapping("/charge")
-    public String showChargePage(@AuthenticationPrincipal AuthDetails authDetails,
-                                 @RequestParam(value = "success", required = false) String success,
-                                 Model model) {
+    public String getChargePage(@AuthenticationPrincipal AuthDetails authDetails,
+                                @RequestParam(value = "success", required = false) String success,
+                                Model model) {
 
         if (authDetails == null) {
             return "redirect:/login";

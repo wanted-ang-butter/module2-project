@@ -13,10 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class PaymentQueryService {
+public class PaymentHistoryService {
 
     private final PaymentItemRepository paymentItemRepository;
 
+    // 결제 내역 조회
     public Page<PaymentHistoryResponse> getPaymentHistories(Long userId,
                                                             PaymentItemType itemType,
                                                             Pageable pageable) {
@@ -29,7 +30,6 @@ public class PaymentQueryService {
     }
 
     private PaymentHistoryResponse toResponse(PaymentItem paymentItem) {
-
         PaymentItemType itemType = paymentItem.getItemType();
         int amount = paymentItem.getFinalPrice();
 
@@ -37,7 +37,7 @@ public class PaymentQueryService {
                 .paymentId(paymentItem.getPayment().getId())
                 .itemType(itemType.name())
                 .itemTypeName(itemType.getDescription())
-                .itemName(paymentItem.getItemName())
+                .itemName(getItemName(paymentItem))
                 .amount(amount)
                 .displayAmount(getDisplayAmount(itemType, amount))
                 .displayPaymentMethod(getDisplayPaymentMethod(itemType))
@@ -46,16 +46,29 @@ public class PaymentQueryService {
                 .build();
     }
 
+    private String getItemName(PaymentItem paymentItem) {
+        return switch (paymentItem.getItemType()) {
+            case COURSE -> {
+                if (paymentItem.getCourse() == null) {
+                    yield "코스";
+                }
+                yield paymentItem.getCourse().getTitle();
+            }
+            case SUBSCRIPTION -> "구독권";
+            case CREDIT -> String.format("%,d 크레딧 충전", paymentItem.getFinalPrice());
+        };
+    }
+
     private String getDisplayAmount(PaymentItemType itemType, int amount) {
         return switch (itemType) {
-            case CREDIT_CHARGE -> "+" + String.format("%,d", amount) + " 크레딧";
+            case CREDIT -> "+" + String.format("%,d", amount) + " 크레딧";
             case COURSE, SUBSCRIPTION -> "-" + String.format("%,d", amount) + " 크레딧";
         };
     }
 
     private String getDisplayPaymentMethod(PaymentItemType itemType) {
         return switch (itemType) {
-            case CREDIT_CHARGE -> "-";
+            case CREDIT -> "-";
             case COURSE, SUBSCRIPTION -> "크레딧";
         };
     }
