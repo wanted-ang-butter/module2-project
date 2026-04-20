@@ -203,8 +203,8 @@
         <p class="text-gray-600 font-medium">등록한 실시간 강의를 조회하고 관리할 수 있습니다</p>
       </div>
 
-      <a href="#"
-         onclick="alert('실시간 강의 신청 기능은 준비 중입니다.'); return false;"
+      <a th:href="@{/instructor/live-lecture}"
+         href="/instructor/live-lecture"
          class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-xl hover:shadow-xl transition-all font-bold">
         <i class="fa-solid fa-plus"></i>
         실시간 강의 신청하기
@@ -276,8 +276,8 @@
       <h3 class="text-3xl font-black text-gray-900 mb-4">등록된 실시간 강의가 없습니다</h3>
       <p class="text-xl text-gray-500 font-medium mb-8">새로운 실시간 강의를 등록해보세요</p>
 
-      <a href="#"
-         onclick="alert('실시간 강의 신청 기능은 준비 중입니다.'); return false;"
+      <a th:href="@{/instructor/live-lecture}"
+         href="/instructor/live-lecture"
          class="inline-flex items-center gap-3 px-9 py-4 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-2xl hover:shadow-lg transition-all font-black text-lg">
         <i class="fa-solid fa-plus"></i>
         실시간 강의 신청하기
