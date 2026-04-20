@@ -1,10 +1,748 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      th:attr="data-success=${success}">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>크레딧 충전</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Pretendard', sans-serif;
+            background: #f6f7f9;
+            color: #111827;
+        }
+
+        .container {
+            width: 1180px;
+            margin: 40px auto 80px;
+        }
+
+        .banner {
+            margin-bottom: 34px;
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #6b7280;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .back:hover {
+            color: #374151;
+        }
+
+        .banner h1 {
+            margin: 0 0 16px;
+            font-size: 42px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            color: #0f172a;
+        }
+
+        .banner p {
+            margin: 0;
+            font-size: 16px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        /* 보유 크레딧 카드 */
+        .balance-card {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            background: linear-gradient(90deg, #f8fbff 0%, #f7fcf9 100%);
+            border: 1px solid #d9dde4;
+            border-radius: 26px;
+            box-shadow: 0 3px 10px rgba(15, 23, 42, 0.05);
+            padding: 30px 34px;
+            margin-bottom: 48px;
+        }
+
+        .balance-icon {
+            width: 86px;
+            height: 86px;
+            border-radius: 24px;
+            background: linear-gradient(135deg, #4f6cff 0%, #35b46a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 12px 24px rgba(79, 108, 255, 0.18);
+            flex-shrink: 0;
+        }
+
+        .balance-icon svg {
+            width: 42px;
+            height: 42px;
+            stroke: white;
+        }
+
+        .balance-info {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .balance-info .label {
+            font-size: 15px;
+            font-weight: 700;
+            color: #374151;
+        }
+
+        .balance-info .value {
+            font-size: 40px;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -1px;
+            color: #0f172a;
+        }
+
+        .balance-info .value span:last-child {
+            font-size: 35px;
+            color: #4b5563;
+            margin-left: 6px;
+        }
+
+        /* 섹션 제목 */
+        .section-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0 0 20px;
+            letter-spacing: -0.4px;
+        }
+
+        /* 충전 옵션 */
+        .option-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+
+        .option-card {
+            position: relative;
+            background: #ffffff;
+            border: 2px solid #d9dde4;
+            border-radius: 26px;
+            min-height: 390px;
+            padding: 32px 26px 28px;
+            cursor: pointer;
+            transition: 0.2s ease;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
+        }
+
+        .option-card:hover {
+            border-color: #8ca0ff;
+            transform: translateY(-2px);
+        }
+
+        .option-card.selected {
+            border-color: #5b6cff;
+            background: #f7f9ff;
+            box-shadow: 0 10px 24px rgba(91, 108, 255, 0.10);
+        }
+
+        .radio-circle {
+            position: absolute;
+            top: 26px;
+            right: 22px;
+            width: 22px;
+            height: 22px;
+            border: 2px solid #c8cdd6;
+            border-radius: 50%;
+            background: white;
+        }
+
+        .option-card.selected .radio-circle {
+            border-color: #5b6cff;
+            box-shadow: inset 0 0 0 5px #5b6cff;
+        }
+
+        .badge {
+            position: absolute;
+            top: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #4f6cff 0%, #35b46a 100%);
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            box-shadow: 0 8px 18px rgba(79, 108, 255, 0.18);
+        }
+
+        .option-amount {
+            margin-top: 28px;
+            font-size: 44px;
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: -1.2px;
+            color: #0f172a;
+            word-break: keep-all;
+        }
+
+        .option-unit {
+            display: block;
+            margin-top: 4px;
+            font-size: 32px;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: -0.8px;
+        }
+
+        .option-desc {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #4b5563;
+            font-weight: 600;
+        }
+
+        .option-divider {
+            margin: 30px 0 24px;
+            border: none;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .option-rate {
+            font-size: 14px;
+            color: #6b7280;
+            font-weight: 700;
+        }
+
+        /* 직접 충전 */
+        .direct-wrap {
+            background: #ffffff;
+            border: 2px solid #d9dde4;
+            border-radius: 26px;
+            padding: 24px 26px 22px;
+            margin-bottom: 40px;
+        }
+
+        .direct-box input {
+            width: 100%;
+            height: 82px;
+            border-radius: 22px;
+            border: 2px solid #cfd4dc;
+            padding: 0 30px;
+            font-size: 22px;
+            font-weight: 700;
+            color: #111827;
+            outline: none;
+            background: #ffffff;
+        }
+
+        .direct-box input::placeholder {
+            color: #9ca3af;
+            font-weight: 700;
+        }
+
+        .direct-box input:focus {
+            border-color: #5b6cff;
+            box-shadow: 0 0 0 4px rgba(91, 108, 255, 0.08);
+        }
+
+        .direct-guide {
+            margin-top: 18px;
+            font-size: 15px;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        /* 요약 */
+        .summary-box {
+            background: #ffffff;
+            border: 2px solid #e5e7eb;
+            border-radius: 26px;
+            padding: 30px 28px 26px;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+        }
+
+        .summary-top {
+            display: flex;
+            align-items: stretch;
+            justify-content: space-between;
+            gap: 22px;
+            margin-bottom: 24px;
+        }
+
+        .summary-left,
+        .summary-right {
+            flex: 1;
+        }
+
+        .summary-center-line {
+            width: 1px;
+            background: #e5e7eb;
+        }
+
+        .summary-label {
+            font-size: 15px;
+            font-weight: 800;
+            color: #374151;
+            margin-bottom: 12px;
+        }
+
+        .summary-price {
+            font-size: 50px;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: -1.2px;
+            line-height: 1;
+        }
+
+        .summary-credit {
+            text-align: right;
+        }
+
+        .summary-credit .plus {
+            font-size: 46px;
+            font-weight: 800;
+            color: #4f63ff;
+            letter-spacing: -1px;
+            line-height: 1;
+        }
+
+        .summary-hint {
+            width: 100%;
+            height: 78px;
+            border: none;
+            border-radius: 20px;
+            background: #eceef3;
+            color: #7b8191;
+            font-size: 21px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            cursor: default;
+        }
+
+        .charge-btn {
+            width: 100%;
+            height: 78px;
+            border: none;
+            border-radius: 20px;
+            background: linear-gradient(90deg, #7585ff 0%, #6172f7 100%);
+            color: white;
+            font-size: 22px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .charge-btn:hover {
+            filter: brightness(0.98);
+        }
+
+        .charge-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* 모달 */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.28);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-box {
+            width: 420px;
+            max-width: calc(100% - 32px);
+            background: #ffffff;
+            border: 1px solid #eadf9a;
+            border-radius: 28px;
+            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.16);
+            padding: 32px 28px 22px;
+            text-align: center;
+        }
+
+        .modal-icon {
+            width: 44px;
+            height: 44px;
+            margin: 0 auto 16px;
+            border-radius: 50%;
+            background: #fff8dc;
+            color: #c89b1d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .modal-title {
+            margin: 0 0 10px;
+            font-size: 30px;
+            font-weight: 800;
+            color: #111827;
+            letter-spacing: -0.5px;
+        }
+
+        .modal-message {
+            margin: 0 0 22px;
+            font-size: 17px;
+            color: #6b7280;
+            line-height: 1.5;
+            word-break: keep-all;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 18px;
+            margin-top: 6px;
+        }
+
+        .modal-btn {
+            width: 180px;
+            height: 74px;
+            border: none;
+            border-radius: 20px;
+            font-size: 21px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .modal-btn.cancel {
+            background: #eceff3;
+            color: #475569;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-btn.confirm {
+            background: linear-gradient(90deg, #7585ff 0%, #6172f7 100%);
+            color: white;
+        }
+
+        .modal-btn.single {
+            width: 100%;
+        }
+
+        @media (max-width: 1280px) {
+            .container {
+                width: calc(100% - 48px);
+            }
+
+            .option-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .banner h1 {
+                font-size: 36px;
+            }
+
+            .banner p {
+                font-size: 15px;
+            }
+
+            .balance-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .balance-info .value {
+                font-size: 34px;
+            }
+
+            .balance-info .value span:last-child {
+                font-size: 28px;
+            }
+
+            .option-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-top {
+                flex-direction: column;
+            }
+
+            .summary-center-line {
+                display: none;
+            }
+
+            .summary-credit {
+                text-align: left;
+            }
+        }
+    </style>
 </head>
 <body>
+
+<div class="container">
+    <div class="banner">
+        <a href="javascript:history.back()" class="back">← 이전으로</a>
+        <h1>크레딧 충전</h1>
+        <p>강의 수강을 위해 크레딧을 충전하세요</p>
+    </div>
+
+    <!-- 보유 크레딧 -->
+    <div class="balance-card" id="balanceCard" th:attr="data-balance=${balance}">
+        <div class="balance-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H18a2 2 0 0 1 2 2v1H6.5A2.5 2.5 0 0 0 4 10.5v6A2.5 2.5 0 0 0 6.5 19H20v1a2 2 0 0 1-2 2H5.5A2.5 2.5 0 0 1 3 19.5v-12Z"/>
+                <path d="M20 9H6.5A1.5 1.5 0 0 0 5 10.5v5A1.5 1.5 0 0 0 6.5 17H20a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1Z"/>
+                <circle cx="16.5" cy="13" r="1"/>
+            </svg>
+        </div>
+        <div class="balance-info">
+            <div class="label">보유 크레딧</div>
+            <div class="value">
+                <span th:text="${#numbers.formatInteger(balance, 3, 'COMMA')}">120,000</span>
+                <span>크레딧</span>
+            </div>
+        </div>
+    </div>
+
+    <form th:action="@{/credit/charge}" method="post" id="chargeForm" novalidate>
+        <input type="hidden" name="amount" id="amountInput">
+
+        <!-- 충전 옵션 -->
+        <h2 class="section-title">충전 옵션 선택</h2>
+        <div class="option-grid">
+            <div class="option-card" data-value="10000">
+                <span class="radio-circle"></span>
+                <div class="option-amount">10,000<span class="option-unit">크레딧</span></div>
+                <div class="option-desc">10,000 크레딧</div>
+                <hr class="option-divider">
+                <div class="option-rate">1크레딧 = ₩1</div>
+            </div>
+
+            <div class="option-card" data-value="30000">
+                <span class="badge">✦ 인기</span>
+                <span class="radio-circle"></span>
+                <div class="option-amount">30,000<span class="option-unit">크레딧</span></div>
+                <div class="option-desc">30,000 크레딧</div>
+                <hr class="option-divider">
+                <div class="option-rate">1크레딧 = ₩1</div>
+            </div>
+
+            <div class="option-card" data-value="50000">
+                <span class="radio-circle"></span>
+                <div class="option-amount">50,000<span class="option-unit">크레딧</span></div>
+                <div class="option-desc">50,000 크레딧</div>
+                <hr class="option-divider">
+                <div class="option-rate">1크레딧 = ₩1</div>
+            </div>
+
+            <div class="option-card" data-value="100000">
+                <span class="radio-circle"></span>
+                <div class="option-amount">100,000<span class="option-unit">크레딧</span></div>
+                <div class="option-desc">100,000 크레딧</div>
+                <hr class="option-divider">
+                <div class="option-rate">1크레딧 = ₩1</div>
+            </div>
+        </div>
+
+        <!-- 직접 충전 -->
+        <h2 class="section-title">직접 충전</h2>
+        <div class="direct-wrap">
+            <div class="direct-box">
+                <input
+                        type="number"
+                        id="customAmount"
+                        placeholder="충전할 크레딧을 입력하세요"
+                >
+            </div>
+            <div class="direct-guide">최소 10,000 크레딧 / 1,000 단위로 입력 가능합니다</div>
+        </div>
+
+        <!-- 요약 -->
+        <div class="summary-box">
+            <div class="summary-top">
+                <div class="summary-left">
+                    <div class="summary-label">결제 금액</div>
+                    <div class="summary-price">₩<span id="price">0</span></div>
+                </div>
+
+                <div class="summary-center-line"></div>
+
+                <div class="summary-right summary-credit">
+                    <div class="summary-label">충전 크레딧</div>
+                    <div class="plus">+<span id="creditAmount">0</span></div>
+                </div>
+            </div>
+
+            <button type="button" class="summary-hint" id="summaryHint" disabled>
+                옵션을 선택하거나 금액을 입력하세요
+            </button>
+
+            <button type="submit" class="charge-btn">충전하기</button>
+        </div>
+    </form>
+</div>
+
+<!-- 공통 모달 -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal-box">
+        <div class="modal-icon" id="modalIcon">!</div>
+        <h3 class="modal-title" id="modalTitle">알림</h3>
+        <p class="modal-message" id="modalMessage">메시지 영역</p>
+
+        <div class="modal-actions" id="modalActions">
+            <button type="button" class="modal-btn cancel" id="modalCancelBtn">취소</button>
+            <button type="button" class="modal-btn confirm" id="modalConfirmBtn">확인</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const cards = document.querySelectorAll('.option-card');
+    const custom = document.getElementById('customAmount');
+    const amountInput = document.getElementById('amountInput');
+
+    const price = document.getElementById('price');
+    const creditAmount = document.getElementById('creditAmount');
+    const summaryHint = document.getElementById('summaryHint');
+    const form = document.getElementById('chargeForm');
+
+    const balanceCard = document.getElementById('balanceCard');
+    const currentBalance = Number(balanceCard.dataset.balance || 0);
+
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalMessage = document.getElementById('modalMessage');
+    const modalConfirmBtn = document.getElementById('modalConfirmBtn');
+    const modalCancelBtn = document.getElementById('modalCancelBtn');
+
+    const success = document.documentElement.dataset.success;
+
+    function openModal({ title, message, confirmText = '확인', cancelText = '취소', onConfirm = null, showCancel = true }) {
+        modalTitle.innerText = title;
+        modalMessage.innerText = message;
+        modalConfirmBtn.innerText = confirmText;
+        modalCancelBtn.innerText = cancelText;
+
+        modalCancelBtn.style.display = showCancel ? 'inline-flex' : 'none';
+        modalConfirmBtn.classList.toggle('single', !showCancel);
+
+        modalOverlay.classList.add('show');
+
+        modalConfirmBtn.onclick = () => {
+            closeModal();
+            if (onConfirm) onConfirm();
+        };
+
+        modalCancelBtn.onclick = () => {
+            closeModal();
+        };
+    }
+
+    function closeModal() {
+        modalOverlay.classList.remove('show');
+    }
+
+    function resetSummary() {
+        amountInput.value = '';
+        price.innerText = '0';
+        creditAmount.innerText = '0';
+        summaryHint.innerText = '옵션을 선택하거나 금액을 입력하세요';
+    }
+
+    function update(amount) {
+        amount = Number(amount);
+
+        if (!amount || amount <= 0) {
+            resetSummary();
+            return;
+        }
+
+        amountInput.value = amount;
+        price.innerText = amount.toLocaleString();
+        creditAmount.innerText = amount.toLocaleString();
+        summaryHint.innerText = '충전 후 잔액: ' + (currentBalance + amount).toLocaleString() + ' 크레딧';
+    }
+
+    cards.forEach(card => {
+        card.addEventListener('click', () => {
+            cards.forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+
+            custom.value = '';
+            update(card.dataset.value);
+        });
+    });
+
+    custom.addEventListener('input', () => {
+        cards.forEach(c => c.classList.remove('selected'));
+        update(custom.value);
+    });
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const amount = Number(amountInput.value);
+
+        if (!amount || amount < 10000) {
+            openModal({
+                title: '입력 오류',
+                message: '최소 10,000 크레딧 이상 입력해야 합니다.',
+                confirmText: '확인',
+                showCancel: false
+            });
+            return;
+        }
+
+        if (amount % 1000 !== 0) {
+            openModal({
+                title: '입력 오류',
+                message: '1,000 단위로만 충전 가능합니다.',
+                confirmText: '확인',
+                showCancel: false
+            });
+            return;
+        }
+
+        openModal({
+            title: '크레딧 충전',
+            message: amount.toLocaleString() + ' 크레딧을 충전하시겠습니까?',
+            confirmText: '충전하기',
+            cancelText: '취소',
+            showCancel: true,
+            onConfirm: () => {
+                form.submit();
+            }
+        });
+    });
+
+    if (success === 'true') {
+        window.addEventListener('load', () => {
+            openModal({
+                title: '충전 완료',
+                message: '크레딧 충전이 완료되었습니다.',
+                confirmText: '확인',
+                showCancel: false
+            });
+        });
+    }
+
+    resetSummary();
+</script>
 
 </body>
 </html>

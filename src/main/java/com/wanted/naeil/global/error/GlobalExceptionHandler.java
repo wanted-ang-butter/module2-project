@@ -41,6 +41,7 @@ public class GlobalExceptionHandler {
         mv.setViewName(DEFAULT_ERROR_VIEW);
         return mv;
     }
+
     // 404 에러, 데이터 not found
     @ExceptionHandler(NoSuchElementException.class)
     protected ModelAndView handleNoSuchElementException(NoSuchElementException e) {
@@ -74,6 +75,7 @@ public class GlobalExceptionHandler {
         mv.setViewName(DEFAULT_ERROR_VIEW);
         return mv;
     }
+
 
     // 403 에러, 권한 없음 (글 수정/삭제 시 본인이 아닌 경우)
     @ExceptionHandler(AccessDeniedException.class)
