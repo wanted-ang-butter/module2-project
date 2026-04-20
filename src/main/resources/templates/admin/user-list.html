@@ -6,103 +6,103 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body class="min-h-screen bg-gray-50">
 
 <div th:replace="fragments/adminHeader :: adminHeader"></div>
 
-<div class="max-w-7xl mx-auto px-6 py-10 flex gap-8">
-
-    <!-- 사이드바 -->
+<div class="mx-auto flex max-w-7xl gap-8 px-6 py-10">
     <aside class="w-56 shrink-0">
-        <div class="bg-white border-2 border-gray-200 rounded-2xl p-4">
-            <p class="text-sm font-black text-gray-900 px-3 py-2 mb-1">회원 관리</p>
+        <div class="rounded-2xl border-2 border-gray-200 bg-white p-4">
+            <p class="mb-1 px-3 py-2 text-sm font-black text-gray-900">회원 관리</p>
             <nav class="space-y-1">
                 <a th:href="@{/admin/user-management}"
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-purple-700 bg-purple-50">
-                    <i class="fa-solid fa-users text-purple-500 w-4"></i>회원 조회
+                   class="flex items-center gap-3 rounded-xl bg-purple-50 px-3 py-2.5 text-sm font-bold text-purple-700">
+                    <i class="fa-solid fa-users w-4 text-purple-500"></i>
+                    회원 조회
                 </a>
                 <a th:href="@{/admin/instructor-approval}"
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50">
-                    <i class="fa-solid fa-chalkboard-teacher text-gray-400 w-4"></i>강사 승인
+                   class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    <i class="fa-solid fa-chalkboard-teacher w-4 text-gray-400"></i>
+                    강사 승인
                 </a>
                 <a th:href="@{/admin/blacklist}"
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50">
-                    <i class="fa-solid fa-ban text-gray-400 w-4"></i>블랙리스트 관리
+                   class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    <i class="fa-solid fa-ban w-4 text-gray-400"></i>
+                    블랙리스트 관리
                 </a>
             </nav>
         </div>
     </aside>
 
-    <!-- 메인 -->
     <main class="flex-1">
+        <div class="mb-12">
+            <button onclick="history.back()"
+                    class="mb-4 flex items-center gap-2 rounded-xl border-2 border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100">
+                <i class="fa-solid fa-arrow-left text-sm"></i>
+                뒤로가기
+            </button>
 
-    <div class="mb-12">
-
-        <button onclick="history.back()" class="flex items-center gap-2 px-4 py-2 border-2 border-gray-200 rounded-xl text-gray-700 hover:bg-gray-100 font-medium text-sm mb-4"><i class="fa-solid fa-arrow-left text-sm"></i>뒤로가기</button>
-
-        <!-- Admin Hero Banner -->
-        <div class="relative overflow-hidden mb-8">
-            <div class="relative bg-gradient-to-br from-purple-50 via-white to-blue-50 rounded-3xl p-12 border-2 border-gray-200 shadow-lg">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <div class="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-200 rounded-full mb-6 shadow-sm">
-                            <div class="w-2.5 h-2.5 bg-purple-500 rounded-full"></div>
-                            <span class="text-sm font-bold text-gray-700">시스템 정상</span>
+            <div class="relative mb-8 overflow-hidden">
+                <div class="rounded-3xl border-2 border-gray-200 bg-gradient-to-br from-purple-50 via-white to-blue-50 p-12 shadow-lg">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="mb-6 inline-flex items-center gap-2 rounded-full border-2 border-gray-200 bg-white px-4 py-2 shadow-sm">
+                                <div class="h-2.5 w-2.5 rounded-full bg-purple-500"></div>
+                                <span class="text-sm font-bold text-gray-700">관리자 화면</span>
+                            </div>
+                            <h1 class="mb-4 text-4xl font-black leading-tight text-gray-900">
+                                회원 상태를 확인하고<br />
+                                <span class="text-purple-600">관리</span>해보세요
+                            </h1>
+                            <p class="text-xl font-semibold text-gray-700">
+                                플랫폼에 가입한 회원 정보를 한눈에 관리합니다
+                            </p>
                         </div>
-                        <h2 class="text-4xl font-black text-gray-900 mb-4 leading-tight">
-                            안녕하세요,<br />
-                            <span class="text-purple-600">관리자</span>님
-                        </h2>
-                        <p class="text-xl text-gray-700 font-semibold">
-                            플랫폼 운영 상태를 확인하고 관리하세요
-                        </p>
-                    </div>
-                    <div class="hidden lg:block">
-                        <div class="w-48 h-48 bg-gradient-to-br from-purple-400 to-blue-400 rounded-3xl flex items-center justify-center shadow-2xl">
-                            <span class="text-white text-7xl">👥</span>
+                        <div class="hidden lg:block">
+                            <div class="flex h-48 w-48 items-center justify-center rounded-3xl bg-gradient-to-br from-purple-400 to-blue-400 shadow-2xl">
+                                <i class="fa-solid fa-users text-7xl text-white"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <h2 class="mb-2 text-4xl font-black text-gray-900">회원 관리</h2>
+            <p class="font-medium text-gray-600">플랫폼에 가입한 회원을 조회하고 상태를 관리합니다</p>
         </div>
 
-        <h1 class="text-4xl font-black text-gray-900 mb-2">회원 관리</h1>
-        <p class="text-gray-600 font-medium">플랫폼에 가입된 회원을 관리합니다</p>
-    </div>
+        <div class="mb-10 grid grid-cols-3 gap-6">
+            <div class="rounded-2xl border-2 border-gray-200 bg-white p-6 shadow-sm">
+                <p class="mb-1 text-sm font-bold text-gray-500">전체 회원</p>
+                <p class="text-3xl font-black text-gray-900" th:text="${totalCount}">0</p>
+            </div>
+            <div class="rounded-2xl border-2 border-gray-200 bg-white p-6 shadow-sm">
+                <p class="mb-1 text-sm font-bold text-gray-500">활성 회원</p>
+                <p class="text-3xl font-black text-green-600" th:text="${activeCount}">0</p>
+            </div>
+            <div class="rounded-2xl border-2 border-gray-200 bg-white p-6 shadow-sm">
+                <p class="mb-1 text-sm font-bold text-gray-500">비활성 회원</p>
+                <p class="text-3xl font-black text-red-500" th:text="${inactiveCount}">0</p>
+            </div>
+        </div>
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-3 gap-6 mb-10">
-        <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 shadow-sm">
-            <p class="text-sm font-bold text-gray-500 mb-1">전체 회원</p>
-            <p class="text-3xl font-black text-gray-900" th:text="${totalCount}">0</p>
+        <div class="mb-6 rounded-2xl border-2 border-gray-200 bg-white p-6 shadow-sm">
+            <div class="flex gap-3">
+                <input type="text"
+                       id="search-input"
+                       placeholder="이름 또는 닉네임으로 검색"
+                       class="flex-1 rounded-xl border-2 border-gray-200 px-4 py-2 text-sm focus:border-blue-400 focus:outline-none"
+                       oninput="applySearch()" />
+            </div>
         </div>
-        <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 shadow-sm">
-            <p class="text-sm font-bold text-gray-500 mb-1">활성 회원</p>
-            <p class="text-3xl font-black text-green-600" th:text="${activeCount}">0</p>
-        </div>
-        <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 shadow-sm">
-            <p class="text-sm font-bold text-gray-500 mb-1">비활성 회원</p>
-            <p class="text-3xl font-black text-red-500" th:text="${inactiveCount}">0</p>
-        </div>
-    </div>
 
-    <!-- Search Bar -->
-    <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 mb-6 shadow-sm">
-        <div class="flex gap-3">
-            <input type="text" id="search-input" placeholder="이름 또는 닉네임으로 검색"
-                   class="flex-1 px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400 text-sm"
-                   oninput="applySearch()" />
-        </div>
-    </div>
-
-    <!-- User Table -->
-    <div class="bg-white border-2 border-gray-200 rounded-2xl shadow-sm overflow-hidden overflow-x-auto">
-        <table class="w-full text-sm min-w-max">
-            <thead class="bg-gray-50 border-b-2 border-gray-200">
+        <div class="overflow-x-auto overflow-hidden rounded-2xl border-2 border-gray-200 bg-white shadow-sm">
+            <table class="min-w-max w-full text-sm">
+                <thead class="border-b-2 border-gray-200 bg-gray-50">
                 <tr>
                     <th class="px-4 py-3 text-left font-bold text-gray-600">No</th>
                     <th class="px-4 py-3 text-left font-bold text-gray-600">아이디</th>
-                    <th class="px-4 py-3 text-left font-bold text-gray-600">본명</th>
+                    <th class="px-4 py-3 text-left font-bold text-gray-600">이름</th>
                     <th class="px-4 py-3 text-left font-bold text-gray-600">전화번호</th>
                     <th class="px-4 py-3 text-left font-bold text-gray-600">생년월일</th>
                     <th class="px-4 py-3 text-left font-bold text-gray-600">닉네임</th>
@@ -112,110 +112,137 @@
                     <th class="px-4 py-3 text-left font-bold text-gray-600">경고</th>
                     <th class="px-4 py-3 text-left font-bold text-gray-600">관리</th>
                 </tr>
-            </thead>
-            <tbody id="user-tbody">
+                </thead>
+                <tbody id="user-tbody">
                 <tr th:if="${#lists.isEmpty(users)}">
                     <td colspan="11" class="px-4 py-8 text-center text-gray-400">회원이 없습니다.</td>
                 </tr>
                 <tr th:each="user, stat : ${users}"
                     th:attr="data-name=${user.name}, data-nickname=${user.nickname}"
-                    class="border-b border-gray-100 hover:bg-gray-50 transition-colors search-row">
-                    <td class="px-4 py-3 text-gray-500" th:text="${stat.count}"></td>
-                    <td class="px-4 py-3 font-medium text-gray-900" th:text="${user.username ?: '-'}"></td>
-                    <td class="px-4 py-3 text-gray-700" th:text="${user.name ?: '-'}"></td>
-                    <td class="px-4 py-3 text-gray-600 whitespace-nowrap" th:text="${user.phone ?: '-'}"></td>
-                    <td class="px-4 py-3 text-gray-600 whitespace-nowrap" th:text="${user.birthDate ?: '-'}"></td>
-                    <td class="px-4 py-3 text-gray-600 whitespace-nowrap" th:text="${user.nickname ?: '-'}"></td>
+                    class="search-row border-b border-gray-100 transition-colors hover:bg-gray-50">
+                    <td class="px-4 py-3 text-gray-500" th:text="${stat.count}">1</td>
+                    <td class="px-4 py-3 font-medium text-gray-900" th:text="${user.username ?: '-'}">-</td>
+                    <td class="px-4 py-3 text-gray-700" th:text="${user.name ?: '-'}">-</td>
+                    <td class="whitespace-nowrap px-4 py-3 text-gray-600" th:text="${user.phone ?: '-'}">-</td>
+                    <td class="whitespace-nowrap px-4 py-3 text-gray-600" th:text="${user.birthDate ?: '-'}">-</td>
+                    <td class="whitespace-nowrap px-4 py-3 text-gray-600" th:text="${user.nickname ?: '-'}">-</td>
                     <td class="px-4 py-3">
                         <span th:if="${user.role.name() == 'INSTRUCTOR'}"
-                              class="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold">강사</span>
+                              class="rounded-full bg-blue-100 px-2 py-1 text-xs font-bold text-blue-700">강사</span>
                         <span th:if="${user.role.name() == 'ADMIN'}"
-                              class="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-bold">관리자</span>
+                              class="rounded-full bg-purple-100 px-2 py-1 text-xs font-bold text-purple-700">관리자</span>
                         <span th:if="${user.role.name() == 'SUBSCRIBER'}"
-                              class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">구독자</span>
+                              class="rounded-full bg-green-100 px-2 py-1 text-xs font-bold text-green-700">구독자</span>
                         <span th:if="${user.role.name() == 'USER'}"
-                              class="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-bold">일반</span>
+                              class="rounded-full bg-gray-100 px-2 py-1 text-xs font-bold text-gray-600">일반</span>
                         <span th:if="${user.role.name() == 'GUEST'}"
-                              class="px-2 py-1 bg-gray-100 text-gray-400 rounded-full text-xs font-bold">게스트</span>
+                              class="rounded-full bg-gray-100 px-2 py-1 text-xs font-bold text-gray-400">게스트</span>
                     </td>
-                    <td class="px-4 py-3 text-gray-600"
-                        th:text="${user.createdAt != null ? #temporals.format(user.createdAt, 'yyyy-MM-dd') : '-'}"></td>
+                    <td class="px-4 py-3 text-gray-600" th:text="${user.createdDateLabel}">-</td>
                     <td class="px-4 py-3">
                         <span th:if="${user.status.name() == 'ACTIVE'}"
-                              class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">활성</span>
-                        <span th:unless="${user.status.name() == 'ACTIVE'}"
-                              class="px-2 py-1 bg-red-100 text-red-600 rounded-full text-xs font-bold">비활성</span>
+                              class="rounded-full bg-green-100 px-2 py-1 text-xs font-bold text-green-700">활성</span>
+                        <span th:if="${user.status.name() == 'INACTIVE'}"
+                              class="rounded-full bg-red-100 px-2 py-1 text-xs font-bold text-red-600">비활성</span>
+                        <span th:if="${user.status.name() == 'BANNED'}"
+                              class="rounded-full bg-red-200 px-2 py-1 text-xs font-bold text-red-700">블랙리스트</span>
                     </td>
                     <td class="px-4 py-3">
                         <span th:if="${user.warningCount > 0}"
-                              class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold"
-                              th:text="${user.warningCount} + '회'"></span>
-                        <span th:unless="${user.warningCount > 0}" class="text-gray-400 text-xs">없음</span>
+                              class="rounded-full bg-yellow-100 px-2 py-1 text-xs font-bold text-yellow-700"
+                              th:text="${user.warningCount} + '회'">0회</span>
+                        <span th:unless="${user.warningCount > 0}" class="text-xs text-gray-400">없음</span>
                     </td>
                     <td class="px-4 py-3">
-                        <div class="flex gap-1 items-center">
-                            <form th:if="${user.status.name() == 'ACTIVE'}" method="post"
+                        <div class="flex items-center gap-1">
+                            <form th:if="${user.status.name() == 'ACTIVE'}"
+                                  method="post"
                                   th:action="@{/admin/user-management/{id}/deactivate(id=${user.id})}">
-                                <button type="submit" title="비활성화 (현재 활성)"
-                                        class="w-8 h-8 flex items-center justify-center rounded-full bg-green-100 text-green-600 hover:bg-red-100 hover:text-red-500 transition-colors">
+                                <button type="submit"
+                                        title="비활성화"
+                                        class="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 text-green-600 transition-colors hover:bg-red-100 hover:text-red-500">
                                     <i class="fa-solid fa-toggle-on text-sm"></i>
                                 </button>
                             </form>
-                            <form th:unless="${user.status.name() == 'ACTIVE'}" method="post"
+
+                            <form th:unless="${user.status.name() == 'ACTIVE'}"
+                                  method="post"
                                   th:action="@{/admin/user-management/{id}/activate(id=${user.id})}">
-                                <button type="submit" title="활성화 (현재 비활성)"
-                                        class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-green-100 hover:text-green-600 transition-colors">
+                                <button type="submit"
+                                        title="활성화"
+                                        class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-400 transition-colors hover:bg-green-100 hover:text-green-600">
                                     <i class="fa-solid fa-toggle-off text-sm"></i>
                                 </button>
                             </form>
-                            <button type="button" title="블랙리스트 추가"
+
+                            <button th:if="${user.status.name() != 'BANNED'}"
+                                    type="button"
+                                    title="블랙리스트 등록"
                                     th:attr="data-uid=${user.id}, data-uname=${user.name}"
                                     onclick="openBlacklistModal(this.dataset.uid, this.dataset.uname)"
-                                    class="w-8 h-8 flex items-center justify-center rounded-full bg-red-100 text-red-500 hover:bg-red-200 transition-colors">
+                                    class="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 text-red-500 transition-colors hover:bg-red-200">
                                 <i class="fa-solid fa-ban text-sm"></i>
                             </button>
-                            <form method="post" th:action="@{/admin/user-management/{id}/reset-warning(id=${user.id})}">
-                                <button type="submit" title="경고 초기화"
-                                        class="w-8 h-8 flex items-center justify-center rounded-full bg-yellow-100 text-yellow-600 hover:bg-yellow-200 transition-colors">
+
+                            <span th:if="${user.status.name() == 'BANNED'}"
+                                  title="이미 블랙리스트로 등록된 회원입니다"
+                                  class="flex h-8 w-8 cursor-not-allowed items-center justify-center rounded-full bg-gray-100 text-gray-400">
+                                <i class="fa-solid fa-lock text-sm"></i>
+                            </span>
+
+                            <form method="post"
+                                  th:action="@{/admin/user-management/{id}/reset-warning(id=${user.id})}">
+                                <button type="submit"
+                                        title="경고 초기화"
+                                        class="flex h-8 w-8 items-center justify-center rounded-full bg-yellow-100 text-yellow-600 transition-colors hover:bg-yellow-200">
                                     <i class="fa-solid fa-triangle-exclamation text-sm"></i>
                                 </button>
                             </form>
-                            <form th:if="${user.status.name() == 'INACTIVE'}" method="post"
+
+                            <form th:if="${user.status.name() == 'INACTIVE'}"
+                                  method="post"
                                   th:action="@{/admin/user-management/{id}/delete(id=${user.id})}"
                                   onsubmit="return confirm('삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')">
-                                <button type="submit" title="회원 삭제"
-                                        class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-red-100 hover:text-red-500 transition-colors">
+                                <button type="submit"
+                                        title="회원 삭제"
+                                        class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-400 transition-colors hover:bg-red-100 hover:text-red-500">
                                     <i class="fa-solid fa-trash text-sm"></i>
                                 </button>
                             </form>
                         </div>
                     </td>
                 </tr>
-            </tbody>
-        </table>
-    </div>
-
+                </tbody>
+            </table>
+        </div>
     </main>
 </div>
 
-<!-- Blacklist Modal -->
-<div id="blacklist-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" style="display:none">
-    <div class="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl border-2 border-gray-200">
-        <h3 class="text-xl font-black text-gray-900 mb-4">블랙리스트 등록</h3>
-        <p class="text-sm text-gray-600 mb-4">
-            <span id="blacklist-user-name" class="font-bold text-gray-900"></span> 님을 블랙리스트에 등록합니다.
+<div id="blacklist-modal"
+     class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50">
+    <div class="w-full max-w-md rounded-2xl border-2 border-gray-200 bg-white p-8 shadow-2xl">
+        <h3 class="mb-4 text-xl font-black text-gray-900">블랙리스트 등록</h3>
+        <p class="mb-4 text-sm text-gray-600">
+            <span id="blacklist-user-name" class="font-bold text-gray-900"></span> 회원을 블랙리스트에 등록합니다.
         </p>
         <form id="blacklist-form" method="post">
             <div class="mb-4">
-                <label class="block text-sm font-bold text-gray-700 mb-2">등록 사유</label>
-                <textarea name="reason" rows="3" placeholder="블랙리스트 등록 사유를 입력하세요"
-                          class="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-red-400 text-sm resize-none"></textarea>
+                <label class="mb-2 block text-sm font-bold text-gray-700">등록 사유</label>
+                <textarea name="reason"
+                          rows="3"
+                          placeholder="블랙리스트 등록 사유를 입력하세요"
+                          class="w-full resize-none rounded-xl border-2 border-gray-200 px-4 py-2 text-sm focus:border-red-400 focus:outline-none"></textarea>
             </div>
             <div class="flex justify-end gap-3">
-                <button type="button" onclick="closeBlacklistModal()"
-                        class="px-6 py-2 border-2 border-gray-200 rounded-xl font-bold text-gray-600 hover:bg-gray-50 text-sm">취소</button>
+                <button type="button"
+                        onclick="closeBlacklistModal()"
+                        class="rounded-xl border-2 border-gray-200 px-6 py-2 text-sm font-bold text-gray-600 hover:bg-gray-50">
+                    취소
+                </button>
                 <button type="submit"
-                        class="px-6 py-2 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 text-sm">등록</button>
+                        class="rounded-xl bg-red-600 px-6 py-2 text-sm font-bold text-white hover:bg-red-700">
+                    등록
+                </button>
             </div>
         </form>
     </div>
@@ -224,25 +251,31 @@
 <script>
     function applySearch() {
         const keyword = document.getElementById('search-input').value.trim().toLowerCase();
-        document.querySelectorAll('.search-row').forEach(tr => {
-            const name = (tr.dataset.name || '').toLowerCase();
-            const nickname = (tr.dataset.nickname || '').toLowerCase();
-            tr.style.display = (!keyword || name.includes(keyword) || nickname.includes(keyword)) ? '' : 'none';
+        document.querySelectorAll('.search-row').forEach((row) => {
+            const name = (row.dataset.name || '').toLowerCase();
+            const nickname = (row.dataset.nickname || '').toLowerCase();
+            row.style.display = !keyword || name.includes(keyword) || nickname.includes(keyword) ? '' : 'none';
         });
     }
 
     function openBlacklistModal(userId, userName) {
         document.getElementById('blacklist-user-name').textContent = userName;
         document.getElementById('blacklist-form').action = '/admin/user-management/' + userId + '/blacklist';
-        document.getElementById('blacklist-modal').style.display = 'flex';
+        document.getElementById('blacklist-modal').classList.remove('hidden');
+        document.getElementById('blacklist-modal').classList.add('flex');
     }
+
     function closeBlacklistModal() {
-        document.getElementById('blacklist-modal').style.display = 'none';
+        document.getElementById('blacklist-modal').classList.remove('flex');
+        document.getElementById('blacklist-modal').classList.add('hidden');
     }
-    var modal = document.getElementById('blacklist-modal');
+
+    const modal = document.getElementById('blacklist-modal');
     if (modal) {
-        modal.addEventListener('click', function(e) {
-            if (e.target === this) this.style.display = 'none';
+        modal.addEventListener('click', function (event) {
+            if (event.target === this) {
+                closeBlacklistModal();
+            }
         });
     }
 </script>

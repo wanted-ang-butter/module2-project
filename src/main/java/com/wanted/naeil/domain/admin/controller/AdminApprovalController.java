@@ -3,11 +3,14 @@ package com.wanted.naeil.domain.admin.controller;
 import com.wanted.naeil.domain.admin.dto.response.ApprovalResponse;
 import com.wanted.naeil.domain.admin.entity.enums.ApprovalRequestType;
 import com.wanted.naeil.domain.admin.service.AdminApprovalService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @Controller
@@ -66,15 +69,50 @@ public class AdminApprovalController {
 
     // 승인 처리 - 코스/강사/실시간/정산 공통, redirect 파라미터로 원래 페이지로 돌아감
     @PostMapping("/approvals/{id}/approve")
-    public String approve(@PathVariable Long id, @RequestParam String redirect) {
+    public String approve(@PathVariable Long id,
+                          @RequestParam(required = false) String redirect,
+                          HttpServletRequest request) {
         adminApprovalService.approve(id, null);
-        return "redirect:" + redirect;
+        return resolveRedirect(redirect, request);
     }
 
     // 반려 처리 - 반려 사유(rejectReason) 함께 처리
     @PostMapping("/approvals/{id}/reject")
-    public String reject(@PathVariable Long id, @RequestParam String rejectReason, @RequestParam String redirect) {
-        adminApprovalService.reject(id, null, rejectReason);
-        return "redirect:" + redirect;
+    public String reject(@PathVariable Long id,
+                         @RequestParam(required = false) String rejectReason,
+                         @RequestParam(required = false) String redirect,
+                         HttpServletRequest request) {
+        adminApprovalService.reject(id, null, normalizeRejectReason(rejectReason));
+        return resolveRedirect(redirect, request);
+    }
+
+    private String resolveRedirect(String redirect, HttpServletRequest request) {
+        if (StringUtils.hasText(redirect) && redirect.startsWith("/")) {
+            return "redirect:" + redirect;
+        }
+
+        String referer = request.getHeader("Referer");
+        if (StringUtils.hasText(referer)) {
+            try {
+                URI refererUri = URI.create(referer);
+                String path = refererUri.getPath();
+                String query = refererUri.getQuery();
+
+                if (StringUtils.hasText(path) && path.startsWith("/")) {
+                    return "redirect:" + path + (query != null ? "?" + query : "");
+                }
+            } catch (IllegalArgumentException ignored) {
+                // Ignore malformed referer values and fall back to the default admin page.
+            }
+        }
+
+        return "redirect:/admin/course-management/approval";
+    }
+
+    private String normalizeRejectReason(String rejectReason) {
+        if (StringUtils.hasText(rejectReason)) {
+            return rejectReason;
+        }
+        return "관리자 반려";
     }
 }

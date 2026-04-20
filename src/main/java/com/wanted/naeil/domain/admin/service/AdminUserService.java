@@ -22,18 +22,7 @@ public class AdminUserService {
         List<User> users =
                 userRepository.findAllByRoleIn(List.of(Role.USER, Role.INSTRUCTOR));
         return users.stream()
-                .map(u ->UserResponse.builder()
-                        .id(u.getId())
-                        .username(u.getUsername())
-                        .name(u.getName())
-                        .nickname(u.getNickname())
-                        .email(u.getEmail())
-                        .phone(u.getPhone())
-                        .role(u.getRole())
-                        .status(u.getStatus())
-                        .warningCount(u.getWarningCount())
-                        .birthDate(u.getBirthDate())
-                        .build())
+                .map(UserResponse::from)
                 .collect(Collectors.toList());
     }
     // 학생 삭제

@@ -5,6 +5,10 @@ import com.wanted.naeil.domain.course.entity.Review;
 import com.wanted.naeil.domain.course.repository.ReviewRepository;
 import com.wanted.naeil.domain.learning.entity.Enrollment;
 import com.wanted.naeil.domain.learning.repository.EnrollmentRepository;
+import com.wanted.naeil.domain.live.dto.response.MyLiveReservationResponse;
+import com.wanted.naeil.domain.live.entity.LiveReservation;
+import com.wanted.naeil.domain.live.entity.enums.LiveReservationStatus;
+import com.wanted.naeil.domain.live.repository.LiveReservationRepository;
 import com.wanted.naeil.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,12 +17,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.stream.Collectors.toList;
+
 @Service
 @RequiredArgsConstructor
 public class MyCourseService {
 
     private final EnrollmentRepository enrollmentRepository;
     private final ReviewRepository reviewRepository;
+    private final LiveReservationRepository liveReservationRepository;
 
     // 내 강의 목록 조회
     @Transactional(readOnly = true)
@@ -42,6 +49,27 @@ public class MyCourseService {
                             .reviewContent(review.map(Review::getContent).orElse(null))
                             .build();
                 })
+                .toList();
+    }
+
+    // 실시간 강의 예약 목록 조회
+    @Transactional(readOnly = true)
+    public List<MyLiveReservationResponse> getLiveReservations(User loginUser) {
+
+        List<LiveReservation> reservations = liveReservationRepository
+                .findByUserAndStatusWithLecture(loginUser, LiveReservationStatus.RESERVED);
+
+        return reservations.stream()
+                .map(r -> MyLiveReservationResponse.builder()
+                        .reservationId(r.getId())
+                        .liveId(r.getLiveLecture().getId())
+                        .title(r.getLiveLecture().getTitle())
+                        .instructorName(r.getLiveLecture().getInstructor().getName())
+                        .startAt(r.getLiveLecture().getStartAt())
+                        .endAt(r.getLiveLecture().getEndAt())
+                        .currentCount(r.getLiveLecture().getCurrentCount())
+                        .maxCapacity(r.getLiveLecture().getMaxCapacity())
+                        .build())
                 .toList();
     }
 }
