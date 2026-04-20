@@ -5,6 +5,7 @@ import com.wanted.naeil.domain.live.entity.enums.LiveLectureStatus;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface LiveLectureRepository extends JpaRepository<LiveLecture, Long> {
@@ -17,5 +18,12 @@ public interface LiveLectureRepository extends JpaRepository<LiveLecture, Long> 
     // EntityGraph는 instructor를 조회할 때 N+1문제 방지 위함
     @EntityGraph(attributePaths = {"instructor"})
     List<LiveLecture> findByStatusInOrderByStartAtAsc(List<LiveLectureStatus> statuses);
+
+    @EntityGraph(attributePaths = {"instructor"})
+    List<LiveLecture> findByStatusInAndEndAtAfterOrderByStartAtAsc(
+            List<LiveLectureStatus> statuses,
+            LocalDateTime now
+    );
+
 
 }

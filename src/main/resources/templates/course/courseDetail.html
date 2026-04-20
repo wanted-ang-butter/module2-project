@@ -78,7 +78,21 @@
   </style>
 </head>
 <body class="bg-[#f7f7f9] min-h-screen text-gray-900">
-<div th:replace="fragments/userHeader :: userHeader"></div>
+<th:block th:if="${user == null or user.role == null}">
+  <div th:replace="~{fragments/guestHeader :: guestHeader}"></div>
+</th:block>
+
+<th:block th:if="${user != null and user.role != null and user.role.name() == 'USER'}">
+  <div th:replace="~{fragments/userHeader :: userHeader}"></div>
+</th:block>
+
+<th:block th:if="${user != null and user.role != null and user.role.name() == 'INSTRUCTOR'}">
+  <div th:replace="~{fragments/instructorHeader :: instructorHeader}"></div>
+</th:block>
+
+<th:block th:if="${user != null and user.role != null and user.role.name() == 'ADMIN'}">
+  <div th:replace="~{fragments/adminHeader :: adminHeader}"></div>
+</th:block>
 
 <!-- 토스트 -->
 <div id="cartToast" class="toast">
