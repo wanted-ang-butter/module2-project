@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
 <body>
-
-<header th:fragment="userHeader"
-        class="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
+<header th:fragment="userHeader" class="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
     <div class="max-w-7xl mx-auto px-6 py-4">
         <div class="flex items-center justify-between">
 
@@ -35,7 +37,8 @@
                 <a th:href="@{/cart}" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
                     <i class="fa-solid fa-cart-shopping w-4 h-4"></i><span class="text-xs font-medium">장바구니</span>
                 </a>
-                <a th:href="@{/credit/charge}" class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+                <a th:href="@{/credit/charge}" href="/credit/charge"
+                   class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
                     <i class="fa-solid fa-wallet w-4 h-4"></i>
                     <span class="text-xs font-medium">크레딧</span>
                 </a>
@@ -61,7 +64,7 @@
                     <button onclick="toggleNoticeDropdown()" class="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shadow-md hover:shadow-lg transition-shadow cursor-pointer">
                         <i class="fa-solid fa-bullhorn text-white text-sm"></i>
                     </button>
-                    <div id="noticeDropdown" class="notice-dropdown absolute right-0 mt-2 w-48 bg-white border-2 border-gray-200 rounded-xl shadow-xl z-50">
+                    <div id="noticeDropdown" class="notice-dropdown hidden absolute right-0 mt-2 w-48 bg-white border-2 border-gray-200 rounded-xl shadow-xl z-50">
                         <div class="py-2">
                             <a th:href="@{/notice}" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
                                 <i class="fa-solid fa-bullhorn text-gray-600"></i>
@@ -76,7 +79,7 @@
                     <button onclick="toggleProfileDropdown()" class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center shadow-md hover:shadow-lg transition-shadow cursor-pointer">
                         <span class="text-white font-mono text-xs font-bold">{ }</span>
                     </button>
-                    <div id="profileDropdown" class="profile-dropdown absolute right-0 mt-2 w-56 bg-white border-2 border-gray-200 rounded-xl shadow-xl z-50">
+                    <div id="profileDropdown" class="profile-dropdown hidden absolute right-0 mt-2 w-56 bg-white border-2 border-gray-200 rounded-xl shadow-xl z-50">
                         <div class="py-2">
                             <a th:href="@{/my-courses}" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
                                 <i class="fa-solid fa-video text-gray-600"></i>
@@ -86,7 +89,8 @@
                                 <i class="fa-solid fa-gear text-gray-600"></i>
                                 <span class="text-sm font-medium text-gray-900">계정 설정</span>
                             </a>
-                            <a th:href="@{/payment/history}" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                            <a th:href="@{/payment/history}" href="/payment/history"
+                               class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
                                 <i class="fa-solid fa-user text-gray-600"></i>
                                 <span class="text-sm font-medium text-gray-900">결제 내역</span>
                             </a>
@@ -102,6 +106,27 @@
         </div>
     </div>
 </header>
+
+<script>
+    function toggleNoticeDropdown() {
+        document.getElementById('noticeDropdown').classList.toggle('hidden');
+        document.getElementById('profileDropdown').classList.add('hidden');
+    }
+    function toggleProfileDropdown() {
+        document.getElementById('profileDropdown').classList.toggle('hidden');
+        document.getElementById('noticeDropdown').classList.add('hidden');
+    }
+    document.addEventListener('click', function(e) {
+        const noticeWrapper = document.getElementById('noticeDropdownWrapper');
+        const profileWrapper = document.getElementById('profileDropdownWrapper');
+        if (noticeWrapper && !noticeWrapper.contains(e.target)) {
+            document.getElementById('noticeDropdown').classList.add('hidden');
+        }
+        if (profileWrapper && !profileWrapper.contains(e.target)) {
+            document.getElementById('profileDropdown').classList.add('hidden');
+        }
+    });
+</script>
 
 </body>
 </html>
