@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nae-Il | 구독하기</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+  <style>
+    .grid-bg {
+      background-image:
+              linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, #4f6df5 0%, #6f7bf7 35%, #67a4d8 65%, #53b36a 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+
+<div class="fixed inset-0 grid-bg opacity-30 pointer-events-none"></div>
+
+<!-- Header -->
+<header class="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
+  <div class="max-w-7xl mx-auto px-6 py-4">
+    <div class="flex items-center justify-between">
+
+      <!-- Logo -->
+      <a th:href="@{/}" href="/" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-green-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
+          <i class="fa-solid fa-terminal text-white text-sm"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold text-gray-900 tracking-tight">
+            내일 <span class="text-gray-500 font-normal">Nae-il</span>
+          </h1>
+          <p class="text-[10px] font-semibold text-gray-500 tracking-wide">내일의 일, My Work</p>
+        </div>
+      </a>
+
+      <!-- Nav -->
+      <nav class="hidden xl:flex items-center gap-1 flex-nowrap">
+        <a th:href="@{/course}" href="/course"
+           class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+          <i class="fa-solid fa-book-open w-4 h-4"></i>
+          <span class="text-xs font-medium">전체 강의</span>
+        </a>
+        <a th:href="@{/live}" href="/live"
+           class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+          <i class="fa-solid fa-calendar w-4 h-4"></i>
+          <span class="text-xs font-medium">실시간 강의</span>
+        </a>
+        <a th:href="@{/my-courses}" href="/my-courses"
+           class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+          <i class="fa-solid fa-video w-4 h-4"></i>
+          <span class="text-xs font-medium">내 강의</span>
+        </a>
+        <a th:href="@{/community/qna}" href="/community/qna"
+           class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+          <i class="fa-solid fa-comment w-4 h-4"></i>
+          <span class="text-xs font-medium">커뮤니티</span>
+        </a>
+        <a th:href="@{/cart}" href="/cart"
+           class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+          <i class="fa-solid fa-cart-shopping w-4 h-4"></i>
+          <span class="text-xs font-medium">장바구니</span>
+        </a>
+        <a th:href="@{/credit/charge}" href="/credit/charge"
+           class="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap">
+          <i class="fa-solid fa-wallet w-4 h-4"></i>
+          <span class="text-xs font-medium">크레딧</span>
+        </a>
+      </nav>
+
+    </div>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-6 py-14">
+
+  <!-- Title -->
+  <section class="text-center mb-12">
+    <h1 class="text-3xl md:text-4xl font-black tracking-tight gradient-text mb-4">
+      프리미엄으로 시작하세요
+    </h1>
+    <p class="text-lg md:text-xl font-bold text-slate-600">
+      언제든 해지 가능한 멤버십
+    </p>
+  </section>
+
+  <!-- Plans -->
+  <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+
+    <!-- Monthly -->
+    <article class="bg-white border border-slate-200 rounded-[28px] p-6 md:p-8 shadow-[0_8px_24px_rgba(15,23,42,0.08)] flex flex-col">
+      <div class="mb-8">
+        <h2 class="text-2xl md:text-3xl font-black text-slate-950 mb-6">1개월 이용권</h2>
+
+        <div class="flex items-end gap-2 flex-wrap mb-8">
+          <span class="text-4xl md:text-5xl font-black text-[#5b62f6] leading-none">99,000</span>
+          <span class="text-3xl md:text-4xl font-black text-[#7c4df6] leading-none">크레딧</span>
+          <span class="text-lg md:text-xl font-bold text-slate-500">/ 월</span>
+        </div>
+
+        <div class="space-y-4 text-lg md:text-xl font-bold text-slate-700">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-circle-check text-green-500"></i>
+            <span>매월 코스 3개 수강</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-circle-check text-green-500"></i>
+            <span>실시간 강의 선예매</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-auto">
+        <a th:href="@{/subscription/checkout(planType='MONTHLY')}"
+           href="/subscription/checkout?planType=MONTHLY"
+           class="w-full h-14 rounded-2xl bg-[#0f172a] text-white text-lg md:text-xl font-black hover:opacity-95 transition shadow-lg flex items-center justify-center">
+          시작하기
+        </a>
+      </div>
+    </article>
+
+    <!-- Yearly -->
+    <article class="relative bg-white border-[2px] border-[#5b78ff] rounded-[28px] p-6 md:p-8 shadow-[0_10px_28px_rgba(91,120,255,0.12)] flex flex-col overflow-hidden">
+      <div class="absolute top-0 right-0 px-5 py-2.5 rounded-bl-[20px] bg-gradient-to-r from-blue-500 to-green-500 text-white text-sm md:text-base font-black shadow-lg">
+        <i class="fa-solid fa-sparkles mr-2"></i>추천
+      </div>
+
+      <div class="mb-8">
+        <h2 class="text-2xl md:text-3xl font-black text-slate-950 mb-4">12개월 이용권</h2>
+
+        <span class="inline-flex items-center px-4 py-2 rounded-full bg-green-100 text-green-700 text-sm md:text-base font-black mb-5">
+                    약 17% 할인
+                </span>
+
+        <div class="flex items-end gap-2 flex-wrap mb-2">
+          <span class="text-4xl md:text-5xl font-black text-[#5b62f6] leading-none">82,500</span>
+          <span class="text-3xl md:text-4xl font-black text-[#7c4df6] leading-none">크레딧</span>
+          <span class="text-lg md:text-xl font-bold text-slate-500">/ 월</span>
+        </div>
+
+        <p class="text-sm md:text-base font-semibold text-slate-400 mb-8">
+          연 990,000 크레딧 결제
+        </p>
+
+        <div class="space-y-4 text-lg md:text-xl font-bold text-slate-700">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-circle-check text-green-500"></i>
+            <span>매월 코스 3개 수강</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-circle-check text-green-500"></i>
+            <span>실시간 강의 선예매</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-circle-check text-green-500"></i>
+            <span>장기 이용 할인</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-auto">
+        <a th:href="@{/subscription/checkout(planType='YEARLY')}"
+           href="/subscription/checkout?planType=YEARLY"
+           class="w-full h-14 rounded-2xl bg-gradient-to-r from-blue-500 to-green-500 text-white text-lg md:text-xl font-black hover:opacity-95 transition shadow-lg flex items-center justify-center">
+          연간 플랜 시작하기
+        </a>
+      </div>
+    </article>
+  </section>
+
+  <p class="text-center text-base md:text-lg font-bold text-slate-500 mb-14">
+    언제든 해지 가능 · 이미 많은 수강생들이 이용 중입니다
+  </p>
+
+  <!-- FAQ -->
+  <section class="mt-6">
+    <div class="text-center mb-10">
+      <h2 class="text-3xl md:text-4xl font-black gradient-text mb-4">자주 묻는 질문</h2>
+      <p class="text-lg md:text-xl font-bold text-slate-600">궁금한 점이 있으신가요?</p>
+    </div>
+
+    <div class="max-w-5xl mx-auto space-y-6">
+      <div class="bg-white rounded-[26px] border border-slate-200 shadow-[0_8px_20px_rgba(15,23,42,0.06)] px-8 py-8">
+        <div class="flex items-start gap-4">
+          <span class="w-3 h-3 rounded-full bg-gradient-to-r from-blue-500 to-green-500 mt-3 shrink-0"></span>
+          <div>
+            <h3 class="text-xl md:text-2xl font-black text-slate-950 mb-4">언제든지 해지할 수 있나요?</h3>
+            <p class="text-base md:text-lg leading-relaxed font-medium text-slate-600">
+              네, 프리미엄 멤버십은 언제든지 해지 가능합니다.
+              해지 후에도 결제하신 기간까지는 프리미엄 혜택이 유지됩니다.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-[26px] border border-slate-200 shadow-[0_8px_20px_rgba(15,23,42,0.06)] px-8 py-8">
+        <div class="flex items-start gap-4">
+          <span class="w-3 h-3 rounded-full bg-gradient-to-r from-blue-500 to-green-500 mt-3 shrink-0"></span>
+          <div>
+            <h3 class="text-xl md:text-2xl font-black text-slate-950 mb-4">매월 3개 코스는 어떻게 선택하나요?</h3>
+            <p class="text-base md:text-lg leading-relaxed font-medium text-slate-600">
+              프리미엄 멤버십이 활성화되면 원하는 코스를 자유롭게 선택하실 수 있습니다.
+              매월 1일에 선택 권한이 초기화됩니다.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-[26px] border border-slate-200 shadow-[0_8px_20px_rgba(15,23,42,0.06)] px-8 py-8">
+        <div class="flex items-start gap-4">
+          <span class="w-3 h-3 rounded-full bg-gradient-to-r from-blue-500 to-green-500 mt-3 shrink-0"></span>
+          <div>
+            <h3 class="text-xl md:text-2xl font-black text-slate-950 mb-4">실시간 강의 선예매는 무엇인가요?</h3>
+            <p class="text-base md:text-lg leading-relaxed font-medium text-slate-600">
+              일반 회원보다 24시간 먼저 실시간 강의를 예약할 수 있는 혜택입니다.
+              인기 강의의 원하는 시간대를 먼저 확보하실 수 있습니다.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-12">
+      <p class="text-lg md:text-xl font-bold text-slate-500 mb-4">더 궁금한 점이 있으신가요?</p>
+      <a th:href="@{/community/qna}" href="/community/qna"
+         class="inline-flex items-center gap-3 text-lg md:text-xl font-black text-[#5968ff] hover:opacity-80 transition">
+        문의하기
+        <i class="fa-solid fa-arrow-right"></i>
+      </a>
+    </div>
+  </section>
+</main>
+
+</body>
+</html>

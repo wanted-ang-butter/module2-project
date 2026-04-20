@@ -92,4 +92,8 @@ public class Course extends BaseTimeEntity {
     public void requestRegistration() {
         this.status = CourseStatus.PENDING;
     }
+
+    public void rejectRegistration() {
+        this.status = CourseStatus.REJECTED;
+    }
 }

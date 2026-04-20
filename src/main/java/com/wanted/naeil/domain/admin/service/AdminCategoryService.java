@@ -22,21 +22,21 @@ public class AdminCategoryService {
     @Transactional(readOnly = true)
     public List<CategoryResponse> getCategories() {
         return categoryRepository.findAll().stream()
-                .map(CategoryResponse::from)
+                .map(c -> CategoryResponse.from(c, courseRepository.countByCategory(c)))
                 .toList();
     }
+
     // 카테고리 생성
     @Transactional
     public CategoryResponse createCategory(String name){
         String trimmedName = name.trim();
-
         if (categoryRepository.existsByName(trimmedName)) {
-            throw new IllegalArgumentException("이미 존재하는 카테고라입니다");
+            throw new IllegalArgumentException("이미 존재하는 카테고리입니다");
         }
         Category category = Category.builder()
                 .name(trimmedName)
                 .build();
-        return CategoryResponse.from(categoryRepository.save(category));
+        return CategoryResponse.from(categoryRepository.save(category), 0L);
     }
     // 카테고리 수정
     @Transactional
@@ -48,7 +48,7 @@ public class AdminCategoryService {
             throw new IllegalArgumentException("이미 존재하는 카테고리입니다");
         }
         category.updateName(trimmedName);
-        return CategoryResponse.from(category);
+        return CategoryResponse.from(categoryRepository.save(category), 0L);
     }
     // 카테고리 삭제
     @Transactional

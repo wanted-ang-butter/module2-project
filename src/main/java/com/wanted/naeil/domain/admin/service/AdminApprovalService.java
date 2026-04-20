@@ -10,6 +10,7 @@ import com.wanted.naeil.domain.course.repository.CourseRepository;
 import com.wanted.naeil.domain.live.entity.LiveLecture;
 import com.wanted.naeil.domain.live.entity.enums.LiveLectureStatus;
 import com.wanted.naeil.domain.live.repository.LiveLectureRepository;
+import com.wanted.naeil.domain.settlement.entity.Settlement;
 import com.wanted.naeil.domain.user.entity.InstructorApplications;
 import com.wanted.naeil.domain.user.entity.enums.Role;
 import com.wanted.naeil.domain.user.entity.User;
@@ -59,6 +60,7 @@ public class AdminApprovalService {
                                     approval.getInstructorApplications();
                             builder.applicationId(applications.getId())
                                     .applicantName(applications.getUser().getName())
+                                    .role(applications.getUser().getRole())
                                     .title(applications.getTitle())
                                     .categoryName(applications.getCategory().getName())
                                     .introduction(applications.getIntroduction())
@@ -76,7 +78,19 @@ public class AdminApprovalService {
                                     .instuctorName(lecture.getInstructor().getName());
                         }
                         case SETTLEMENT_REGISTER -> {
-                            builder.instuctorName(approval.getSettlement().getInstructor().getName());
+                            Settlement s = approval.getSettlement();
+                            builder.instuctorName(s.getInstructor().getName())
+                                    .requestedAmount(s.getRequestedAmount())
+                                    .platformFee(s.getPlatformFee())
+                                    .finalAmount(s.getFinalAmount())
+                                    .settlementMonth(s.getSettlementMonth())
+                                    .settlementDetails(s.getDetails().stream()
+                                            .map(d -> ApprovalResponse.SettlementDetailInfo.builder()
+                                                    .courseName(d.getCourse().getTitle())
+                                                    .saleCount(d.getSaleCount())
+                                                    .totalSalesAmount(d.getTotalSalesAmount())
+                                                    .build())
+                                            .collect(Collectors.toList()));
                         }
                     }
                     return builder.build();
@@ -123,7 +137,11 @@ public class AdminApprovalService {
         approval.reject(admin, rejectReason);
 
         switch (approval.getRequestType()) {
-            case COURSE_REGISTER, COURSE_DELETE -> {
+            case COURSE_REGISTER -> {
+                approval.getCourse().rejectRegistration();
+            }
+            case COURSE_DELETE -> {
+                // 삭제 요청 반려 시 코스는 기존 INACTIVE 상태 유지 비워놓음
             }
             case INSTRUCTOR_REGISTER -> {
                 approval.getInstructorApplications().reject(rejectReason);
@@ -132,6 +150,9 @@ public class AdminApprovalService {
             case LIVE_REGISTER -> {
                 approval.getLecture().changeStatus(LiveLectureStatus.REJECTED);
                 liveLectureRepository.save(approval.getLecture());
+            }
+            case SETTLEMENT_REGISTER -> {
+                // TODO : 정산 반려 정책 필요 시 추가
             }
         }
         courseApprovalRepository.save(approval);

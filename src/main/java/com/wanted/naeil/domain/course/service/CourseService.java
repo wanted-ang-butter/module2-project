@@ -47,7 +47,7 @@ public class CourseService {
     private final SectionService sectionService;
     private final ModelMapper modelMapper;
 
-    // 코스 생성 - 강사
+    // 코스 등록 요청 - 강사
     @Transactional
     public CreateCourseResponse createCourse(Long instructorId, CourseCreateRequest request) throws AccessDeniedException {
 
@@ -109,7 +109,14 @@ public class CourseService {
         log.info("[코스 생성] 코스가 정상적으로 등록 됐습니다. course_id: {}", savedCourse.getId());
 
 
-        // TODO : createSection() 만들어서 호출하기
+        // 강사 승인 테이블에 요청 로직
+        AdminApproval adminApproval = AdminApproval.builder()
+                .course(savedCourse)
+                .requestType(ApprovalRequestType.COURSE_REGISTER)
+                .build();
+
+        adminApprovalRepository.save(adminApproval);
+
         if (request.getSections() != null && !request.getSections().isEmpty()) {
             sectionService.registerSections(course, request.getSections());
         }
@@ -159,7 +166,7 @@ public class CourseService {
 
     // 강의 전체 조회 - 공통
     @Transactional(readOnly = true)
-    public List<CourseListResponse> findAllCourses() {
+    public List<CourseListResponse> getAllCourses() {
         return courseRepository.findAllWithStatus();
     }
 
@@ -261,26 +268,66 @@ public class CourseService {
         CourseStatus currentStatus = course.getStatus();
 
         if (currentStatus == CourseStatus.PENDING && nextStatus == CourseStatus.CANCELLED) {
+
+            log.info("[코스 상태 변경] 승인 대기 -> 취소됨 상태 변경 시작!");
+
+            // 승인 대기 -> 취소 했으니까, 관리자 승인 테이블 속 기록 삭제
+            adminApprovalRepository.deleteByCourseIdAndRequestTypeAndStatus(
+                    courseId,
+                    ApprovalRequestType.COURSE_REGISTER,
+                    ApprovalStatus.PENDING
+            );
+
             course.cancelRegistration();
 
-            log.info("[CourseRegistrationStatus] 강의 등록 요청 취소 완료 - instructorId: {}, courseId: {}",
+            log.info("[코스 상태 변경] 강의 등록 요청 취소 완료 - instructorId: {}, courseId: {}",
                     instructorId, courseId);
 
             return;
         }
 
-        if (currentStatus == CourseStatus.CANCELLED && nextStatus == CourseStatus.PENDING) {
+        if (currentStatus == CourseStatus.CANCELLED || currentStatus == CourseStatus.REJECTED
+                && nextStatus == CourseStatus.PENDING) {
+
+            log.info("[코스 상태 변경] 취소 / 반려 -> 승인대기 상태 변경 시작!");
+
+            // 승인 대기 테이블에 이미 존재하는지 검증
+            boolean alreadyRequested = adminApprovalRepository.existsByCourseIdAndRequestTypeAndStatus(
+                    courseId,
+                    ApprovalRequestType.COURSE_REGISTER,
+                    ApprovalStatus.PENDING
+            );
+
+            if (alreadyRequested) {
+                throw new IllegalStateException("이미 등록 승인 요청이 진행 중인 강의입니다.");
+            }
+
+            // 승인 요청 테이블에 새롭게 추가
+            AdminApproval approval = AdminApproval.builder()
+                    .course(course)
+                    .requestType(ApprovalRequestType.COURSE_REGISTER)
+                    .build();
+
+            adminApprovalRepository.save(approval);
+
+            // 코스 승인 대기 상태로 변경
             course.requestRegistration();
 
-            log.info("[CourseRegistrationStatus] 강의 등록 재요청 완료 - instructorId: {}, courseId: {}",
+            log.info("[코스 상태 변경] 강의 등록 재요청 완료 - instructorId: {}, courseId: {}",
                     instructorId, courseId);
             return;
         }
 
+        log.error("[코스 상태 변경] 🚨 코스 상태 변경 실패 ㅜ 에러가 발생했다..");
         throw new IllegalStateException("현재 상태에서는 요청한 등록 상태로 변경할 수 없습니다.");
     }
 
+    // 코스 삭제 요청
+    @Transactional
     public void requestCourseDelete(Long instructorId, Long courseId) {
+
+        log.info("[CourseDeleteRequest] 강의 삭제 요청 시작 - instructorId: {}, courseId: {}",
+                instructorId, courseId);
 
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 강의입니다."));
@@ -308,6 +355,14 @@ public class CourseService {
 
         log.info("[CourseDeleteRequest] 강의 삭제 요청 완료 - instructorId: {}, courseId: {}",
                 instructorId, courseId);
+    }
+    // 강사용 강의 상세 조회
+    @Transactional(readOnly = true)
+    public CourseDetailsResponse getInstructorCourseDetail(Long instructorId, Long courseId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 강의입니다."));
+        validateCourseOwner(course, instructorId);
+        return getCourseDetail(courseId);
     }
 
     // ==== 내부 편의 메서드 ====

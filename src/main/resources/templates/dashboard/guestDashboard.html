@@ -30,8 +30,7 @@
 <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-100">
     <div class="max-w-7xl mx-auto px-6 py-4">
         <div class="flex items-center justify-between">
-            <!-- Logo -->
-            <a th:href="@{/static}" href="/static" class="flex items-center gap-3 group">
+            <a th:href="@{/}" href="/" class="flex items-center gap-3 group">
                 <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-green-500 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
                     <i class="fa-solid fa-terminal text-white text-sm"></i>
                 </div>
@@ -43,39 +42,34 @@
                 </div>
             </a>
 
-            <!-- Navigation Menu -->
             <div class="flex items-center gap-4">
                 <a th:href="@{/course}" href="/course"
                    class="flex items-center gap-2 px-3 py-2 border-2 border-gray-200 rounded-xl hover:border-blue-600 hover:bg-blue-50 transition-all group">
                     <i class="fa-solid fa-book-open text-gray-600 group-hover:text-blue-600 text-sm"></i>
                     <span class="font-medium text-gray-700 group-hover:text-blue-600 text-sm">전체 강의</span>
                 </a>
-
                 <a th:href="@{/my-courses}" href="/my-courses"
                    class="flex items-center gap-2 px-3 py-2 border-2 border-gray-200 rounded-xl hover:border-blue-600 hover:bg-blue-50 transition-all group">
                     <i class="fa-solid fa-video text-gray-600 group-hover:text-blue-600 text-sm"></i>
                     <span class="font-medium text-gray-700 group-hover:text-blue-600 text-sm">내 강의</span>
                 </a>
-
                 <a th:href="@{/community/qna}" href="/community/qna"
                    class="flex items-center gap-2 px-3 py-2 border-2 border-gray-200 rounded-xl hover:border-blue-600 hover:bg-blue-50 transition-all group">
                     <i class="fa-solid fa-comment text-gray-600 group-hover:text-blue-600 text-sm"></i>
                     <span class="font-medium text-gray-700 group-hover:text-blue-600 text-sm">커뮤니티</span>
                 </a>
-
                 <a th:href="@{/cart}" href="/cart"
                    class="flex items-center gap-2 px-3 py-2 border-2 border-gray-200 rounded-xl hover:border-blue-600 hover:bg-blue-50 transition-all group">
                     <i class="fa-solid fa-cart-shopping text-gray-600 group-hover:text-blue-600 text-sm"></i>
                     <span class="font-medium text-gray-700 group-hover:text-blue-600 text-sm">장바구니</span>
                 </a>
 
-                <a th:href="@{/credit}" href="/credit"
+                <a th:href="@{/credit/charge}" href="/credit/charge"
                    class="flex items-center gap-2 px-3 py-2 border-2 border-gray-200 rounded-xl hover:border-blue-600 hover:bg-blue-50 transition-all group">
                     <i class="fa-solid fa-wallet text-gray-600 group-hover:text-blue-600 text-sm"></i>
                     <span class="font-medium text-gray-700 group-hover:text-blue-600 text-sm">크레딧</span>
                 </a>
 
-                <!-- Notice Dropdown -->
                 <div class="relative" id="noticeDropdownWrapper">
                     <button onclick="toggleNoticeDropdown()"
                             class="w-9 h-9 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shadow-md hover:shadow-lg transition-shadow cursor-pointer">
@@ -92,9 +86,10 @@
                     </div>
                 </div>
 
-                <!-- 이렇게 -->
-                <a th:href="@{/auth/login}" href="/auth/login" ...>로그인</a>
-                <a th:href="@{/auth/signup}" href="/auth/signup" ...>회원가입</a>
+                <a th:href="@{/auth/login}" href="/auth/login"
+                   class="px-4 py-2 text-gray-700 font-medium hover:text-blue-600 transition-colors text-sm">로그인</a>
+                <a th:href="@{/auth/signup}" href="/auth/signup"
+                   class="px-4 py-2 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-lg hover:shadow-lg transition-all font-medium text-sm">회원가입</a>
             </div>
         </div>
     </div>
@@ -105,7 +100,7 @@
     <div class="max-w-7xl mx-auto px-6 text-center">
         <h2 class="text-3xl font-black text-white mb-3">지금 시작하세요</h2>
         <p class="text-base text-white/90 mb-6">구독권 구매 시 매달 3개의 강의를 무료로 수강할 수 있습니다</p>
-        <a th:href="@{/pricing}" href="/pricing"
+        <a th:href="@{/subscription}" href="/subscription"
            class="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-xl hover:shadow-xl transition-all font-bold">
             <span>구독하기</span>
         </a>
@@ -129,8 +124,6 @@
             </h2>
             <p class="text-lg text-gray-600 font-semibold mb-10">프로 개발자가 만든 실전 중심의 코딩 강의</p>
         </div>
-
-        <!-- Search Bar -->
         <div class="relative max-w-2xl mx-auto">
             <div class="relative group">
                 <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
@@ -150,28 +143,19 @@
         <h2 class="text-2xl font-black">Categories</h2>
     </div>
     <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
-        <!-- th:each로 서버에서 카테고리 목록을 렌더링하거나, 아래처럼 정적 버튼 사용 -->
-        <button onclick="selectCategory(this, '전체')"
-                class="category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap flex-shrink-0 bg-[#111827] text-white"
-                data-category="전체">전체</button>
-        <button onclick="selectCategory(this, 'Frontend')"
-                class="category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap flex-shrink-0 bg-white border border-gray-300 text-gray-700 hover:border-gray-400"
-                data-category="Frontend">Frontend</button>
-        <button onclick="selectCategory(this, 'Backend')"
-                class="category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap flex-shrink-0 bg-white border border-gray-300 text-gray-700 hover:border-gray-400"
-                data-category="Backend">Backend</button>
-        <button onclick="selectCategory(this, 'Programming')"
-                class="category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap flex-shrink-0 bg-white border border-gray-300 text-gray-700 hover:border-gray-400"
-                data-category="Programming">Programming</button>
-        <button onclick="selectCategory(this, 'Data Science')"
-                class="category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap flex-shrink-0 bg-white border border-gray-300 text-gray-700 hover:border-gray-400"
-                data-category="Data Science">Data Science</button>
-        <button onclick="selectCategory(this, 'Design')"
-                class="category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap flex-shrink-0 bg-white border border-gray-300 text-gray-700 hover:border-gray-400"
-                data-category="Design">Design</button>
-        <button onclick="selectCategory(this, 'DevOps')"
-                class="category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap flex-shrink-0 bg-white border border-gray-300 text-gray-700 hover:border-gray-400"
-                data-category="DevOps">DevOps</button>
+        <!-- 전체 버튼 -->
+        <button data-category=""
+                onclick="selectCategory('')"
+                th:class="${selectedCategory == null} ? 'category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap flex-shrink-0 bg-[#111827] text-white' : 'category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap flex-shrink-0 bg-white border border-gray-300 text-gray-700 hover:border-gray-400'">
+            전체
+        </button>
+        <!-- DB에서 카테고리 목록 동적 렌더링 -->
+        <div th:each="category : ${categories}">
+            <button th:data-category="${category.name}"
+                    onclick="selectCategory(this.getAttribute('data-category'))"
+                    th:class="${selectedCategory == category.name} ? 'category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap flex-shrink-0 bg-[#111827] text-white' : 'category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap flex-shrink-0 bg-white border border-gray-300 text-gray-700 hover:border-gray-400'"
+                    th:text="${category.name}">카테고리</button>
+        </div>
     </div>
 </section>
 
@@ -182,56 +166,52 @@
             <i class="fa-solid fa-arrow-trend-up text-orange-500 text-xl"></i>
             <h2 class="text-2xl font-black">인기 강의</h2>
         </div>
-        <a th:href="@{/courses}" href="/courses"
+        <a th:href="@{/course}" href="/course"
            class="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-bold group">
             전체보기
             <i class="fa-solid fa-chevron-right text-xs group-hover:translate-x-1 transition-transform"></i>
         </a>
     </div>
-
     <div class="flex gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
-        <!-- th:each로 popularCourses 반복 렌더링 -->
         <div th:each="course : ${popularCourses}" class="snap-start flex-none">
-            <a th:href="@{/course/{id}(id=${course.id})}" href="#"
-               class="flex-none w-72 bg-white rounded-xl overflow-hidden cursor-pointer border border-gray-100 hover:border-blue-200 transition-all duration-300 hover:shadow-xl group block">
-                <!-- Thumbnail -->
+            <a th:href="@{/course/{id}(id=${course.courseId})}" href="#"
+               th:data-category="${course.category}"
+               class="course-card flex-none w-72 bg-white rounded-xl overflow-hidden cursor-pointer border border-gray-100 hover:border-blue-200 transition-all duration-300 hover:shadow-xl group block">
                 <div class="relative h-40 overflow-hidden bg-gray-100">
                     <img th:src="${course.thumbnail}" th:alt="${course.title}"
                          src="#" alt="강의 썸네일"
                          class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
                 <div class="p-5">
                     <div class="mb-3">
-              <span class="inline-block px-2.5 py-1 text-xs font-bold rounded-full bg-blue-50 text-blue-700 border border-blue-200"
-                    th:text="${course.category}">카테고리</span>
+                        <span class="inline-block px-2.5 py-1 text-xs font-bold rounded-full bg-blue-50 text-blue-700 border border-blue-200"
+                              th:text="${course.category}">카테고리</span>
                     </div>
                     <h3 class="text-base font-bold mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors"
                         th:text="${course.title}">강의 제목</h3>
                     <p class="text-sm text-gray-500 font-medium mb-3 line-clamp-2"
                        th:text="${course.description}">강의 설명</p>
                     <p class="text-sm text-gray-600 font-medium mb-4"
-                       th:text="${course.instructor}">강사명</p>
+                       th:text="${course.instructorName}">강사명</p>
                     <div class="flex items-center justify-between pt-3 border-t border-gray-200">
                         <div class="flex items-center gap-3 text-sm">
                             <div class="flex items-center gap-1">
                                 <span class="text-yellow-400">★</span>
-                                <span class="font-bold text-gray-900" th:text="${#numbers.formatDecimal(course.rating, 1, 1)}">4.5</span>
+                                <span class="font-bold text-gray-900" th:text="${course.rating}">4.5</span>
                             </div>
                             <div class="flex items-center gap-1">
                                 <span class="text-gray-400">👥</span>
-                                <span class="text-gray-600 font-medium" th:text="${#numbers.formatInteger(course.studentCount, 1, 'COMMA')}">1,234</span>
+                                <span class="text-gray-600 font-medium"
+                                      th:text="${#numbers.formatInteger(course.studentCount, 1, 'COMMA')}">1,234</span>
                             </div>
                         </div>
                         <span class="text-base font-bold text-gray-900">
-                <span th:text="${#numbers.formatInteger(course.price, 1, 'COMMA')}">10,000</span> 크레딧
-              </span>
+                            <span th:text="${#numbers.formatInteger(course.price, 1, 'COMMA')}">10,000</span> 크레딧
+                        </span>
                     </div>
                 </div>
             </a>
         </div>
-
-        <!-- 데이터 없을 때 -->
         <div th:if="${#lists.isEmpty(popularCourses)}" class="w-full text-center py-16">
             <p class="text-gray-500 font-medium text-sm">해당 카테고리의 강의가 없습니다</p>
         </div>
@@ -245,17 +225,17 @@
             <i class="fa-solid fa-wand-magic-sparkles text-green-500 text-xl"></i>
             <h2 class="text-2xl font-black">신규 강의</h2>
         </div>
-        <a th:href="@{/courses}" href="/courses"
+        <a th:href="@{/course}" href="/course"
            class="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-bold group">
             전체보기
             <i class="fa-solid fa-chevron-right text-xs group-hover:translate-x-1 transition-transform"></i>
         </a>
     </div>
-
     <div class="flex gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
         <div th:each="course : ${newCourses}" class="snap-start flex-none">
-            <a th:href="@{/course/{id}(id=${course.id})}" href="#"
-               class="flex-none w-72 bg-white rounded-xl overflow-hidden cursor-pointer border border-gray-100 hover:border-blue-200 transition-all duration-300 hover:shadow-xl group block">
+            <a th:href="@{/course/{id}(id=${course.courseId})}" href="#"
+               th:data-category="${course.category}"
+               class="course-card flex-none w-72 bg-white rounded-xl overflow-hidden cursor-pointer border border-gray-100 hover:border-blue-200 transition-all duration-300 hover:shadow-xl group block">
                 <div class="relative h-40 overflow-hidden bg-gray-100">
                     <img th:src="${course.thumbnail}" th:alt="${course.title}"
                          src="#" alt="강의 썸네일"
@@ -263,28 +243,30 @@
                 </div>
                 <div class="p-5">
                     <div class="mb-3">
-              <span class="inline-block px-2.5 py-1 text-xs font-bold rounded-full bg-blue-50 text-blue-700 border border-blue-200"
-                    th:text="${course.category}">카테고리</span>
+                        <span class="inline-block px-2.5 py-1 text-xs font-bold rounded-full bg-blue-50 text-blue-700 border border-blue-200"
+                              th:text="${course.category}">카테고리</span>
                     </div>
                     <h3 class="text-base font-bold mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors"
                         th:text="${course.title}">강의 제목</h3>
                     <p class="text-sm text-gray-500 font-medium mb-3 line-clamp-2"
                        th:text="${course.description}">강의 설명</p>
-                    <p class="text-sm text-gray-600 font-medium mb-4" th:text="${course.instructor}">강사명</p>
+                    <p class="text-sm text-gray-600 font-medium mb-4"
+                       th:text="${course.instructorName}">강사명</p>
                     <div class="flex items-center justify-between pt-3 border-t border-gray-200">
                         <div class="flex items-center gap-3 text-sm">
                             <div class="flex items-center gap-1">
                                 <span class="text-yellow-400">★</span>
-                                <span class="font-bold text-gray-900" th:text="${#numbers.formatDecimal(course.rating, 1, 1)}">4.5</span>
+                                <span class="font-bold text-gray-900" th:text="${course.rating}">4.5</span>
                             </div>
                             <div class="flex items-center gap-1">
                                 <span class="text-gray-400">👥</span>
-                                <span class="text-gray-600 font-medium" th:text="${#numbers.formatInteger(course.studentCount, 1, 'COMMA')}">1,234</span>
+                                <span class="text-gray-600 font-medium"
+                                      th:text="${#numbers.formatInteger(course.studentCount, 1, 'COMMA')}">1,234</span>
                             </div>
                         </div>
                         <span class="text-base font-bold text-gray-900">
-                <span th:text="${#numbers.formatInteger(course.price, 1, 'COMMA')}">10,000</span> 크레딧
-              </span>
+                            <span th:text="${#numbers.formatInteger(course.price, 1, 'COMMA')}">10,000</span> 크레딧
+                        </span>
                     </div>
                 </div>
             </a>
@@ -296,17 +278,30 @@
 </section>
 
 <!-- Category-Based Course Lists -->
-<!-- th:each로 카테고리별 강의 섹션 반복 -->
 <div th:each="category : ${categories}">
     <section th:if="${not #lists.isEmpty(category.courses)}" class="max-w-7xl mx-auto px-6 py-12">
         <div class="flex items-center justify-between mb-8">
             <div class="flex items-center gap-3">
-                <div th:class="'w-10 h-10 rounded-lg flex items-center justify-center shadow-lg bg-gradient-to-br ' + ${category.gradient}">
-                    <i th:class="'fa-solid ' + ${category.icon} + ' text-white text-sm'"></i>
+                <div th:class="'w-10 h-10 rounded-lg flex items-center justify-center shadow-lg bg-gradient-to-br '
+                    + (${category.name} == 'Frontend' ? 'from-blue-500 to-cyan-500' :
+                       (${category.name} == 'Backend' ? 'from-green-500 to-emerald-500' :
+                       (${category.name} == 'Data Science' ? 'from-purple-500 to-pink-500' :
+                       (${category.name} == 'DevOps' ? 'from-orange-500 to-red-500' :
+                       (${category.name} == 'Design' ? 'from-pink-500 to-rose-500' :
+                       (${category.name} == 'Programming' ? 'from-yellow-500 to-orange-500' :
+                       'from-gray-500 to-gray-600'))))))">
+                    <i th:class="'fa-solid text-white text-sm '
+                        + (${category.name} == 'Frontend' ? 'fa-code' :
+                           (${category.name} == 'Backend' ? 'fa-server' :
+                           (${category.name} == 'Data Science' ? 'fa-chart-bar' :
+                           (${category.name} == 'DevOps' ? 'fa-gear' :
+                           (${category.name} == 'Design' ? 'fa-pen-nib' :
+                           (${category.name} == 'Programming' ? 'fa-terminal' :
+                           'fa-book'))))))"></i>
                 </div>
                 <h2 class="text-2xl font-black" th:text="${category.name}">카테고리명</h2>
             </div>
-            <a th:href="@{/courses(category=${category.id})}" href="/courses"
+            <a th:href="@{/course(category=${category.name})}" href="/course"
                class="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-bold group">
                 전체보기
                 <i class="fa-solid fa-chevron-right text-xs"></i>
@@ -314,25 +309,26 @@
         </div>
         <div class="flex gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
             <div th:each="course : ${category.courses}" class="snap-start flex-none">
-                <a th:href="@{/course/{id}(id=${course.id})}" href="#"
-                   class="flex-none w-72 bg-white rounded-xl overflow-hidden cursor-pointer border border-gray-100 hover:border-blue-200 transition-all duration-300 hover:shadow-xl group block">
+                <a th:href="@{/course/{id}(id=${course.courseId})}" href="#"
+                   th:data-category="${course.category}"
+                   class="course-card flex-none w-72 bg-white rounded-xl overflow-hidden cursor-pointer border border-gray-100 hover:border-blue-200 transition-all duration-300 hover:shadow-xl group block">
                     <div class="relative h-40 overflow-hidden bg-gray-100">
                         <img th:src="${course.thumbnail}" th:alt="${course.title}"
                              src="#" alt="썸네일"
                              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
                     </div>
                     <div class="p-5">
-              <span class="inline-block px-2.5 py-1 text-xs font-bold rounded-full bg-blue-50 text-blue-700 border border-blue-200 mb-3"
-                    th:text="${course.category}">카테고리</span>
+                        <span class="inline-block px-2.5 py-1 text-xs font-bold rounded-full bg-blue-50 text-blue-700 border border-blue-200 mb-3"
+                              th:text="${course.category}">카테고리</span>
                         <h3 class="text-base font-bold mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors"
                             th:text="${course.title}">강의 제목</h3>
                         <p class="text-sm text-gray-500 font-medium mb-4 line-clamp-2"
                            th:text="${course.description}">강의 설명</p>
                         <div class="flex items-center justify-between pt-3 border-t border-gray-200">
-                            <span class="font-bold text-gray-900 text-sm">★ <span th:text="${#numbers.formatDecimal(course.rating, 1, 1)}">4.5</span></span>
+                            <span class="font-bold text-gray-900 text-sm">★ <span th:text="${course.rating}">4.5</span></span>
                             <span class="text-sm font-bold text-gray-900">
-                  <span th:text="${#numbers.formatInteger(course.price, 1, 'COMMA')}">10,000</span> 크레딧
-                </span>
+                                <span th:text="${#numbers.formatInteger(course.price, 1, 'COMMA')}">10,000</span> 크레딧
+                            </span>
                         </div>
                     </div>
                 </a>
@@ -382,20 +378,37 @@
 
     function handleSearch() {
         const query = document.getElementById('searchInput').value.trim();
-        if (query) window.location.href = '/search?q=' + encodeURIComponent(query);
+        if (query) window.location.href = '/course/search?q=' + encodeURIComponent(query);
     }
 
-    function selectCategory(btn, category) {
+    // 수정 후
+    function selectCategory(category) {
         document.querySelectorAll('.category-pill').forEach(el => {
-            el.className = el.className
-                .replace('bg-[#111827] text-white', '')
-                .replace('bg-white border border-gray-300 text-gray-700 hover:border-gray-400', '')
-                .trim();
-            el.classList.add('bg-white', 'border', 'border-gray-300', 'text-gray-700', 'hover:border-gray-400');
+            el.classList.remove('bg-[#111827]', 'text-white');
+            el.classList.add('bg-white', 'border', 'border-gray-300', 'text-gray-700');
         });
-        btn.classList.remove('bg-white', 'border', 'border-gray-300', 'text-gray-700', 'hover:border-gray-400');
-        btn.classList.add('bg-[#111827]', 'text-white');
-        // 서버사이드 필터링 시: window.location.href = '/?category=' + encodeURIComponent(category);
+
+        // 현재 선택된 버튼 찾아서 활성화
+        document.querySelectorAll('.category-pill').forEach(btn => {
+            const btnCategory = btn.getAttribute('data-category') || '';
+            if (btnCategory === category) {
+                btn.classList.remove('bg-white', 'border', 'border-gray-300', 'text-gray-700');
+                btn.classList.add('bg-[#111827]', 'text-white');
+            }
+        });
+        // 전체 버튼은 별도 처리
+        if (category === '') {
+            document.querySelector('.category-pill').classList.remove('bg-white', 'border', 'border-gray-300', 'text-gray-700');
+            document.querySelector('.category-pill').classList.add('bg-[#111827]', 'text-white');
+        }
+
+        document.querySelectorAll('.course-card').forEach(card => {
+            if (category === '' || card.dataset.category === category) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
     }
 </script>
 </body>

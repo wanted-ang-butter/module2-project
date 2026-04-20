@@ -2,6 +2,8 @@ package com.wanted.naeil.domain.course.controller;
 
 import com.wanted.naeil.domain.course.dto.request.CourseStatusUpdateRequest;
 import com.wanted.naeil.domain.course.dto.request.CourseUpdateRequest;
+import com.wanted.naeil.domain.live.dto.response.InstructorLiveLectureResponse;
+import com.wanted.naeil.domain.live.service.LiveLectureService;
 import com.wanted.naeil.global.auth.model.dto.AuthDetails;
 import com.wanted.naeil.domain.course.dto.request.CourseCreateRequest;
 import com.wanted.naeil.domain.course.dto.response.CourseEditResponse;
@@ -31,6 +33,7 @@ import java.util.List;
 public class InstCourseController {
 
     private final CourseService courseService;
+    private final LiveLectureService liveLectureService;
     private final CategoryRepository  categoryRepository;
 
     // 코스 등록 조회
@@ -98,11 +101,14 @@ public class InstCourseController {
 
         List<InstructorCourseResponse> courses =
                 courseService.getInstructorCourses(instructorId);
+
+        List<InstructorLiveLectureResponse> liveCourses =
+                liveLectureService.getInstructorLiveLectures(instructorId);
         // 헤더 정보
         mv.addObject("user", authDetails.getLoginUserDTO());
         mv.addObject("courses", courses);
         // TODO : 실시간 강의 등록하면 인자 넣기
-        mv.addObject("liveCourses", List.of());
+        mv.addObject("liveCourses", liveCourses);
         mv.setViewName("course/InstructorCourseManagement");
 
         return mv;
@@ -203,7 +209,17 @@ public class InstCourseController {
         redirectAttributes.addFlashAttribute("message", "강의 삭제 요청이 접수되었습니다.");
         return "redirect:/instructor/course-management";
     }
-    
+    // 강사 강의 상세 조회
+    @GetMapping("/course/{courseId}/detail")
+    public ModelAndView courseDetailPage(@PathVariable Long courseId,
+                                         ModelAndView mv,
+                                         @AuthenticationPrincipal AuthDetails authDetails) {
+        Long instructorId = authDetails.getLoginUserDTO().getUserId();
+        mv.addObject("user", authDetails.getLoginUserDTO());
+        mv.addObject("course", courseService.getInstructorCourseDetail(instructorId, courseId));
+        mv.setViewName("course/InstructorCourseDetail");
+        return mv;
+    }
 
     // 성공시 redirect 페이지
     // TODO : 병합 후 강사의 내 강의 페이지로 수정하기

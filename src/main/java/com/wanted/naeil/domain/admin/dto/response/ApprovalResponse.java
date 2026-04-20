@@ -2,10 +2,12 @@ package com.wanted.naeil.domain.admin.dto.response;
 
 import com.wanted.naeil.domain.admin.entity.enums.ApprovalRequestType;
 import com.wanted.naeil.domain.admin.entity.enums.ApprovalStatus;
+import com.wanted.naeil.domain.user.entity.enums.Role;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
@@ -30,6 +32,21 @@ public class ApprovalResponse {
     private String description;
     private Integer maxCapacity;
     private LocalDateTime startAt;
+    private Integer requestedAmount;
+    private Integer platformFee;
+    private Integer finalAmount;
+    private String settlementMonth;
+    private List<SettlementDetailInfo> settlementDetails;
+    private Role role;
+
+    @Getter
+    @Builder
+    public static class SettlementDetailInfo {
+        private String courseName;
+        private int saleCount;
+        private int totalSalesAmount;
+
+    }
 
 
 

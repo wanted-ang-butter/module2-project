@@ -18,4 +18,6 @@ public class BlacklistResponse {
     String reason;
     String releaseReason;
     LocalDateTime createdAt;
+    String phone;
+    LocalDateTime userCreatedAt;
 }

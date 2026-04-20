@@ -1,22 +1,23 @@
 package com.wanted.naeil.domain.live.controller;
 
-import com.wanted.naeil.domain.live.dto.CreateLiveLectureRequest;
+import com.wanted.naeil.domain.live.dto.request.CreateLiveLectureRequest;
+import com.wanted.naeil.domain.live.dto.response.InstructorLiveDetailResponse;
 import com.wanted.naeil.domain.live.service.LiveLectureService;
 import com.wanted.naeil.domain.user.entity.enums.Role;
 import com.wanted.naeil.global.auth.model.dto.AuthDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -58,6 +59,15 @@ public class InstLiveController {
         return mv;
     }
 
+    /**
+     * 실시간 강의 등록 form 제출 로직
+     * @param authDetails : 세션에 저장된 사용자 정보
+     * @param request : 실시간 강의 요청에 필요한 값들
+     * @param bindingResult : dto 필수 입력값 검증 처리
+     * @param mv : message, view 페이지
+     * @param redirectAttributes : 리다이렉트할 때, 메시지가 잘 보이게 추가
+     * @return : 성공 -> 성공 페이지, 실패 -> 값들 유지하면서 신청 폼 리다이렉트
+     */
     @PostMapping("/live-lecture")
     public ModelAndView registerLiveLecture(
             @AuthenticationPrincipal AuthDetails authDetails,
@@ -92,13 +102,132 @@ public class InstLiveController {
             redirectAttributes.addFlashAttribute("message", message);
             mv.setViewName("redirect:/instructor/course/complete");
         } catch (Exception e) {
-            mv.addObject("errorMessage", "실시간 강의 등록 중 오류가 발생했습니다: " + e.getMessage());
             mv.addObject("user", authDetails.getLoginUserDTO());
             mv.addObject("createLiveLectureRequest", request);
-            mv.addObject("errorMessage", "강의 등록 중 오류가 발생했습니다: " + e.getMessage());
+            mv.addObject("errorMessage", "실시간 강의 등록 중 오류가 발생했습니다: " + e.getMessage());
             mv.setViewName("live/liveLectureCreate");
         }
 
         return mv;
+    }
+
+    /**
+     * 강사 - 실시간 강의 상세 조회
+     * @param authDetails : 세션 로그인 정보
+     * @param liveId : 실시간 강의 번호
+     * @param mv : response 값 및 html
+     * @return : html
+     */
+    @GetMapping("/live-lecture/{liveId}")
+    public ModelAndView getInstructorLiveLectureDetail(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @PathVariable Long liveId,
+            ModelAndView mv
+    ) {
+        if (authDetails == null) {
+            throw new AccessDeniedException("로그인이 필요합니다.");
+        }
+
+        Long instructorId = authDetails.getLoginUserDTO().getUserId();
+
+        InstructorLiveDetailResponse response =
+                liveLectureService.getInstructorLiveLectureDetail(instructorId, liveId);
+
+        mv.addObject("user", authDetails.getLoginUserDTO());
+        mv.addObject("liveCourse", response);
+        // TODO : 추후 예약자 명단 페이지 추가
+        mv.addObject("reservations", List.of());
+        mv.setViewName("live/liveLectureDetail");
+
+        return mv;
+    }
+
+    /**
+     * 실시간 강의 수정 form 조회
+     * @param authDetails
+     * @param liveId
+     * @param mv
+     * @return
+     */
+    @GetMapping("/live-lecture/{liveId}/edit")
+    public ModelAndView editLiveLecture(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @PathVariable Long liveId,
+            ModelAndView mv
+    ) {
+        if (authDetails == null) {
+            throw new AccessDeniedException("로그인이 필요합니다.");
+        }
+
+        Long instructorId = authDetails.getLoginUserDTO().getUserId();
+
+        InstructorLiveDetailResponse response =
+                liveLectureService.getInstructorLiveLectureDetail(instructorId, liveId);
+
+        mv.addObject("user", authDetails.getLoginUserDTO());
+        mv.addObject("liveCourse", response);
+        mv.setViewName("live/liveLectureEdit");
+
+        return mv;
+    }
+
+    /**
+     * 실시간 강의 수정 기능
+     * @param authDetails
+     * @param liveId
+     * @param request : 수정 사항을 묶어놓은 request
+     * @return
+     */
+    @PatchMapping("/live-lecture/{liveId}")
+    public ResponseEntity<String> updateInstructorLiveLecture(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @PathVariable Long liveId,
+            @Valid @ModelAttribute CreateLiveLectureRequest request
+    ) {
+        if (authDetails == null) {
+            throw new AccessDeniedException("로그인이 필요합니다.");
+        }
+
+        Long instructorId = authDetails.getLoginUserDTO().getUserId();
+
+        log.info("[LiveLectureUpdate] 실시간 강의 수정 요청 - instructorId: {}, liveId: {}",
+                instructorId, liveId);
+
+        try {
+            liveLectureService.updateInstructorLiveLecture(instructorId, liveId, request);
+            return ResponseEntity.ok("실시간 강의 정보가 수정되었습니다.");
+        } catch (IllegalArgumentException e) {
+            log.warn("[LiveLectureUpdate] 잘못된 수정 요청 - liveId: {}, message: {}", liveId, e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (IllegalStateException e) {
+            log.warn("[LiveLectureUpdate] 수정 불가 상태 - liveId: {}, message: {}", liveId, e.getMessage());
+            return ResponseEntity.status(409).body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/live-lecture/{liveId}")
+    public ResponseEntity<String> deleteInstructorLiveLecture(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @PathVariable Long liveId
+    ) {
+        if (authDetails == null) {
+            throw new AccessDeniedException("로그인이 필요합니다.");
+        }
+
+        Long instructorId = authDetails.getLoginUserDTO().getUserId();
+
+        log.info("[실시간 강의 삭제] 실시간 강의 삭제 요청 - instructorId: {}, liveId: {}",
+                instructorId, liveId);
+
+        try {
+            liveLectureService.deleteLiveLecture(instructorId, liveId);
+            return ResponseEntity.ok("실시간 강의가 삭제되었습니다.");
+        } catch (IllegalArgumentException e) {
+            log.warn("[실시간 강의 삭제] 잘못된 삭제 요청 - liveId: {}, message: {}", liveId, e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (IllegalStateException e) {
+            log.warn("[LiveLectureDelete] 삭제 불가 상태 - liveId: {}, message: {}", liveId, e.getMessage());
+            return ResponseEntity.status(409).body(e.getMessage());
+        }
     }
 }

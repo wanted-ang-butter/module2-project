@@ -8,80 +8,24 @@
 </head>
 <body class="bg-gray-50 min-h-screen">
 
-<!-- Header -->
-<header class="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
-    <div class="max-w-7xl mx-auto px-6 py-4">
-        <div class="flex items-center justify-between">
-            <a th:href="@{/admin/dashboard}" class="flex items-center gap-3 group">
-                <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <i class="fa-solid fa-terminal text-white text-sm"></i>
-                </div>
-                <div>
-                    <h1 class="text-xl font-bold text-gray-900">내일 <span class="text-gray-500 font-normal">Nae-il</span></h1>
-                    <p class="text-[10px] font-semibold text-gray-500">관리자 패널</p>
-                </div>
-            </a>
-            <nav class="flex items-center gap-2">
-                <a th:href="@{/community/qna}" class="flex items-center gap-2 px-4 py-2 border-2 border-gray-200 rounded-xl text-gray-700 hover:border-blue-600 hover:bg-blue-50 transition-all font-medium text-sm">
-                    <i class="fa-solid fa-comment text-sm"></i><span>커뮤니티</span>
-                </a>
-                <div class="relative" id="adminMenuWrapper">
-                    <button onclick="toggleAdminMenu()" class="flex items-center gap-2 px-4 py-2 border-2 border-gray-200 rounded-xl text-gray-700 hover:border-blue-600 hover:bg-blue-50 transition-all font-medium text-sm">
-                        <i class="fa-solid fa-shield text-sm"></i><span>관리</span><i class="fa-solid fa-chevron-down text-xs"></i>
-                    </button>
-                    <div id="adminMenu" class="hidden absolute left-0 mt-2 w-64 bg-white border-2 border-gray-200 rounded-xl shadow-xl z-50">
-                        <div class="py-2">
-                            <div>
-                                <button onclick="toggleMemberMenu()" class="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50">
-                                    <div class="flex items-center gap-3"><i class="fa-solid fa-users text-gray-600"></i><span class="text-sm font-bold">회원 관리</span></div>
-                                    <i class="fa-solid fa-chevron-down text-xs text-gray-500"></i>
-                                </button>
-                                <div id="memberSubMenu" class="hidden px-4 pb-2">
-                                    <a th:href="@{/admin/user-management}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">회원 조회</a>
-                                    <a th:href="@{/admin/instructor-approval}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">강사 승인</a>
-                                    <a th:href="@{/admin/blacklist}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">블랙리스트 관리</a>
-                                </div>
-                            </div>
-                            <div class="border-t border-gray-100"></div>
-                            <div>
-                                <button onclick="toggleCourseMenu()" class="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50">
-                                    <div class="flex items-center gap-3"><i class="fa-solid fa-book-open text-gray-600"></i><span class="text-sm font-bold">코스 관리</span></div>
-                                    <i class="fa-solid fa-chevron-down text-xs text-gray-500"></i>
-                                </button>
-                                <div id="courseSubMenu" class="hidden px-4 pb-2">
-                                    <a th:href="@{/admin/course-management/approval}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">코스 승인 관리</a>
-                                    <a th:href="@{/admin/live-management}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">실시간 강의 승인 관리</a>
-                                    <a th:href="@{/admin/category-management}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">카테고리 관리</a>
-                                </div>
-                            </div>
-                            <div class="border-t border-gray-100"></div>
-                            <a th:href="@{/admin/settlement}" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50">
-                                <i class="fa-solid fa-wallet text-gray-600"></i><span class="text-sm font-bold">정산 관리</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-            <a th:href="@{/auth/logout}" class="flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-red-50 transition-all group">
-                <i class="fa-solid fa-right-from-bracket text-gray-600 group-hover:text-red-600 text-sm"></i>
-                <span class="font-medium text-gray-700 group-hover:text-red-600 text-sm">로그아웃</span>
-            </a>
-        </div>
-    </div>
-</header>
+<div th:replace="fragments/adminHeader :: adminHeader"></div>
 
 <div class="max-w-7xl mx-auto px-6 py-12">
 
     <div class="mb-8">
+        <button type="button"
+                onclick="history.back()"
+                class="flex items-center gap-2 px-4 py-2 border-2 border-gray-200 rounded-xl text-gray-700 hover:bg-gray-100 font-medium text-sm mb-4">
+            <i class="fa-solid fa-arrow-left text-sm"></i>
+            뒤로가기
+        </button>
+
         <h1 class="text-4xl font-black text-gray-900 mb-2">정산 관리</h1>
         <p class="text-lg text-gray-600 font-medium">강사 정산 요청과 수익 현황을 관리합니다</p>
     </div>
 
     <!-- Stats -->
-    <div th:with="pendingCount=${approvals.?[status.name() == 'PENDING'].size()},
-                  approvedCount=${approvals.?[status.name() == 'APPROVED'].size()},
-                  rejectedCount=${approvals.?[status.name() == 'REJECTED'].size()}"
-         class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
         <div class="bg-white border-2 border-yellow-200 rounded-2xl p-6 hover:shadow-lg transition-all">
             <div class="flex items-center justify-between mb-3">
                 <h3 class="text-sm font-bold text-gray-700">이번 달 정산 요청</h3>
@@ -92,80 +36,254 @@
             <p class="text-4xl font-black text-gray-900 mb-2" th:text="${pendingCount} + '건'">0건</p>
             <p class="text-sm text-yellow-600 font-bold">승인 대기 중</p>
         </div>
-        <div class="bg-white border-2 border-green-200 rounded-2xl p-6 hover:shadow-lg transition-all">
+
+        <div class="bg-white border-2 border-blue-200 rounded-2xl p-6 hover:shadow-lg transition-all">
             <div class="flex items-center justify-between mb-3">
-                <h3 class="text-sm font-bold text-gray-700">승인 완료</h3>
-                <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                    <i class="fa-solid fa-circle-check text-green-600"></i>
+                <h3 class="text-sm font-bold text-gray-700">플랫폼 수수료</h3>
+                <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-chart-line text-blue-600"></i>
                 </div>
             </div>
-            <p class="text-4xl font-black text-gray-900 mb-2" th:text="${approvedCount} + '건'">0건</p>
-            <p class="text-sm text-green-600 font-bold">처리 완료</p>
-        </div>
-        <div class="bg-white border-2 border-red-200 rounded-2xl p-6 hover:shadow-lg transition-all">
-            <div class="flex items-center justify-between mb-3">
-                <h3 class="text-sm font-bold text-gray-700">반려</h3>
-                <div class="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
-                    <i class="fa-solid fa-circle-xmark text-red-600"></i>
-                </div>
-            </div>
-            <p class="text-4xl font-black text-gray-900 mb-2" th:text="${rejectedCount} + '건'">0건</p>
-            <p class="text-sm text-red-600 font-bold">반려 처리</p>
+            <p class="text-4xl font-black text-gray-900 mb-2"
+               th:text="'₩' + ${#numbers.formatInteger(totalPlatformFee, 0, 'COMMA')}">₩0</p>
+            <p class="text-sm text-blue-600 font-bold">이번 달</p>
         </div>
     </div>
 
     <!-- Table -->
     <div class="bg-white border-2 border-gray-200 rounded-2xl p-6">
         <h2 class="text-2xl font-black text-gray-900 mb-6">강사 정산 요청 목록</h2>
+
         <div class="overflow-x-auto">
-            <table class="w-full">
+            <table class="w-full min-w-max">
                 <thead class="bg-gray-50 border-b-2 border-gray-200">
-                    <tr>
-                        <th class="px-4 py-3 text-left text-sm font-black text-gray-900 whitespace-nowrap">No</th>
-                        <th class="px-4 py-3 text-left text-sm font-black text-gray-900 whitespace-nowrap">강사명</th>
-                        <th class="px-4 py-3 text-left text-sm font-black text-gray-900 whitespace-nowrap">요청일</th>
-                        <th class="px-4 py-3 text-left text-sm font-black text-gray-900 whitespace-nowrap">상태</th>
-                        <th class="px-4 py-3 text-left text-sm font-black text-gray-900 whitespace-nowrap">액션</th>
-                    </tr>
+                <tr>
+                    <th class="px-4 py-3 text-left text-sm font-black text-gray-900 whitespace-nowrap">No</th>
+                    <th class="px-4 py-3 text-left text-sm font-black text-gray-900 whitespace-nowrap">강사명</th>
+                    <th class="px-4 py-3 text-left text-sm font-black text-gray-900 whitespace-nowrap">정산 월</th>
+                    <th class="px-4 py-3 text-left text-sm font-black text-gray-900 whitespace-nowrap">요청 금액</th>
+                    <th class="px-4 py-3 text-left text-sm font-black text-gray-900 whitespace-nowrap">수수료 (30%)</th>
+                    <th class="px-4 py-3 text-left text-sm font-black text-gray-900 whitespace-nowrap">정산 예정</th>
+                    <th class="px-4 py-3 text-left text-sm font-black text-gray-900 whitespace-nowrap">요청일</th>
+                    <th class="px-4 py-3 text-left text-sm font-black text-gray-900 whitespace-nowrap">상태</th>
+                    <th class="px-4 py-3 text-left text-sm font-black text-gray-900 whitespace-nowrap">액션</th>
+                </tr>
                 </thead>
+
                 <tbody>
-                    <tr th:if="${#lists.isEmpty(approvals)}">
-                        <td colspan="5" class="px-6 py-16 text-center text-gray-400">정산 요청이 없습니다</td>
-                    </tr>
-                    <tr th:each="approval, stat : ${approvals}"
-                        th:classappend="${approval.status.name() == 'PENDING'} ? 'bg-yellow-50/30' : ''"
-                        class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                        <td class="px-4 py-3 text-sm text-gray-600" th:text="${stat.count}"></td>
-                        <td class="px-4 py-3 text-sm font-bold text-gray-900 whitespace-nowrap" th:text="${approval.instuctorName ?: '-'}"></td>
-                        <td class="px-4 py-3 text-sm font-mono text-gray-600 whitespace-nowrap"
-                            th:text="${approval.createdAt != null ? #temporals.format(approval.createdAt, 'yyyy-MM-dd') : '-'}"></td>
-                        <td class="px-4 py-3 whitespace-nowrap">
-                            <span th:classappend="${approval.status.name() == 'PENDING'} ? 'bg-yellow-100 text-yellow-700' : (${approval.status.name() == 'APPROVED'} ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700')"
-                                  class="px-3 py-1 rounded-full text-sm font-bold"
-                                  th:text="${approval.status.name() == 'PENDING'} ? '승인 대기' : (${approval.status.name() == 'APPROVED'} ? '승인 완료' : '반려')"></span>
-                        </td>
-                        <td class="px-4 py-3 whitespace-nowrap">
-                            <div class="flex gap-2" th:if="${approval.status.name() == 'PENDING'}">
-                                <form method="post" th:action="@{/admin/approvals/{id}/approve(id=${approval.approvalId})}">
-                                    <input type="hidden" name="redirect" value="/admin/settlement"/>
-                                    <button type="submit" class="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-bold text-sm">승인</button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
+                <tr th:if="${#lists.isEmpty(approvals)}">
+                    <td colspan="9" class="px-6 py-16 text-center text-gray-400">정산 요청이 없습니다</td>
+                </tr>
+
+                <tr th:each="approval, stat : ${approvals}"
+                    th:classappend="${approval.status.name() == 'PENDING'} ? 'bg-yellow-50/30' : ''"
+                    class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                    <td class="px-4 py-3 text-sm text-gray-600" th:text="${stat.count}"></td>
+                    <td class="px-4 py-3 text-sm font-bold text-gray-900 whitespace-nowrap"
+                        th:text="${approval.instuctorName ?: '-'}"></td>
+                    <td class="px-4 py-3 text-sm text-gray-600 whitespace-nowrap"
+                        th:text="${approval.settlementMonth ?: '-'}"></td>
+                    <td class="px-4 py-3 text-sm font-bold text-gray-900 whitespace-nowrap"
+                        th:text="${approval.requestedAmount != null ? '₩' + #numbers.formatInteger(approval.requestedAmount, 0, 'COMMA') : '-'}"></td>
+                    <td class="px-4 py-3 text-sm font-bold text-red-500 whitespace-nowrap"
+                        th:text="${approval.platformFee != null ? '-₩' + #numbers.formatInteger(approval.platformFee, 0, 'COMMA') : '-'}"></td>
+                    <td class="px-4 py-3 text-sm font-bold text-green-600 whitespace-nowrap"
+                        th:text="${approval.finalAmount != null ? '₩' + #numbers.formatInteger(approval.finalAmount, 0, 'COMMA') : '-'}"></td>
+                    <td class="px-4 py-3 text-sm font-mono text-gray-600 whitespace-nowrap"
+                        th:text="${approval.createdAt != null ? #temporals.format(approval.createdAt, 'yyyy-MM-dd') : '-'}"></td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                        <span th:classappend="${approval.status.name() == 'PENDING'} ? 'bg-yellow-100 text-yellow-700' : (${approval.status.name() == 'APPROVED'} ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700')"
+                              class="px-3 py-1 rounded-full text-sm font-bold"
+                              th:text="${approval.status.name() == 'PENDING'} ? '승인 대기' : (${approval.status.name() == 'APPROVED'} ? '승인 완료' : '반려')"></span>
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                        <div class="flex gap-2 items-center">
+                            <button type="button"
+                                    th:attr="data-id=${approval.approvalId},
+                                             data-instructor=${approval.instuctorName},
+                                             data-month=${approval.settlementMonth},
+                                             data-requested=${approval.requestedAmount},
+                                             data-fee=${approval.platformFee},
+                                             data-final=${approval.finalAmount},
+                                             data-date=${approval.createdAt != null ? #temporals.format(approval.createdAt, 'yyyy-MM-dd') : '-'},
+                                             data-status=${approval.status.name()}"
+                                    onclick="openDetailModal(this)"
+                                    class="w-8 h-8 flex items-center justify-center rounded-lg border-2 border-blue-200 text-blue-500 hover:bg-blue-50 transition-colors">
+                                <i class="fa-solid fa-eye text-sm"></i>
+                            </button>
+
+                            <form method="post"
+                                  th:if="${approval.status.name() == 'PENDING'}"
+                                  th:action="@{/admin/approvals/{id}/approve(id=${approval.approvalId})}">
+                                <input type="hidden" name="redirect" value="/admin/settlement"/>
+                                <button type="submit"
+                                        class="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-bold text-sm">
+                                    승인
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- 상세 데이터 (hidden) -->
+    <div style="display:none">
+        <div th:each="approval : ${approvals}" th:id="'details-' + ${approval.approvalId}">
+            <div th:each="d : ${approval.settlementDetails}"
+                 th:attr="data-course=${d.courseName}, data-count=${d.saleCount}, data-amount=${d.totalSalesAmount}">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 정산 상세 모달 -->
+<div id="detail-modal"
+     class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+     style="display:none">
+    <div class="bg-white rounded-2xl w-full max-w-lg mx-4 shadow-2xl overflow-y-auto max-h-[90vh]">
+        <div class="p-8">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-black text-gray-900">정산 상세</h3>
+                <button type="button"
+                        onclick="closeDetailModal()"
+                        class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3 mb-6 pb-6 border-b border-gray-100">
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500 font-medium">요청 번호</span>
+                    <span id="d-number" class="font-bold text-gray-900"></span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500 font-medium">강사명</span>
+                    <span id="d-instructor" class="font-bold text-gray-900"></span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500 font-medium">강의명</span>
+                    <span id="d-coursename" class="font-bold text-gray-900"></span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500 font-medium">정산 월</span>
+                    <span id="d-month" class="font-bold text-gray-900"></span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500 font-medium">요청일</span>
+                    <span id="d-date" class="font-bold text-gray-900"></span>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 rounded-2xl p-6 mb-6">
+                <h4 class="text-base font-black text-gray-900 mb-4">금액 내역</h4>
+                <div class="space-y-3">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">요청 금액</span>
+                        <span id="d-requested" class="font-bold text-gray-900"></span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">플랫폼 수수료 (30%)</span>
+                        <span id="d-fee" class="font-bold text-red-500"></span>
+                    </div>
+                    <div class="border-t border-gray-200 pt-3 flex justify-between text-sm">
+                        <span class="font-black text-gray-900">최종 지급 금액</span>
+                        <span id="d-final" class="font-black text-green-600 text-base"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h4 class="text-base font-black text-gray-900 mb-4">판매 내역</h4>
+                <div id="d-details" class="space-y-3"></div>
+            </div>
+
+            <div class="flex gap-3">
+                <form id="d-approve-form" method="post" class="flex-1" style="display:none">
+                    <input type="hidden" name="redirect" value="/admin/settlement"/>
+                    <button type="submit"
+                            class="w-full py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-bold">
+                        승인하기
+                    </button>
+                </form>
+
+                <button type="button"
+                        onclick="closeDetailModal()"
+                        class="flex-1 py-3 border-2 border-gray-200 rounded-xl font-bold text-gray-700 hover:bg-gray-50">
+                    닫기
+                </button>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    function toggleAdminMenu() { document.getElementById('adminMenu').classList.toggle('hidden'); }
-    function toggleMemberMenu() { document.getElementById('memberSubMenu').classList.toggle('hidden'); }
-    function toggleCourseMenu() { document.getElementById('courseSubMenu').classList.toggle('hidden'); }
-    document.addEventListener('click', e => {
-        if (!document.getElementById('adminMenuWrapper').contains(e.target))
-            document.getElementById('adminMenu').classList.add('hidden');
+    function formatMoney(val) {
+        if (!val || val === 'null') return '-';
+        return '₩' + parseInt(val).toLocaleString();
+    }
+
+    function openDetailModal(btn) {
+        const id = btn.dataset.id;
+        const year = btn.dataset.date ? btn.dataset.date.substring(0, 4) : new Date().getFullYear();
+
+        document.getElementById('d-number').textContent = 'ST-' + year + '-' + String(id).padStart(3, '0');
+        document.getElementById('d-instructor').textContent = btn.dataset.instructor || '-';
+        document.getElementById('d-month').textContent = btn.dataset.month || '-';
+        document.getElementById('d-date').textContent = btn.dataset.date || '-';
+        document.getElementById('d-requested').textContent = formatMoney(btn.dataset.requested);
+        document.getElementById('d-fee').textContent = '-' + formatMoney(btn.dataset.fee);
+        document.getElementById('d-final').textContent = formatMoney(btn.dataset.final);
+
+        const detailsContainer = document.getElementById('d-details');
+        detailsContainer.innerHTML = '';
+
+        const detailsDiv = document.getElementById('details-' + id);
+        let firstCourse = '-';
+
+        if (detailsDiv) {
+            const firstDetail = detailsDiv.querySelector('[data-course]');
+            if (firstDetail) firstCourse = firstDetail.dataset.course;
+
+            detailsDiv.querySelectorAll('[data-course]').forEach(d => {
+                detailsContainer.innerHTML += `
+                    <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl text-sm">
+                        <div>
+                            <p class="font-bold text-gray-900">${d.dataset.course}</p>
+                            <p class="text-gray-500">수강생 ${d.dataset.count}명</p>
+                        </div>
+                        <span class="font-bold text-gray-900">₩${parseInt(d.dataset.amount).toLocaleString()}</span>
+                    </div>`;
+            });
+        }
+
+        if (detailsContainer.innerHTML === '') {
+            detailsContainer.innerHTML = '<p class="text-gray-400 text-sm text-center py-4">판매 내역이 없습니다</p>';
+        }
+
+        document.getElementById('d-coursename').textContent = firstCourse;
+
+        const approveForm = document.getElementById('d-approve-form');
+        if (btn.dataset.status === 'PENDING') {
+            approveForm.action = '/admin/approvals/' + id + '/approve';
+            approveForm.style.display = 'block';
+        } else {
+            approveForm.style.display = 'none';
+        }
+
+        document.getElementById('detail-modal').style.display = 'flex';
+    }
+
+    function closeDetailModal() {
+        document.getElementById('detail-modal').style.display = 'none';
+    }
+
+    document.getElementById('detail-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.style.display = 'none';
+        }
     });
 </script>
 

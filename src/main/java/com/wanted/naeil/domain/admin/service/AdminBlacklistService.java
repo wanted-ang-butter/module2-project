@@ -57,6 +57,8 @@ public class AdminBlacklistService {
                         .blacklistID(h.getBlacklistId())
                         .userId(h.getUser().getId())
                         .userName(h.getUser().getName())
+                        .phone(h.getUser().getPhone())
+                        .userCreatedAt(h.getUser().getCreatedAt())
                         .reason(h.getReason())
                         .releaseReason(h.getReleaseReason())
                         .createdAt(h.getCreatedAt())

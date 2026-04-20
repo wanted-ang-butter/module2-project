@@ -28,7 +28,7 @@ public class UserCourseController {
 
         log.info("[Course] 전체 코스 목록 페이지 조회");
 
-        List<CourseListResponse> courses = courseService.findAllCourses();
+        List<CourseListResponse> courses = courseService.getAllCourses();
 
         mv.addObject("courses", courses);
         mv.addObject("categories", categoryRepository.findAll());
