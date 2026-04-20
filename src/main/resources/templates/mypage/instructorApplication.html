@@ -210,32 +210,34 @@
                     <!-- 증빙 자료 -->
                     <div>
                         <label class="block text-sm font-bold text-gray-900 mb-2">증빙 자료 <span class="text-red-500">*</span></label>
+                        <div id="proofFileList" class="space-y-2 mb-2"></div>
                         <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-blue-500 hover:bg-blue-50 transition-colors cursor-pointer"
-                             onclick="document.getElementById('proofFiles').click()">
+                             onclick="document.getElementById('proofFilesInput').click()">
                             <i class="fa-solid fa-upload text-gray-400 text-3xl mb-3 block"></i>
                             <p class="text-sm font-medium text-gray-600">파일을 선택하거나 드래그하여 업로드</p>
-                            <p class="text-xs text-gray-400 mt-1">PDF, DOC, DOCX, JPG, PNG (최대 10MB)</p>
-                            <input type="file" id="proofFiles" name="proofFiles"
+                            <p class="text-xs text-gray-400 mt-1">PDF, DOC, DOCX, JPG, PNG (최대 10MB, 최대 10개)</p>
+                            <input type="file" id="proofFilesInput"
                                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
                                    multiple
-                                   class="hidden" onchange="showFileNames(this, 'proofFileName')"/>
+                                   class="hidden" onchange="addProofFiles(this)"/>
                         </div>
-                        <p id="proofFileName" class="text-sm text-blue-600 font-medium mt-2 hidden"></p>
+                        <!-- 실제 전송용 hidden input들이 JS로 동적 추가됨 -->
+                        <div id="proofFilesContainer"></div>
                     </div>
 
                     <!-- 얼굴 사진 -->
                     <div>
                         <label class="block text-sm font-bold text-gray-900 mb-2">얼굴 사진 <span class="text-red-500">*</span></label>
-                        <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-blue-500 hover:bg-blue-50 transition-colors cursor-pointer"
-                             onclick="document.getElementById('faceImg').click()">
+                        <div id="faceImgPreview" class="mb-2"></div>
+                        <div id="faceImgUploadArea" class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-blue-500 hover:bg-blue-50 transition-colors cursor-pointer"
+                             onclick="document.getElementById('faceImgInput').click()">
                             <i class="fa-solid fa-image text-gray-400 text-3xl mb-3 block"></i>
                             <p class="text-sm font-medium text-gray-600">얼굴 사진을 업로드하세요</p>
                             <p class="text-xs text-gray-400 mt-1">JPG, PNG (최대 5MB)</p>
-                            <input type="file" id="faceImg" name="faceImg"
+                            <input type="file" id="faceImgInput" name="faceImg"
                                    accept=".jpg,.jpeg,.png"
-                                   class="hidden" onchange="showFileNames(this, 'faceImgName')"/>
+                                   class="hidden" onchange="addFaceImg(this)"/>
                         </div>
-                        <p id="faceImgName" class="text-sm text-blue-600 font-medium mt-2 hidden"></p>
                     </div>
 
                     <!-- 버튼 -->
@@ -274,6 +276,7 @@
 </footer>
 
 <script>
+    let proofFiles = [];
     function toggleNoticeDropdown() {
         const el = document.getElementById('noticeDropdown');
         if (el) el.classList.toggle('open');
@@ -293,13 +296,133 @@
         }
     });
 
-    function showFileNames(input, targetId) {
-        const target = document.getElementById(targetId);
-        if (input.files && input.files.length > 0) {
-            const names = Array.from(input.files).map(f => f.name).join(', ');
-            target.textContent = '선택된 파일: ' + names;
-            target.classList.remove('hidden');
+    // ===== 증빙 자료 관리 =====
+    // let proofFiles = []; // 선택된 파일 배열
+
+    function addProofFiles(input) {
+        const newFiles = Array.from(input.files);
+
+        // 전체 체크를 forEach 밖에서 먼저 해요
+        const availableSlots = 10 - proofFiles.length;
+        if (availableSlots <= 0) {
+            alert('증빙 자료는 최대 10개까지 업로드 가능합니다.');
+            input.value = '';
+            return;
         }
+
+        let addedCount = 0;
+        newFiles.forEach(file => {
+            if (addedCount >= availableSlots) return; // 슬롯 초과 시 그냥 건너뜀
+            if (file.size > 10 * 1024 * 1024) {
+                alert(`${file.name}: 파일 크기는 10MB 이하여야 합니다.`);
+                return;
+            }
+            proofFiles.push(file);
+            addedCount++;
+        });
+
+        // 10개 초과분이 잘렸을 때 한 번만 알림
+        if (newFiles.length > availableSlots) {
+            alert(`증빙 자료는 최대 10개까지 업로드 가능합니다. ${availableSlots}개만 추가되었습니다.`);
+        }
+
+        input.value = '';
+        renderProofFiles();
+        syncProofFilesToForm();
+    }
+
+    function removeProofFile(index) {
+        proofFiles.splice(index, 1);
+        renderProofFiles();
+        syncProofFilesToForm();
+    }
+
+    function renderProofFiles() {
+        const list = document.getElementById('proofFileList');
+        list.innerHTML = '';
+        proofFiles.forEach((file, index) => {
+            const item = document.createElement('div');
+            item.className = 'flex items-center justify-between p-4 border-2 border-green-200 bg-green-50 rounded-xl';
+            item.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                        <i class="fa-solid fa-file-lines text-green-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-gray-900">${file.name}</p>
+                        <p class="text-xs text-gray-500">${(file.size / 1024).toFixed(2)} KB</p>
+                    </div>
+                </div>
+                <button type="button" onclick="removeProofFile(${index})"
+                        class="p-2 hover:bg-red-100 rounded-lg transition-colors">
+                    <i class="fa-solid fa-xmark text-red-600"></i>
+                </button>
+            `;
+            list.appendChild(item);
+        });
+    }
+
+    function syncProofFilesToForm() {
+        // 기존 hidden input 제거
+        const container = document.getElementById('proofFilesContainer');
+        container.innerHTML = '';
+
+        // DataTransfer로 FileList 생성해서 hidden input에 연결
+        const dt = new DataTransfer();
+        proofFiles.forEach(file => dt.items.add(file));
+
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.name = 'proofFiles';
+        input.multiple = true;
+        input.style.display = 'none';
+        input.files = dt.files;
+        container.appendChild(input);
+    }
+
+    // ===== 얼굴 사진 관리 =====
+    function addFaceImg(input) {
+        const file = input.files[0];
+        if (!file) return;
+
+        // 5MB 체크
+        if (file.size > 5 * 1024 * 1024) {
+            alert('파일 크기는 5MB 이하여야 합니다.');
+            input.value = '';
+            return;
+        }
+
+        const preview = document.getElementById('faceImgPreview');
+        const uploadArea = document.getElementById('faceImgUploadArea');
+
+        preview.innerHTML = `
+            <div class="flex items-center justify-between p-4 border-2 border-blue-200 bg-blue-50 rounded-xl">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i class="fa-solid fa-image text-blue-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-gray-900">${file.name}</p>
+                        <p class="text-xs text-gray-500">${(file.size / 1024).toFixed(2)} KB</p>
+                    </div>
+                </div>
+                <button type="button" onclick="removeFaceImg()"
+                        class="p-2 hover:bg-red-100 rounded-lg transition-colors">
+                    <i class="fa-solid fa-xmark text-red-600"></i>
+                </button>
+            </div>
+        `;
+        uploadArea.classList.add('hidden'); // 업로드 영역 숨기기
+    }
+
+    function removeFaceImg() {
+        const preview = document.getElementById('faceImgPreview');
+        const uploadArea = document.getElementById('faceImgUploadArea');
+        const input = document.getElementById('faceImgInput');
+
+        preview.innerHTML = '';
+        uploadArea.classList.remove('hidden'); // 업로드 영역 다시 보이기
+        input.value = ''; // input 초기화
     }
 </script>
 </body>

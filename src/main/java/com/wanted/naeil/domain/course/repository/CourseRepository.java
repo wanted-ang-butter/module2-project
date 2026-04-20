@@ -1,20 +1,22 @@
 package com.wanted.naeil.domain.course.repository;
 
-import com.wanted.naeil.domain.course.dto.response.CourseDetailsResponse;
+
 import com.wanted.naeil.domain.course.dto.response.CourseListResponse;
+import com.wanted.naeil.domain.course.entity.Category;
 import com.wanted.naeil.domain.course.entity.Course;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
+
 
 import java.util.List;
 import java.util.Optional;
 
 public interface CourseRepository extends JpaRepository <Course, Long> {
     boolean existsByCategoryId(Long categoryId);
-    Optional<Course>findByTitle(String title);
+    Optional<Course>findByTitle(String title); //성민 추가
+    long countByCategory(Category category);
 
     // 코스 전체 조회
     //group by에는 select 문에 있는 일반 컬럼들은 모두 들어가야함
@@ -29,6 +31,49 @@ public interface CourseRepository extends JpaRepository <Course, Long> {
             "GROUP BY c.id, cat.name, u.name, c.thumbnail, c.title, c.description, c.price"
     )
     List<CourseListResponse> findAllWithStatus();
+
+    // ---------- 현지 추가 -----------
+    // 코스 전체 조회 - 최신순
+    @Query("select new com.wanted.naeil.domain.course.dto.response.CourseListResponse(" +
+            "c.id, c.thumbnail, cat.name, c.title, c.description, u.name, " +
+            "AVG(r.rating), COUNT(distinct e.id), c.price) " +
+            "FROM Course c " +
+            "JOIN c.category cat " +
+            "JOIN c.instructor u " +
+            "LEFT join Review r ON r.course = c " +
+            "LEFT JOIN Enrollment e ON e.course = c " +
+            "GROUP BY c.id, cat.name, u.name, c.thumbnail, c.title, c.description, c.price " +
+            "ORDER BY c.createdAt DESC"
+    )
+    List<CourseListResponse> findAllOrderByCreatedAtDesc();
+
+    // 코스 전체 조회 - 인기순
+    @Query("select new com.wanted.naeil.domain.course.dto.response.CourseListResponse(" +
+            "c.id, c.thumbnail, cat.name, c.title, c.description, u.name, " +
+            "AVG(r.rating), COUNT(distinct e.id), c.price) " +
+            "FROM Course c " +
+            "JOIN c.category cat " +
+            "JOIN c.instructor u " +
+            "LEFT join Review r ON r.course = c " +
+            "LEFT JOIN Enrollment e ON e.course = c " +
+            "GROUP BY c.id, cat.name, u.name, c.thumbnail, c.title, c.description, c.price " +
+            "ORDER BY COUNT(distinct e.id) DESC"
+    )
+    List<CourseListResponse> findAllOrderByStudentCountDesc();
+
+    // 키워드로 강의 검색 (제목 또는 설명)
+    @Query("select new com.wanted.naeil.domain.course.dto.response.CourseListResponse(" +
+            "c.id, c.thumbnail, cat.name, c.title, c.description, u.name, " +
+            "AVG(r.rating), COUNT(distinct e.id), c.price) " +
+            "FROM Course c " +
+            "JOIN c.category cat " +
+            "JOIN c.instructor u " +
+            "LEFT join Review r ON r.course = c " +
+            "LEFT JOIN Enrollment e ON e.course = c " +
+            "WHERE c.title LIKE %:keyword% OR c.description LIKE %:keyword% " +
+            "GROUP BY c.id, cat.name, u.name, c.thumbnail, c.title, c.description, c.price")
+    List<CourseListResponse> searchByKeyword(@Param("keyword") String keyword);
+    // -------------------------------
 
     // 내가 등록한 강의 - 강사
     @EntityGraph(attributePaths = {"category"})

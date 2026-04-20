@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 
@@ -20,15 +21,14 @@ public class AdminUserController {
 
     // 회원 목록 페이지 - USER/INSTRUCTOR 전체 조회 + 상태별 카운트
     @GetMapping("/user-management")
-    public String userList(Model model) {
+    public ModelAndView userList() {
+        ModelAndView mav = new ModelAndView("admin/user-list");
         List<UserResponse> users = adminUserService.getUser();
-        long activeCount = users.stream().filter(u -> "ACTIVE".equals(u.getStatus().name())).count();
-        long inactiveCount = users.stream().filter(u -> !"ACTIVE".equals(u.getStatus().name())).count();
-        model.addAttribute("users", users);
-        model.addAttribute("totalCount", users.size());
-        model.addAttribute("activeCount", activeCount);
-        model.addAttribute("inactiveCount", inactiveCount);
-        return "admin/user-list";
+        mav.addObject("users", users);
+        mav.addObject("totalCount", users.size());
+        mav.addObject("activeCount", users.stream().filter(u -> "ACTIVE".equals(u.getStatus().name())).count());
+        mav.addObject("inactiveCount", users.stream().filter(u -> !"ACTIVE".equals(u.getStatus().name())).count());
+        return mav;
     }
 
     // 회원 활성화
