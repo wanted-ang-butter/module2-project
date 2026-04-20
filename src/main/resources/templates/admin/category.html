@@ -12,7 +12,7 @@
 <header class="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
     <div class="max-w-7xl mx-auto px-6 py-4">
         <div class="flex items-center justify-between">
-            <a th:href="@{/admin/dashboard}" class="flex items-center gap-3 group">
+            <a th:href="@{/dashboard/admin}" class="flex items-center gap-3 group">
                 <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
                     <i class="fa-solid fa-terminal text-white text-sm"></i>
                 </div>
@@ -84,65 +84,92 @@
     </div>
 </header>
 
-<div class="max-w-7xl mx-auto px-6 py-12">
+<div class="max-w-7xl mx-auto px-6 py-10 flex gap-8">
 
-    <div class="mb-8">
-        <button onclick="history.back()" class="flex items-center gap-2 px-4 py-2 border-2 border-gray-200 rounded-xl text-gray-700 hover:bg-gray-100 font-medium text-sm mb-4"><i class="fa-solid fa-arrow-left text-sm"></i>뒤로가기</button>
-        <h1 class="text-4xl font-black text-gray-900 mb-2">카테고리 관리</h1>
-        <p class="text-lg text-gray-600 font-medium">코스 카테고리를 추가하고 관리합니다</p>
-    </div>
+    <!-- Sidebar -->
+    <aside class="w-56 shrink-0">
+        <div class="bg-white border-2 border-gray-200 rounded-2xl p-4">
+            <p class="text-sm font-black text-gray-900 px-3 py-2 mb-1">코스 관리</p>
+            <nav class="space-y-1">
+                <a th:href="@{/admin/course-management/approval}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    <i class="fa-solid fa-book-open text-gray-400 w-4"></i>코스 승인 관리
+                </a>
+                <a th:href="@{/admin/live-management}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    <i class="fa-solid fa-video text-gray-400 w-4"></i>실시간 강의 승인 관리
+                </a>
+                <a th:href="@{/admin/category-management}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-purple-700 bg-purple-50">
+                    <i class="fa-solid fa-tags text-purple-500 w-4"></i>카테고리 관리
+                </a>
+            </nav>
+        </div>
+    </aside>
 
-    <!-- Add Category -->
-    <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 mb-6 shadow-sm">
-        <h2 class="text-lg font-black text-gray-900 mb-4">카테고리 추가</h2>
-        <form method="post" th:action="@{/admin/category-management}" class="flex gap-3">
-            <input type="text" name="name" placeholder="카테고리명을 입력하세요"
-                   class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none font-medium" />
-            <button type="submit"
-                    class="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all font-bold flex items-center gap-2">
-                <i class="fa-solid fa-plus"></i>등록
-            </button>
-        </form>
-    </div>
+    <!-- Main -->
+    <main class="flex-1">
+        <div class="mb-8">
+            <button onclick="history.back()" class="flex items-center gap-2 px-4 py-2 border-2 border-gray-200 rounded-xl text-gray-700 hover:bg-gray-100 font-medium text-sm mb-4"><i class="fa-solid fa-arrow-left text-sm"></i>뒤로가기</button>
+            <h1 class="text-4xl font-black text-gray-900 mb-2">카테고리 관리</h1>
+            <p class="text-lg text-gray-600 font-medium">코스 카테고리를 추가하고 관리합니다</p>
+        </div>
 
-    <!-- Table -->
-    <div class="bg-white border-2 border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-        <table class="w-full text-sm">
-            <thead class="bg-gray-50 border-b-2 border-gray-200">
-                <tr>
-                    <th class="px-6 py-4 text-left font-bold text-gray-600">No</th>
-                    <th class="px-6 py-4 text-left font-bold text-gray-600">카테고리명</th>
-                    <th class="px-6 py-4 text-left font-bold text-gray-600">관리</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:if="${#lists.isEmpty(categories)}">
-                    <td colspan="3" class="px-6 py-16 text-center text-gray-400">등록된 카테고리가 없습니다</td>
-                </tr>
-                <tr th:each="cat, stat : ${categories}" class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                    <td class="px-6 py-4 text-gray-500" th:text="${stat.count}"></td>
-                    <td class="px-6 py-4 font-medium text-gray-900" th:text="${cat.name}"></td>
-                    <td class="px-6 py-4">
-                        <div class="flex gap-2">
-                            <button type="button"
-                                    th:attr="data-id=${cat.id}, data-name=${cat.name}"
-                                    onclick="openEditModal(this.dataset.id, this.dataset.name)"
-                                    class="px-3 py-1.5 border-2 border-blue-300 text-blue-600 rounded-lg hover:bg-blue-50 font-bold text-xs">
-                                수정
-                            </button>
-                            <form method="post" th:action="@{/admin/category-management/{id}/delete(id=${cat.id})}"
-                                  onsubmit="return confirm('삭제하시겠습니까?')">
-                                <button type="submit"
-                                        class="px-3 py-1.5 border-2 border-red-300 text-red-600 rounded-lg hover:bg-red-50 font-bold text-xs">
-                                    삭제
+        <!-- Add Category -->
+        <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 mb-6 shadow-sm">
+            <h2 class="text-lg font-black text-gray-900 mb-4">카테고리 추가</h2>
+            <form method="post" th:action="@{/admin/category-management}" class="flex gap-3">
+                <input type="text" name="name" placeholder="카테고리명을 입력하세요"
+                       class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none font-medium" />
+                <button type="submit"
+                        class="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i>등록
+                </button>
+            </form>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-white border-2 border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50 border-b-2 border-gray-200">
+                    <tr>
+                        <th class="px-6 py-4 text-left font-bold text-gray-600">카테고리명</th>
+                        <th class="px-6 py-4 text-left font-bold text-gray-600">코스 수</th>
+                        <th class="px-6 py-4 text-left font-bold text-gray-600">등록일</th>
+                        <th class="px-6 py-4 text-left font-bold text-gray-600">액션</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(categories)}">
+                        <td colspan="4" class="px-6 py-16 text-center text-gray-400">등록된 카테고리가 없습니다</td>
+                    </tr>
+                    <tr th:each="cat : ${categories}" class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4 font-medium text-gray-900" th:text="${cat.name}"></td>
+                        <td class="px-6 py-4 text-blue-600 font-bold" th:text="${cat.courseCount} + '개'"></td>
+                        <td class="px-6 py-4 text-gray-500"
+                            th:text="${cat.createdAt != null ? #temporals.format(cat.createdAt, 'yyyy-MM-dd') : '-'}"></td>
+                        <td class="px-6 py-4">
+                            <div class="flex gap-2">
+                                <button type="button"
+                                        th:attr="data-id=${cat.id}, data-name=${cat.name}"
+                                        onclick="openEditModal(this.dataset.id, this.dataset.name)"
+                                        class="flex items-center gap-1 px-3 py-1.5 border-2 border-blue-300 text-blue-600 rounded-lg hover:bg-blue-50 font-bold text-xs">
+                                    <i class="fa-solid fa-pen text-xs"></i>수정
                                 </button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+                                <form method="post" th:action="@{/admin/category-management/{id}/delete(id=${cat.id})}"
+                                      onsubmit="return confirm('삭제하시겠습니까?')">
+                                    <button type="submit"
+                                            class="flex items-center gap-1 px-3 py-1.5 border-2 border-red-300 text-red-600 rounded-lg hover:bg-red-50 font-bold text-xs">
+                                        <i class="fa-solid fa-trash text-xs"></i>삭제
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
 </div>
 
 <!-- Edit Modal -->
@@ -170,10 +197,10 @@
     function openEditModal(id, name) {
         document.getElementById('edit-name-input').value = name;
         document.getElementById('edit-form').action = '/admin/category-management/' + id + '/edit';
-        document.getElementById('edit-modal').classList.remove('hidden');
+        document.getElementById('edit-modal').style.display = 'flex';
     }
     function closeEditModal() {
-        document.getElementById('edit-modal').classList.add('hidden');
+        document.getElementById('edit-modal').style.display = 'none';
     }
     function toggleAdminMenu() { document.getElementById('adminMenu').classList.toggle('hidden'); }
     function toggleMemberMenu() { document.getElementById('memberSubMenu').classList.toggle('hidden'); }

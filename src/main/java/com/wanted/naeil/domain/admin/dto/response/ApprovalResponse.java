@@ -2,6 +2,7 @@ package com.wanted.naeil.domain.admin.dto.response;
 
 import com.wanted.naeil.domain.admin.entity.enums.ApprovalRequestType;
 import com.wanted.naeil.domain.admin.entity.enums.ApprovalStatus;
+import com.wanted.naeil.domain.user.entity.enums.Role;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -36,6 +37,7 @@ public class ApprovalResponse {
     private Integer finalAmount;
     private String settlementMonth;
     private List<SettlementDetailInfo> settlementDetails;
+    private Role role;
 
     @Getter
     @Builder
@@ -43,6 +45,7 @@ public class ApprovalResponse {
         private String courseName;
         private int saleCount;
         private int totalSalesAmount;
+
     }
 
 

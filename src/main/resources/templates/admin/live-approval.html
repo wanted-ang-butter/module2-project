@@ -12,7 +12,7 @@
 <header class="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
     <div class="max-w-7xl mx-auto px-6 py-4">
         <div class="flex items-center justify-between">
-            <a th:href="@{/admin/dashboard}" class="flex items-center gap-3 group">
+            <a th:href="@{/dashboard/admin}" class="flex items-center gap-3 group">
                 <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
                     <i class="fa-solid fa-terminal text-white text-sm"></i>
                 </div>
@@ -159,12 +159,25 @@
                                   th:text="${approval.status.name() == 'PENDING'} ? '승인 대기' : (${approval.status.name() == 'APPROVED'} ? '승인 완료' : '반려')"></span>
                         </td>
                         <td class="px-4 py-3 whitespace-nowrap">
-                            <div class="flex gap-1.5" th:if="${approval.status.name() == 'PENDING'}">
-                                <form method="post" th:action="@{/admin/approvals/{id}/approve(id=${approval.approvalId})}">
+                            <div class="flex gap-1.5 items-center">
+                                <!-- 검토 버튼 (전체) -->
+                                <button type="button"
+                                        th:attr="data-id=${approval.approvalId},
+                                                 data-title=${approval.title},
+                                                 data-instructor=${approval.instuctorName},
+                                                 data-description=${approval.description},
+                                                 data-startat=${approval.startAt != null ? #temporals.format(approval.startAt, 'yyyy-MM-dd HH:mm') : '-'},
+                                                 data-createdat=${approval.createdAt != null ? #temporals.format(approval.createdAt, 'yyyy-MM-dd') : '-'},
+                                                 data-status=${approval.status.name()}"
+                                        onclick="openDetailModal(this)"
+                                        class="px-2.5 py-1.5 border-2 border-blue-300 text-blue-600 rounded-lg hover:bg-blue-50 font-bold text-xs">검토</button>
+                                <!-- 승인/반려 버튼 (PENDING만) -->
+                                <form method="post" th:if="${approval.status.name() == 'PENDING'}"
+                                      th:action="@{/admin/approvals/{id}/approve(id=${approval.approvalId})}">
                                     <input type="hidden" name="redirect" value="/admin/live-management"/>
                                     <button type="submit" class="px-2.5 py-1.5 border-2 border-green-300 text-green-600 rounded-lg hover:bg-green-50 font-bold text-xs">승인</button>
                                 </form>
-                                <button type="button"
+                                <button type="button" th:if="${approval.status.name() == 'PENDING'}"
                                         th:attr="data-id=${approval.approvalId}, data-title=${approval.title}"
                                         onclick="openRejectModal(this.dataset.id, this.dataset.title)"
                                         class="px-2.5 py-1.5 border-2 border-red-300 text-red-600 rounded-lg hover:bg-red-50 font-bold text-xs">반려</button>
@@ -175,6 +188,54 @@
             </table>
         </div>
     </main>
+</div>
+
+<!-- Detail Modal -->
+<div id="detail-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" style="display:none">
+    <div class="bg-white rounded-2xl w-full max-w-lg mx-4 shadow-2xl overflow-y-auto max-h-[90vh]">
+        <div class="p-8">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-black text-gray-900">실시간 강의 신청 상세</h3>
+                <button onclick="closeDetailModal()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl text-sm">
+                    <span class="text-gray-500 font-medium">상태</span>
+                    <span id="d-status" class="px-3 py-1 rounded-full text-sm font-bold"></span>
+                </div>
+                <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl text-sm">
+                    <span class="text-gray-500 font-medium">강의명</span>
+                    <span id="d-title" class="font-bold text-gray-900 text-right"></span>
+                </div>
+                <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl text-sm">
+                    <span class="text-gray-500 font-medium">강사명</span>
+                    <span id="d-instructor" class="font-bold text-gray-900"></span>
+                </div>
+                <div class="p-4 bg-gray-50 rounded-xl text-sm">
+                    <p class="text-gray-500 font-medium mb-2">코스 설명</p>
+                    <p id="d-description" class="font-bold text-gray-900 leading-relaxed"></p>
+                </div>
+                <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl text-sm">
+                    <span class="text-gray-500 font-medium">강의 예정 일시</span>
+                    <span id="d-startat" class="font-bold text-gray-900"></span>
+                </div>
+                <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl text-sm">
+                    <span class="text-gray-500 font-medium">신청일</span>
+                    <span id="d-createdat" class="font-bold text-gray-900"></span>
+                </div>
+            </div>
+            <div class="flex gap-3 mt-8">
+                <form id="d-approve-form" method="post" class="flex-1" style="display:none">
+                    <input type="hidden" name="redirect" value="/admin/live-management"/>
+                    <button type="submit" class="w-full py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 font-bold">승인하기</button>
+                </form>
+                <button id="d-reject-btn" type="button" onclick="openRejectFromDetail()" class="flex-1 py-3 border-2 border-red-300 text-red-600 rounded-xl hover:bg-red-50 font-bold" style="display:none">반려하기</button>
+                <button onclick="closeDetailModal()" class="flex-1 py-3 border-2 border-gray-200 rounded-xl font-bold text-gray-700 hover:bg-gray-50">닫기</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Reject Modal -->
@@ -205,12 +266,56 @@
                 : 'px-4 py-2 rounded-full font-bold text-sm bg-white border-2 border-gray-200 text-gray-700 hover:border-blue-300';
         });
     }
+    let currentDetailId = null;
+    let currentDetailTitle = null;
+
+    function openDetailModal(btn) {
+        currentDetailId = btn.dataset.id;
+        currentDetailTitle = btn.dataset.title;
+        const status = btn.dataset.status;
+
+        document.getElementById('d-title').textContent = btn.dataset.title || '-';
+        document.getElementById('d-instructor').textContent = btn.dataset.instructor || '-';
+        document.getElementById('d-description').textContent = btn.dataset.description || '-';
+        document.getElementById('d-startat').textContent = btn.dataset.startat || '-';
+        document.getElementById('d-createdat').textContent = btn.dataset.createdat || '-';
+
+        const statusEl = document.getElementById('d-status');
+        if (status === 'PENDING') {
+            statusEl.textContent = '승인 대기';
+            statusEl.className = 'px-3 py-1 rounded-full text-sm font-bold bg-yellow-100 text-yellow-700';
+        } else if (status === 'APPROVED') {
+            statusEl.textContent = '승인 완료';
+            statusEl.className = 'px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-700';
+        } else {
+            statusEl.textContent = '반려';
+            statusEl.className = 'px-3 py-1 rounded-full text-sm font-bold bg-red-100 text-red-700';
+        }
+
+        const approveForm = document.getElementById('d-approve-form');
+        const rejectBtn = document.getElementById('d-reject-btn');
+        if (status === 'PENDING') {
+            approveForm.action = '/admin/approvals/' + currentDetailId + '/approve';
+            approveForm.style.display = 'block';
+            rejectBtn.style.display = 'block';
+        } else {
+            approveForm.style.display = 'none';
+            rejectBtn.style.display = 'none';
+        }
+        document.getElementById('detail-modal').style.display = 'flex';
+    }
+    function closeDetailModal() { document.getElementById('detail-modal').style.display = 'none'; }
+    function openRejectFromDetail() {
+        closeDetailModal();
+        openRejectModal(currentDetailId, currentDetailTitle);
+    }
+
     function openRejectModal(id, title) {
         document.getElementById('reject-title').textContent = '"' + title + '"를 반려하시겠습니까?';
         document.getElementById('reject-form').action = '/admin/approvals/' + id + '/reject';
-        document.getElementById('reject-modal').classList.remove('hidden');
+        document.getElementById('reject-modal').style.display = 'flex';
     }
-    function closeRejectModal() { document.getElementById('reject-modal').classList.add('hidden'); }
+    function closeRejectModal() { document.getElementById('reject-modal').style.display = 'none'; }
     function toggleAdminMenu() { document.getElementById('adminMenu').classList.toggle('hidden'); }
     function toggleMemberMenu() { document.getElementById('memberSubMenu').classList.toggle('hidden'); }
     function toggleCourseMenu() { document.getElementById('courseSubMenu').classList.toggle('hidden'); }

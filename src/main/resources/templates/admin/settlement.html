@@ -12,7 +12,7 @@
 <header class="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
     <div class="max-w-7xl mx-auto px-6 py-4">
         <div class="flex items-center justify-between">
-            <a th:href="@{/admin/dashboard}" class="flex items-center gap-3 group">
+            <a th:href="@{/dashboard/admin}" class="flex items-center gap-3 group">
                 <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
                     <i class="fa-solid fa-terminal text-white text-sm"></i>
                 </div>
@@ -79,10 +79,7 @@
     </div>
 
     <!-- Stats -->
-    <div th:with="pendingCount=${approvals.?[status.name() == 'PENDING'].size()},
-                  approvedCount=${approvals.?[status.name() == 'APPROVED'].size()},
-                  rejectedCount=${approvals.?[status.name() == 'REJECTED'].size()}"
-         class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+    <div class="grid grid-cols-2 gap-6 mb-12">
         <div class="bg-white border-2 border-yellow-200 rounded-2xl p-6 hover:shadow-lg transition-all">
             <div class="flex items-center justify-between mb-3">
                 <h3 class="text-sm font-bold text-gray-700">이번 달 정산 요청</h3>
@@ -93,25 +90,16 @@
             <p class="text-4xl font-black text-gray-900 mb-2" th:text="${pendingCount} + '건'">0건</p>
             <p class="text-sm text-yellow-600 font-bold">승인 대기 중</p>
         </div>
-        <div class="bg-white border-2 border-green-200 rounded-2xl p-6 hover:shadow-lg transition-all">
+        <div class="bg-white border-2 border-blue-200 rounded-2xl p-6 hover:shadow-lg transition-all">
             <div class="flex items-center justify-between mb-3">
-                <h3 class="text-sm font-bold text-gray-700">승인 완료</h3>
-                <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                    <i class="fa-solid fa-circle-check text-green-600"></i>
+                <h3 class="text-sm font-bold text-gray-700">플랫폼 수수료</h3>
+                <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-chart-line text-blue-600"></i>
                 </div>
             </div>
-            <p class="text-4xl font-black text-gray-900 mb-2" th:text="${approvedCount} + '건'">0건</p>
-            <p class="text-sm text-green-600 font-bold">처리 완료</p>
-        </div>
-        <div class="bg-white border-2 border-red-200 rounded-2xl p-6 hover:shadow-lg transition-all">
-            <div class="flex items-center justify-between mb-3">
-                <h3 class="text-sm font-bold text-gray-700">반려</h3>
-                <div class="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
-                    <i class="fa-solid fa-circle-xmark text-red-600"></i>
-                </div>
-            </div>
-            <p class="text-4xl font-black text-gray-900 mb-2" th:text="${rejectedCount} + '건'">0건</p>
-            <p class="text-sm text-red-600 font-bold">반려 처리</p>
+            <p class="text-4xl font-black text-gray-900 mb-2"
+               th:text="'₩' + ${#numbers.formatInteger(totalPlatformFee, 0, 'COMMA')}">₩0</p>
+            <p class="text-sm text-blue-600 font-bold">이번 달</p>
         </div>
     </div>
 
@@ -210,8 +198,16 @@
             <!-- 기본 정보 -->
             <div class="space-y-3 mb-6 pb-6 border-b border-gray-100">
                 <div class="flex justify-between text-sm">
+                    <span class="text-gray-500 font-medium">요청 번호</span>
+                    <span id="d-number" class="font-bold text-gray-900"></span>
+                </div>
+                <div class="flex justify-between text-sm">
                     <span class="text-gray-500 font-medium">강사명</span>
                     <span id="d-instructor" class="font-bold text-gray-900"></span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500 font-medium">강의명</span>
+                    <span id="d-coursename" class="font-bold text-gray-900"></span>
                 </div>
                 <div class="flex justify-between text-sm">
                     <span class="text-gray-500 font-medium">정산 월</span>
@@ -276,6 +272,8 @@
 
     function openDetailModal(btn) {
         const id = btn.dataset.id;
+        const year = btn.dataset.date ? btn.dataset.date.substring(0, 4) : new Date().getFullYear();
+        document.getElementById('d-number').textContent = 'ST-' + year + '-' + String(id).padStart(3, '0');
         document.getElementById('d-instructor').textContent = btn.dataset.instructor || '-';
         document.getElementById('d-month').textContent = btn.dataset.month || '-';
         document.getElementById('d-date').textContent = btn.dataset.date || '-';
@@ -287,7 +285,10 @@
         const detailsContainer = document.getElementById('d-details');
         detailsContainer.innerHTML = '';
         const detailsDiv = document.getElementById('details-' + id);
+        let firstCourse = '-';
         if (detailsDiv) {
+            const firstDetail = detailsDiv.querySelector('[data-course]');
+            if (firstDetail) firstCourse = firstDetail.dataset.course;
             detailsDiv.querySelectorAll('[data-course]').forEach(d => {
                 detailsContainer.innerHTML += `
                     <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl text-sm">
@@ -302,6 +303,7 @@
         if (detailsContainer.innerHTML === '') {
             detailsContainer.innerHTML = '<p class="text-gray-400 text-sm text-center py-4">판매 내역이 없습니다</p>';
         }
+        document.getElementById('d-coursename').textContent = firstCourse;
 
         // 승인 버튼 (PENDING만)
         const approveForm = document.getElementById('d-approve-form');

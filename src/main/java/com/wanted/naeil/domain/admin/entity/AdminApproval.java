@@ -42,10 +42,6 @@ public class AdminApproval extends BaseTimeEntity {
     private InstructorApplications instructorApplications;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "instructor_id")
-    private User instructor;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "admin_id")
     private User admin;
 

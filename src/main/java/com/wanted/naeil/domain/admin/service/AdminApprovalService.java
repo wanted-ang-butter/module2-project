@@ -58,6 +58,7 @@ public class AdminApprovalService {
                                     approval.getInstructorApplications();
                             builder.applicationId(applications.getId())
                                     .applicantName(applications.getUser().getName())
+                                    .role(applications.getUser().getRole())
                                     .title(applications.getTitle())
                                     .categoryName(applications.getCategory().getName())
                                     .introduction(applications.getIntroduction())

@@ -12,7 +12,7 @@
 <header class="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
     <div class="max-w-7xl mx-auto px-6 py-4">
         <div class="flex items-center justify-between">
-            <a th:href="@{/admin/dashboard}" class="flex items-center gap-3 group">
+            <a th:href="@{/dashboard/admin}" class="flex items-center gap-3 group">
                 <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
                     <i class="fa-solid fa-terminal text-white text-sm"></i>
                 </div>
@@ -70,7 +70,31 @@
     </div>
 </header>
 
-<div class="max-w-7xl mx-auto px-6 py-12">
+<div class="max-w-7xl mx-auto px-6 py-10 flex gap-8">
+
+    <!-- Sidebar -->
+    <aside class="w-56 shrink-0">
+        <div class="bg-white border-2 border-gray-200 rounded-2xl p-4">
+            <p class="text-sm font-black text-gray-900 px-3 py-2 mb-1">회원 관리</p>
+            <nav class="space-y-1">
+                <a th:href="@{/admin/user-management}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-purple-700 bg-purple-50">
+                    <i class="fa-solid fa-users text-purple-500 w-4"></i>회원 조회
+                </a>
+                <a th:href="@{/admin/instructor-approval}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    <i class="fa-solid fa-chalkboard-teacher text-gray-400 w-4"></i>강사 승인
+                </a>
+                <a th:href="@{/admin/blacklist}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    <i class="fa-solid fa-ban text-gray-400 w-4"></i>블랙리스트 관리
+                </a>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="flex-1">
 
     <div class="mb-12">
 
@@ -142,6 +166,8 @@
                     <th class="px-4 py-3 text-left font-bold text-gray-600">전화번호</th>
                     <th class="px-4 py-3 text-left font-bold text-gray-600">생년월일</th>
                     <th class="px-4 py-3 text-left font-bold text-gray-600">닉네임</th>
+                    <th class="px-4 py-3 text-left font-bold text-gray-600">역할</th>
+                    <th class="px-4 py-3 text-left font-bold text-gray-600">가입일</th>
                     <th class="px-4 py-3 text-left font-bold text-gray-600">상태</th>
                     <th class="px-4 py-3 text-left font-bold text-gray-600">경고</th>
                     <th class="px-4 py-3 text-left font-bold text-gray-600">관리</th>
@@ -149,7 +175,7 @@
             </thead>
             <tbody id="user-tbody">
                 <tr th:if="${#lists.isEmpty(users)}">
-                    <td colspan="9" class="px-4 py-8 text-center text-gray-400">회원이 없습니다.</td>
+                    <td colspan="10" class="px-4 py-8 text-center text-gray-400">회원이 없습니다.</td>
                 </tr>
                 <tr th:each="user, stat : ${users}"
                     th:attr="data-name=${user.name}, data-nickname=${user.nickname}"
@@ -160,6 +186,20 @@
                     <td class="px-4 py-3 text-gray-600" th:text="${user.phone ?: '-'}"></td>
                     <td class="px-4 py-3 text-gray-600" th:text="${user.birthDate ?: '-'}"></td>
                     <td class="px-4 py-3 text-gray-600" th:text="${user.nickname ?: '-'}"></td>
+                    <td class="px-4 py-3">
+                        <span th:if="${user.role.name() == 'INSTRUCTOR'}"
+                              class="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold">강사</span>
+                        <span th:if="${user.role.name() == 'ADMIN'}"
+                              class="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-bold">관리자</span>
+                        <span th:if="${user.role.name() == 'SUBSCRIBER'}"
+                              class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">구독자</span>
+                        <span th:if="${user.role.name() == 'USER'}"
+                              class="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-bold">일반</span>
+                        <span th:if="${user.role.name() == 'GUEST'}"
+                              class="px-2 py-1 bg-gray-100 text-gray-400 rounded-full text-xs font-bold">게스트</span>
+                    </td>
+                    <td class="px-4 py-3 text-gray-600"
+                        th:text="${user.createdAt != null ? #temporals.format(user.createdAt, 'yyyy-MM-dd') : '-'}"></td>
                     <td class="px-4 py-3">
                         <span th:if="${user.status.name() == 'ACTIVE'}"
                               class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">활성</span>
@@ -218,6 +258,8 @@
             </tbody>
         </table>
     </div>
+
+    </main>
 </div>
 
 <!-- Blacklist Modal -->

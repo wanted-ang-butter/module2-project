@@ -7,6 +7,7 @@ import com.wanted.naeil.domain.user.entity.enums.UserStatus;
 import lombok.Builder;
 import lombok.Getter;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Builder
@@ -22,6 +23,7 @@ public class UserResponse {
     private UserStatus status;
     private int warningCount;
     private LocalDate birthDate;
+    private LocalDateTime createdAt;
 
 
     public static UserResponse from(User user) {
@@ -36,6 +38,7 @@ public class UserResponse {
                 .status(user.getStatus())
                 .warningCount(user.getWarningCount())
                 .birthDate(user.getBirthDate())
+                .createdAt(user.getCreatedAt())
                 .build();
     }
 
