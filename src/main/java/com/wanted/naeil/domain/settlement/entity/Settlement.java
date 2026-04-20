@@ -32,22 +32,22 @@ public class Settlement {
     private User admin;
 
     @Column(name = "settlement_month", nullable = false, length = 7)
-    private String settlementMonth; // ex) 2026-04
+    private String settlementMonth;
 
     @Column(name = "total_sales_amount", nullable = false)
-    private int totalSalesAmount; // 정산 대상 총 판매 금액
+    private int totalSalesAmount;
 
     @Column(name = "platform_fee", nullable = false)
-    private int platformFee; // 플랫폼 수수료
+    private int platformFee;
 
     @Column(name = "final_amount", nullable = false)
-    private int finalAmount; // 실제 정산 금액
+    private int finalAmount;
 
     @Column(name = "total_amount", nullable = false)
-    private int totalAmount; // 누적 정산 완료 금액
+    private int totalAmount;
 
     @Column(name = "requested_amount", nullable = false)
-    private int requestedAmount; // 강사가 이번에 신청한 금액
+    private int requestedAmount;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -62,29 +62,24 @@ public class Settlement {
     @OneToMany(mappedBy = "settlement", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SettlementDetail> details = new ArrayList<>();
 
-
-    // 비지니스 로직
-
     public void addDetail(SettlementDetail detail) {
         this.details.add(detail);
         detail.assignSettlement(this);
     }
 
-    public void approve(User admin) {
-        this.admin = admin;
-        this.status = SettlementStatus.APPROVED;
-        this.completedAt = LocalDateTime.now();
-    }
+    public void request() {
+        if (this.status != SettlementStatus.READY) {
+            throw new IllegalStateException("신청 가능한 정산만 신청할 수 있습니다.");
+        }
 
-    public void reject(User admin, String rejectReason) {
-        this.admin = admin;
-        this.status = SettlementStatus.REJECTED;
+        this.status = SettlementStatus.PENDING;
     }
 
     public void cancel() {
         if (this.status != SettlementStatus.PENDING) {
             throw new IllegalStateException("대기 중인 정산만 취소할 수 있습니다.");
         }
+
         this.status = SettlementStatus.CANCELED;
     }
 }
