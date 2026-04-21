@@ -16,6 +16,7 @@ import com.wanted.naeil.domain.settlement.entity.Settlement;
 import com.wanted.naeil.domain.settlement.entity.enums.SettlementStatus;
 import com.wanted.naeil.domain.settlement.repository.SettlementRepository;
 import com.wanted.naeil.domain.settlement.service.SettlementService;
+import com.wanted.naeil.domain.learning.repository.EnrollmentRepository;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.domain.user.entity.enums.Role;
 import com.wanted.naeil.domain.user.entity.enums.UserStatus;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
@@ -52,6 +54,7 @@ public class DashboardController {
     private final CourseRepository courseRepository;
     private final SettlementRepository settlementRepository;
     private final AdminApprovalService adminApprovalService;
+    private final EnrollmentRepository enrollmentRepository;
 
     @GetMapping("/admin")
     public ModelAndView adminDashboard(@AuthenticationPrincipal AuthDetails authDetails) {
@@ -159,6 +162,22 @@ public class DashboardController {
                     .mapToInt(Settlement::getFinalAmount)
                     .sum();
 
+            // 신규 수강생 (이번 달)
+            LocalDateTime startOfMonth = LocalDate.now().withDayOfMonth(1).atStartOfDay();
+            long newStudentCount = enrollmentRepository.countNewStudentsThisMonth(instructorId, startOfMonth);
+
+            // 평균 완강률
+            Double avgCompletionRate = enrollmentRepository.findAvgCompletionRateByInstructorId(instructorId);
+            int completionRate = avgCompletionRate != null ? (int) Math.round(avgCompletionRate) : 0;
+
+            // 평균 평점
+            double avgRating = courses.stream()
+                    .mapToDouble(c -> {
+                        try { return Double.parseDouble(c.getRating()); } catch (Exception e) { return 0.0; }
+                    })
+                    .average()
+                    .orElse(0.0);
+
             mv.addObject("subscription", mySubscriptionService.getMySubscription(instructorId));
             mv.addObject("user", authDetails.getLoginUserDTO());
             mv.addObject("courses", courses);
@@ -168,6 +187,9 @@ public class DashboardController {
             mv.addObject("currentMonthSales", currentMonthSales);
             mv.addObject("currentMonthFee", currentMonthFee);
             mv.addObject("availableAmount", availableAmount);
+            mv.addObject("newStudentCount", newStudentCount);
+            mv.addObject("completionRate", completionRate);
+            mv.addObject("avgRating", String.format("%.2f", avgRating));
         }
 
         return mv;

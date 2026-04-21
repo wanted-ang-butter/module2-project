@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
@@ -51,6 +52,22 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
     // 수강 정보 조회
     Optional<Enrollment> findByUserIdAndCourseId(Long userId, Long courseId);
+
+    // 강사 신규 수강생 수 (이번 달)
+    @Query("""
+        SELECT COUNT(e) FROM Enrollment e
+        WHERE e.course.instructor.id = :instructorId
+        AND e.createdAt >= :startOfMonth
+    """)
+    long countNewStudentsThisMonth(@Param("instructorId") Long instructorId,
+                                   @Param("startOfMonth") LocalDateTime startOfMonth);
+
+    // 강사 강의 평균 완강률
+    @Query("""
+        SELECT AVG(e.coursesRate) FROM Enrollment e
+        WHERE e.course.instructor.id = :instructorId
+    """)
+    Double findAvgCompletionRateByInstructorId(@Param("instructorId") Long instructorId);
 
     // 내 강의 상세 페이지용
     @Query("""
