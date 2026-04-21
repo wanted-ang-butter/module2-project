@@ -37,6 +37,11 @@
         <p class="text-sm font-bold text-red-600">아이디 또는 비밀번호가 올바르지 않습니다.</p>
     </div>
 
+    <!-- 블랙리스트 메시지 -->
+    <div th:if="${param.blacklist}" class="mb-4 p-4 bg-red-50 border-2 border-red-200 rounded-xl">
+        <p class="text-sm font-bold text-red-600">블랙리스트 유저입니다. 관리자에게 문의해주세요.</p>
+    </div>
+
     <!-- 비밀번호 변경 성공 메시지 -->
     <div th:if="${message}" class="mb-4 p-4 bg-green-50 border-2 border-green-200 rounded-xl">
         <p class="text-sm font-bold text-green-600" th:text="${message}"></p>
