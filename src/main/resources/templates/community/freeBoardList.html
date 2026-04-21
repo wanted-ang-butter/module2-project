@@ -8,7 +8,22 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 </head>
 <body class="bg-white">
-<div th:replace="fragments/userHeader :: userHeader"></div>
+<th:block th:if="${user == null or user.role == null}">
+  <div th:replace="~{fragments/guestHeader :: guestHeader}"></div>
+</th:block>
+
+<th:block th:if="${user != null and user.role != null and user.role.name() == 'USER'}">
+  <div th:replace="~{fragments/userHeader :: userHeader}"></div>
+</th:block>
+
+<th:block th:if="${user != null and user.role != null and user.role.name() == 'INSTRUCTOR'}">
+  <div th:replace="~{fragments/instructorHeader :: instructorHeader}"></div>
+</th:block>
+
+<th:block th:if="${user != null and user.role != null and user.role.name() == 'ADMIN'}">
+  <div th:replace="~{fragments/adminHeader :: adminHeader}"></div>
+</th:block>
+
 <div class="max-w-7xl mx-auto px-6 py-12">
 
   <a th:href="@{/}" class="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors mb-6 font-medium">
