@@ -48,22 +48,6 @@
                     <span class="font-medium text-gray-700 group-hover:text-blue-600 text-sm">크레딧</span>
                 </a>
 
-                <div class="relative" id="noticeDropdownWrapper">
-                    <button onclick="toggleNoticeDropdown()"
-                            class="w-9 h-9 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shadow-md hover:shadow-lg transition-shadow cursor-pointer">
-                        <i class="fa-solid fa-bullhorn text-white text-sm"></i>
-                    </button>
-                    <div id="noticeDropdown" class="notice-dropdown absolute right-0 mt-2 w-48 bg-white border-2 border-gray-200 rounded-xl shadow-xl z-50">
-                        <div class="py-2">
-                            <a th:href="@{/notice}" href="/notice"
-                               class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
-                                <i class="fa-solid fa-bullhorn text-gray-600"></i>
-                                <span class="text-sm font-medium text-gray-900">공지사항</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
                 <a th:href="@{/auth/login}" href="/auth/login"
                    class="px-4 py-2 text-gray-700 font-medium hover:text-blue-600 transition-colors text-sm">로그인</a>
