@@ -67,7 +67,7 @@
 
           <form th:action="@{/cart/delete/{id}(id=${item.cartItemId})}" method="post">
             <input type="hidden" name="_method" value="delete"/>
-            <button onclick="return confirm('삭제하시겠습니까?')">
+            <button type="submit" onclick="return confirm('삭제하시겠습니까?')">
               🗑
             </button>
           </form>
@@ -89,9 +89,27 @@
             <span id="selectedCount" class="font-bold">0</span>
           </div>
 
+          <!-- 구독자일 때만 노출 -->
+          <div th:if="${isSubscriber}" class="rounded-2xl bg-yellow-50 border border-yellow-200 p-4">
+            <div class="inline-flex items-center px-3 py-1 rounded-full bg-yellow-400 text-slate-900 font-extrabold text-sm mb-3">
+              👑 구독자 혜택
+            </div>
+            <p class="text-slate-700 font-semibold">
+              무료 구매 횟수:
+              <span class="text-green-600 font-extrabold" th:text="${remainingFreeCount}">3</span>회 남음
+            </p>
+          </div>
+
           <div class="flex justify-between">
             <span class="text-gray-600">필요 크레딧</span>
             <span id="totalRequiredCredit" class="font-bold">0</span>
+          </div>
+
+          <div th:if="${isSubscriber and discountAmount > 0}" class="flex justify-between">
+            <span class="text-green-600 font-semibold">총 할인 금액</span>
+            <span class="font-bold text-green-600">
+              -<span th:text="${#numbers.formatInteger(discountAmount, 3, 'COMMA')}">0</span>
+            </span>
           </div>
 
           <div class="flex justify-between">
@@ -127,7 +145,8 @@
           </div>
         </div>
 
-        <form id="checkoutForm" th:action="@{/cart/checkout}" method="post">
+        <!-- 결제 페이지 이동 -->
+        <form id="checkoutForm" th:action="@{/payments/courses}" method="get">
           <div id="selectedCartItemInputs"></div>
 
           <button id="checkoutBtn"
@@ -202,7 +221,7 @@
         checkoutBtn.classList.add('bg-slate-200', 'text-slate-500', 'cursor-not-allowed');
       } else {
         checkoutBtn.disabled = false;
-        checkoutBtn.textContent = '결제하기';
+        checkoutBtn.textContent = total === 0 ? '무료로 수강 신청하기' : '결제하기';
         checkoutBtn.classList.remove('bg-slate-200', 'text-slate-500', 'cursor-not-allowed');
         checkoutBtn.classList.add('bg-blue-600', 'hover:bg-blue-700', 'text-white');
       }

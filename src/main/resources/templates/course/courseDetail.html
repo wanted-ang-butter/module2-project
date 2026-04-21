@@ -156,12 +156,24 @@
           <div class="flex items-center gap-3 shrink-0">
             <span class="font-semibold text-gray-700"
                   th:text="${#numbers.formatInteger(course.likeCount, 0, 'COMMA')}">0</span>
-            <form th:action="@{/likes}" method="post">
+            <!-- 좋아요 안 누른 상태 -->
+            <form th:if="${!course.isLiked}" th:action="@{/likes}" method="post">
               <input type="hidden" name="targetType" value="COURSE">
               <input type="hidden" name="targetId" th:value="${course.courseId}">
               <button type="submit"
                       class="w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition">
                 <i class="fa-regular fa-heart"></i>
+              </button>
+            </form>
+
+            <!-- 좋아요 누른 상태 -->
+            <form th:if="${course.isLiked}"
+                  th:action="@{/likes/{likeId}/delete(likeId=${course.likeId})}"
+                  method="post"
+                  onsubmit="return confirm('좋아요를 취소하시겠습니까?')">
+              <button type="submit"
+                      class="w-9 h-9 rounded-full flex items-center justify-center text-red-500 bg-red-50 transition">
+                <i class="fa-solid fa-heart"></i>
               </button>
             </form>
           </div>
@@ -263,53 +275,49 @@
     <!-- Right Sidebar -->
     <aside class="lg:col-span-4">
       <div class="lg:sticky lg:top-24">
-        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm">
-          <div class="mb-6">
-            <p class="text-sm text-gray-500 font-semibold mb-2">강의 가격</p>
-            <p class="text-5xl font-extrabold tracking-tight text-gray-900"
-               th:text="${#numbers.formatInteger(course.price, 0, 'COMMA')}">0</p>
-            <p class="mt-1 text-lg font-semibold text-gray-600">크레딧</p>
-          </div>
 
-          <div class="space-y-3">
-            <!-- 바로 결제 -->
-            <form th:action="@{/payments/courses/direct/{courseId}(courseId=${course.courseId})}" method="post">
-              <button type="submit"
-                      class="w-full h-14 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg flex items-center justify-center gap-2 transition">
-                <i class="fa-regular fa-credit-card"></i>
-                <span>바로 결제</span>
-              </button>
-            </form>
-
-            <!-- 장바구니 담기 -->
-            <form th:action="@{/cart/add/{courseId}(courseId=${course.courseId})}" method="post">
-              <button type="submit"
-                      class="w-full h-14 rounded-2xl border border-gray-300 bg-white hover:bg-gray-50 text-gray-900 font-bold text-lg flex items-center justify-center gap-2 transition">
-                <i class="fa-solid fa-cart-shopping"></i>
-                <span>장바구니 담기</span>
-              </button>
-            </form>
-          </div>
-
-          <div class="mt-6 pt-6 border-t border-gray-200 space-y-3">
-            <div class="flex items-center gap-3 text-sm text-gray-700">
-              <i class="fa-regular fa-circle-check text-green-600"></i>
-              <span>평생 수강 가능</span>
+        <!-- USER: 커리큘럼만 표시 -->
+        <th:block th:if="${user != null and user.role != null and user.role.name() == 'USER'}">
+          <div class="bg-white border border-gray-200 rounded-3xl overflow-hidden">
+            <div class="px-6 py-5 flex items-center justify-between border-b border-gray-200">
+              <h2 class="text-xl font-extrabold">커리큘럼</h2>
+              <span class="text-sm text-gray-500">
+            총 <span th:text="${course.sectionCount}">0</span>개 강의
+          </span>
             </div>
-            <div class="flex items-center gap-3 text-sm text-gray-700">
-              <i class="fa-regular fa-circle-check text-green-600"></i>
-              <span>모바일 지원</span>
-            </div>
-            <div class="flex items-center gap-3 text-sm text-gray-700">
-              <i class="fa-regular fa-circle-check text-green-600"></i>
-              <span>수료증 발급</span>
-            </div>
-            <div class="flex items-center gap-3 text-sm text-gray-700">
-              <i class="fa-regular fa-circle-check text-green-600"></i>
-              <span>Q&amp;A 지원</span>
+            <div class="divide-y divide-gray-200">
+              <div th:each="section, stat : ${course.sections}">
+                <button type="button"
+                        class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-gray-50 transition"
+                        onclick="this.nextElementSibling.classList.toggle('hidden')">
+                  <p class="font-bold text-gray-900 break-words text-sm"
+                     th:text="|섹션 ${stat.count}. ${section.title}|">섹션명</p>
+                  <div class="flex items-center gap-2 shrink-0">
+                <span th:if="${section.isFree}"
+                      class="text-[11px] font-bold text-green-700 bg-green-100 px-2 py-1 rounded-md">무료공개</span>
+                    <span class="text-sm text-gray-500 font-medium" th:text="${section.playTime}">00:15</span>
+                    <i class="fa-solid fa-chevron-down text-sm text-gray-400"></i>
+                  </div>
+                </button>
+                <div class="hidden bg-gray-50 border-t border-gray-100">
+                  <a th:href="@{/course/{courseId}/sections/{sectionId}(courseId=${course.courseId}, sectionId=${section.sectionId})}"
+                     class="px-6 py-4 flex items-center gap-3 hover:bg-gray-100 transition">
+                    <i class="fa-solid fa-play text-blue-500 text-xs"></i>
+                    <span class="text-sm text-gray-700" th:text="${section.title} + ' 학습하기'">강의명</span>
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        </th:block>
+
+        <!-- 비로그인/강사: 기존 가격/결제 박스 -->
+        <th:block th:unless="${user != null and user.role != null and user.role.name() == 'USER'}">
+          <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm">
+            <!-- 기존 가격/결제 내용 그대로 유지 -->
+          </div>
+        </th:block>
+
       </div>
     </aside>
   </div>

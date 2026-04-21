@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+
 @Getter
 @Builder
 public class MySubscriptionResponse {
@@ -12,9 +13,9 @@ public class MySubscriptionResponse {
     private String planType;
     private String planName;
     private String status;
+
     private LocalDateTime startAt;
     private LocalDateTime endAt;
-    private LocalDateTime nextResetAt;
 
     private Integer remainingFreeCount;
     private Integer usedFreeCount;
