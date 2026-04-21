@@ -142,6 +142,19 @@
             </a>
         </div>
     </nav>
+    <script>
+        function toggleInstructorProfileDropdown() {
+            const dropdown = document.getElementById('instructorProfileDropdown');
+            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+        }
+
+        document.addEventListener('click', function(e) {
+            const wrapper = document.getElementById('instructorProfileDropdownWrapper');
+            if (wrapper && !wrapper.contains(e.target)) {
+                document.getElementById('instructorProfileDropdown').style.display = 'none';
+            }
+        });
+    </script>
 </header>
 
 </body>
