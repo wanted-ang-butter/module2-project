@@ -4,6 +4,8 @@ import com.wanted.naeil.domain.course.dto.response.CourseDetailsResponse;
 import com.wanted.naeil.domain.course.dto.response.CourseListResponse;
 import com.wanted.naeil.domain.course.repository.CategoryRepository;
 import com.wanted.naeil.domain.course.service.CourseService;
+import com.wanted.naeil.domain.user.entity.User;
+import com.wanted.naeil.domain.user.repository.UserRepository;
 import com.wanted.naeil.global.auth.model.dto.AuthDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,15 +17,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Controller
-@RequestMapping("/course")
+@RequestMapping("/courses")
 @RequiredArgsConstructor
 @Slf4j
 public class UserCourseController {
 
     private final CourseService courseService;
     private final CategoryRepository categoryRepository;
+    private final UserRepository userRepository;
 
     @GetMapping
     public ModelAndView showAllCourses(
@@ -53,14 +57,19 @@ public class UserCourseController {
 
         log.info("[Course] 코스 상세 페이지 조회");
 
-        CourseDetailsResponse course = courseService.getCourseDetail(courseId);
+        User loginUser = authDetails != null
+                ? userRepository.findByUsername(authDetails.getLoginUserDTO().getUsername())
+                .orElseThrow(() -> new NoSuchElementException("유저를 찾을 수 없습니다."))
+                : null;
+
+        CourseDetailsResponse course = courseService.getCourseDetail(courseId, loginUser);
 
         if (authDetails != null) {
             mv.addObject("user", authDetails.getLoginUserDTO());
         }
 
         mv.addObject("course", course);
-        mv.setViewName("course/courseDetail");
+        mv.setViewName("courses/courseDetail");
         return mv;
     }
 }

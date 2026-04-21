@@ -24,7 +24,7 @@ public class SectionController {
     private final SectionService sectionService;
 
     // 섹션 상세 조회 (섹션 수강)
-    @GetMapping("/course/{courseId}/sections/{sectionId}")
+    @GetMapping("/courses/{courseId}/sections/{sectionId}")
     public ModelAndView getSectionStudyPage(
             @AuthenticationPrincipal AuthDetails authDetails,
             @PathVariable Long courseId, @PathVariable Long sectionId,
@@ -36,13 +36,13 @@ public class SectionController {
                 userId, courseId, sectionId);
 
         mv.addObject("sectionStudy", response);
-        mv.setViewName("course/sectionDetail");
+        mv.setViewName("courses/sectionDetail");
 
         return mv;
     }
 
     // 섹션 수정 - 강사
-    @PatchMapping(value = "/instructor/course/{courseId}/sections/{sectionId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/instructor/courses/{courseId}/sections/{sectionId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
     public ResponseEntity<Void> updateSection(
             @AuthenticationPrincipal AuthDetails authDetails,
@@ -60,7 +60,7 @@ public class SectionController {
     }
 
     // 섹션 추가 - 강사
-    @PostMapping("/instructor/course/{courseId}/sections")
+    @PostMapping("/instructor/courses/{courseId}/sections")
     @ResponseBody
     public ResponseEntity<Void> addSection(
             @AuthenticationPrincipal AuthDetails authDetails,
@@ -77,7 +77,7 @@ public class SectionController {
     }
 
     // 섹션 삭제 - 강사
-    @DeleteMapping("/instructor/course/{courseId}/sections/{sectionId}")
+    @DeleteMapping("/instructor/courses/{courseId}/sections/{sectionId}")
     @ResponseBody
     public ResponseEntity<Void> deleteSection(
             @AuthenticationPrincipal AuthDetails authDetails,
