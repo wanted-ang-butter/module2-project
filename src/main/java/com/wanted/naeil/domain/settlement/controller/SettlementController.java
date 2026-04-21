@@ -2,8 +2,8 @@ package com.wanted.naeil.domain.settlement.controller;
 
 import com.wanted.naeil.domain.settlement.entity.Settlement;
 import com.wanted.naeil.domain.settlement.entity.enums.SettlementStatus;
-import com.wanted.naeil.global.auth.model.dto.AuthDetails;
 import com.wanted.naeil.domain.settlement.service.SettlementService;
+import com.wanted.naeil.global.auth.model.dto.AuthDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -60,7 +60,17 @@ public class SettlementController {
         return "instructor/settlement";
     }
 
-    // 정산 신청
+    // 정산 생성 후 신청 -> 채린
+    @PostMapping("/request")
+    public String createAndRequestSettlement(@AuthenticationPrincipal AuthDetails authDetails) {
+
+        Long instructorId = authDetails.getLoginUserDTO().getUserId();
+        settlementService.createAndRequestSettlement(instructorId, YearMonth.now());
+
+        return "redirect:/instructor/settlements";
+    }
+
+    // 기존 정산 신청
     @PostMapping("/{settlementId}/request")
     public String requestSettlement(@PathVariable Long settlementId,
                                     @AuthenticationPrincipal AuthDetails authDetails) {
