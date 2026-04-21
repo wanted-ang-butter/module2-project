@@ -99,22 +99,56 @@
             </div>
 
             <!-- 업로드된 동영상 -->
-            <div th:if="${course.sections != null and not #lists.isEmpty(course.sections)}">
-                <h3 class="flex items-center gap-2 text-lg font-black text-gray-900 mb-4">
-                    <i class="fa-regular fa-file-video text-blue-500"></i> 업로드된 동영상
-                </h3>
-                <div class="space-y-2">
-                    <div th:each="section : ${course.sections}" th:if="${section.videoUrl != null}">
-                        <a th:href="${section.videoUrl}" target="_blank"
-                           class="flex items-center gap-3 px-4 py-3 bg-gray-50 hover:bg-blue-50 border border-gray-200 rounded-xl text-sm text-gray-700 hover:text-blue-600 transition">
-                            <i class="fa-regular fa-file-video text-blue-400"></i>
-                            <span th:text="${section.videoUrl}">파일명</span>
-                        </a>
+            <div th:if="${course.sections != null and not #lists.isEmpty(course.sections)}"
+                 class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <div>
+                    <h3 class="flex items-center gap-2 text-lg font-black text-gray-900 mb-4">
+                        <i class="fa-regular fa-file-video text-purple-500"></i> 업로드된 동영상
+                    </h3>
+
+                    <div class="space-y-2">
+                        <div th:each="section : ${course.sections}" th:if="${section.videoUrl != null}">
+                            <a th:href="${section.videoUrl}" target="_blank"
+                               class="flex items-center gap-3 px-4 py-3 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-xl text-sm text-gray-700 transition">
+                                <i class="fa-regular fa-file-video text-purple-500"></i>
+                                <span th:text="${#strings.substring(section.videoUrl, section.videoUrl.lastIndexOf('/') + 1)}">
+                        video.mp4
+                    </span>
+                            </a>
+                        </div>
+
+                        <div th:if="${#lists.isEmpty(course.sections.?[videoUrl != null])}"
+                             class="text-sm text-gray-400 py-4 text-center">
+                            업로드된 동영상이 없습니다.
+                        </div>
                     </div>
-                    <div th:if="${#lists.isEmpty(course.sections.?[videoUrl != null])}"
-                         class="text-sm text-gray-400 py-4 text-center">업로드된 동영상이 없습니다.</div>
+                </div>
+
+                <div>
+                    <h3 class="flex items-center gap-2 text-lg font-black text-gray-900 mb-4">
+                        <i class="fa-solid fa-paperclip text-gray-700"></i> 강의 자료
+                    </h3>
+
+                    <div class="space-y-2">
+                        <div th:each="section : ${course.sections}" th:if="${section.attachmentUrl != null}">
+                            <a th:href="${section.attachmentUrl}" target="_blank"
+                               class="flex items-center gap-3 px-4 py-3 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl text-sm text-gray-700 transition">
+                                <i class="fa-solid fa-paperclip text-gray-500"></i>
+                                <span th:text="${#strings.substring(section.attachmentUrl, section.attachmentUrl.lastIndexOf('/') + 1)}">
+                        attachment.pdf
+                    </span>
+                            </a>
+                        </div>
+
+                        <div th:if="${#lists.isEmpty(course.sections.?[attachmentUrl != null])}"
+                             class="text-sm text-gray-400 py-4 text-center">
+                            등록된 강의 자료가 없습니다.
+                        </div>
+                    </div>
                 </div>
             </div>
+
         </div>
 
         <!-- 수강생 조회 탭 내용 -->

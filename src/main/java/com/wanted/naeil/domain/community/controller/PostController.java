@@ -34,6 +34,12 @@ public class PostController {
     private final EnrollmentRepository enrollmentRepository;
     private final UserRepository userRepository;
 
+    // 커뮤니티 기본 페이지
+    @GetMapping
+    public ModelAndView communityHome() {
+        return new ModelAndView("redirect:/community/free");
+    }
+
     // 글 목록 조회
     @GetMapping("/{category}")
     public ModelAndView postList(@PathVariable String category,
