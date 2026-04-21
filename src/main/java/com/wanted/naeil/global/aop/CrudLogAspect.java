@@ -34,8 +34,7 @@ public class CrudLogAspect {
 
     // 삭제 AOP
     @AfterReturning("""
-        execution(* com.wanted.naeil.domain..service..delete*(..)) ||
-        execution(* com.wanted.naeil.domain..service..cancel*(..))
+        execution(* com.wanted.naeil.domain..service..delete*(..))
     """)
     public void logDeleteSuccess(JoinPoint joinPoint) {
         logSuccess("DELETE", joinPoint);
