@@ -19,20 +19,31 @@ public class PerformanceLogAspect {
     """)
     public Object measureExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
 
-        long startTime = System.currentTimeMillis();
+        long startTime = System.nanoTime();
 
         try {
             return joinPoint.proceed();
         } finally {
-            long endTime = System.currentTimeMillis();
-            long executionTime = endTime - startTime;
+            long endTime = System.nanoTime();
+
+            long executionTimeMs = (endTime - startTime) / 1_000_000;
+            double executionTimeSec = (endTime - startTime) / 1_000_000_000.0;
 
             MethodSignature signature = (MethodSignature) joinPoint.getSignature();
 
-            log.info("[성능 측정] {}.{} 싷행 시간 {}초",
+            log.info("""
+                
+                ==================== [성능 측정 시작] ====================
+                대상 메서드 : {}.{}
+                실행 시간  : {}ms
+                실행 시간  : {}초
+                ==================== [성능 측정 종료] ====================
+                """,
                     signature.getDeclaringType().getSimpleName(),
                     signature.getMethod().getName(),
-                    executionTime);
+                    executionTimeMs,
+                    String.format("%.2f", executionTimeSec)
+            );
         }
     }
 }
