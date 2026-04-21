@@ -15,7 +15,10 @@ public class InstructorLiveLectureResponse {
     private LiveLectureStatus status;
     private String statusDescription;
     private String title;
+    private String description;
+    private String instructorName;
     private LocalDateTime startAt;
+    private LocalDateTime createdAt;
     private int currentCount;
     private int maxCapacity;
 
@@ -25,7 +28,10 @@ public class InstructorLiveLectureResponse {
                 .status(liveLecture.getStatus())
                 .statusDescription(liveLecture.getStatus().getDescription())
                 .title(liveLecture.getTitle())
+                .description(liveLecture.getDescription())
+                .instructorName(liveLecture.getInstructor().getNickname())
                 .startAt(liveLecture.getStartAt())
+                .createdAt(liveLecture.getCreatedAt())
                 .currentCount(liveLecture.getCurrentCount())
                 .maxCapacity(liveLecture.getMaxCapacity())
                 .build();

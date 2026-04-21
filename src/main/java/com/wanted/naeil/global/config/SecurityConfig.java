@@ -1,5 +1,6 @@
 package com.wanted.naeil.global.config;
 
+import com.wanted.naeil.global.auth.handler.AuthFailureHandler;
 import com.wanted.naeil.global.auth.handler.AuthSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,12 +38,21 @@ public class SecurityConfig {
     }
 
     @Bean
+    public AuthFailureHandler authFailureHandler() {
+        return new AuthFailureHandler();
+    }
+
+    @Bean
     public SecurityFilterChain configure(HttpSecurity http,
                                          SessionRegistry sessionRegistry,
-                                         AuthSuccessHandler authSuccessHandler) throws Exception {
+                                         AuthSuccessHandler authSuccessHandler,
+                                         AuthFailureHandler authFailureHandler) throws Exception {
 
         http.authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/auth/login", "/auth/signup", "/auth/fail", "/auth/find-id", "/auth/find-password",  "/", "/dashboard", "/dashboard/guest", "/course/**","/subscription/**",  "/community/**", "/error").permitAll();
+                    auth.requestMatchers("/auth/login", "/auth/signup", "/auth/fail",
+                            "/auth/find-id", "/auth/find-password",  "/", "/dashboard",
+                            "/dashboard/guest", "/course/**","/subscription/**",
+                            "/community/**", "/error", "/uploads/**").permitAll();
                     auth.requestMatchers("/admin/**").hasAnyAuthority("ADMIN");
                     auth.requestMatchers("/instructor/**").hasAnyAuthority("ADMIN", "INSTRUCTOR");
                     auth.requestMatchers("/subscribe/**").hasAnyAuthority("ADMIN", "INSTRUCTOR", "SUBSCRIBER");
@@ -60,7 +70,7 @@ public class SecurityConfig {
                     login.loginPage("/auth/login");
                     login.usernameParameter("user");
                     login.passwordParameter("pass");
-                    login.failureUrl("/auth/login?error=true");
+                    login.failureHandler(authFailureHandler);
                     login.successHandler(authSuccessHandler); // defaultSuccessUrl 대신
                 }).rememberMe(rememberMe -> {
                     rememberMe.rememberMeParameter("remember-me");

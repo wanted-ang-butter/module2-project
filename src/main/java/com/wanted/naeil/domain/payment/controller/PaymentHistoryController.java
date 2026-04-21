@@ -7,6 +7,7 @@ import com.wanted.naeil.global.auth.model.dto.AuthDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,7 @@ public class PaymentHistoryController {
     public Page<PaymentHistoryResponse> getPaymentHistories(
             @AuthenticationPrincipal AuthDetails authDetails,
             @RequestParam(required = false) PaymentItemType itemType,
-            @PageableDefault(size = 10) Pageable pageable
+            @PageableDefault(size = 10, sort = "payment.paidAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         Long userId = authDetails.getLoginUserDTO().getUserId();
 

@@ -90,8 +90,10 @@
            class="block bg-white border-2 border-gray-200 rounded-2xl p-6 hover:shadow-xl hover:-translate-y-1 transition-all group">
           <div class="flex items-start justify-between">
             <div class="flex-1">
-              <h3 class="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors mb-3"
-                  th:text="${post.title}">제목</h3>
+              <h3 class="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors mb-3 flex items-center gap-2">
+                <span th:text="${post.title}">제목</span>
+                <i th:if="${!post.isPublic}" class="fa-solid fa-lock text-gray-400 text-sm" title="비공개"></i>
+              </h3>
               <div class="flex items-center gap-4">
                 <span class="text-sm text-gray-600 font-medium"
                       th:text="${post.nickname}">작성자</span>
