@@ -1,6 +1,7 @@
 package com.wanted.naeil.domain.mainpage.service;
 
 import com.wanted.naeil.domain.course.dto.response.CourseListResponse;
+import com.wanted.naeil.domain.course.entity.enums.CourseStatus;
 import com.wanted.naeil.domain.course.repository.CategoryRepository;
 import com.wanted.naeil.domain.course.repository.CourseRepository;
 import com.wanted.naeil.domain.learning.entity.Enrollment;
@@ -29,7 +30,7 @@ public class MainPageService {
     // 인기 강의 조회 - 수강생 많은 순 상위 10개
     // category가 null이면 전체, 값이 있으면 해당 카테고리만 필터링
     public List<CourseListResponse> getPopularCourses(String category) {
-        return courseRepository.findAllOrderByStudentCountDesc()
+        return courseRepository.findAllOrderByStudentCountDesc(CourseStatus.ACTIVE)
                 .stream()
                 .filter(course -> category == null || course.getCategory().equals(category))
                 .limit(10)
@@ -39,7 +40,7 @@ public class MainPageService {
     // 신규 강의 조회 - 최신 등록순 상위 10개
     // category가 null이면 전체, 값이 있으면 해당 카테고리만 필터링
     public List<CourseListResponse> getNewCourses(String category) {
-        return courseRepository.findAllOrderByCreatedAtDesc()
+        return courseRepository.findAllOrderByCreatedAtDesc(CourseStatus.ACTIVE)
                 .stream()
                 .filter(course -> category == null || course.getCategory().equals(category))
                 .limit(10)
@@ -48,7 +49,7 @@ public class MainPageService {
 
     // 카테고리별 강의 조회 - 카테고리당 최대 6개
     public List<MainCategoryResponse> getCategoryCourses() {
-        List<CourseListResponse> allCourses = courseRepository.findAllWithStatus();
+        List<CourseListResponse> allCourses = courseRepository.findAllWithStatus(CourseStatus.ACTIVE);
 
         return categoryRepository.findAll()
                 .stream()
@@ -104,7 +105,7 @@ public class MainPageService {
                 .map(e -> e.getCourse().getId())
                 .collect(Collectors.toSet());
 
-        return courseRepository.findAllWithStatus()
+        return courseRepository.findAllWithStatus(CourseStatus.ACTIVE)
                 .stream()
                 .filter(course -> enrolledCategories.contains(course.getCategory()))
                 .filter(course -> !enrolledCourseIds.contains(course.getCourseId()))

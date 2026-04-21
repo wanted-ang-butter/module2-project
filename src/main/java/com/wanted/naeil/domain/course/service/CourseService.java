@@ -168,11 +168,16 @@ public class CourseService {
         return CourseEditResponse.of(course, sections);
     }
 
-    // 강의 전체 조회 - 공통
+    // 코스 전체 조회
     @Transactional(readOnly = true)
-    public List<CourseListResponse> getAllCourses() {
-        return courseRepository.findAllWithStatus();
+    public List<CourseListResponse> getAllCourses(String category) {
+        if (category == null || category.isBlank()) {
+            return courseRepository.findAllWithStatus(CourseStatus.ACTIVE);
+        }
+
+        return courseRepository.findAllByCategoryNameAndStatus(category, CourseStatus.ACTIVE);
     }
+
 
     // 코스 단일 조회 - 공통
     @Transactional(readOnly = true)
@@ -380,6 +385,19 @@ public class CourseService {
                 .stream()
                 .map(InstructorCourseStudentResponse::from)
                 .toList();
+    }
+
+    // 검색기능
+    @Transactional(readOnly = true)
+    public List<CourseListResponse> getCourses(String category, String keyword) {
+        String normalizedCategory = (category == null || category.isBlank()) ? null : category;
+        String normalizedKeyword = (keyword == null || keyword.isBlank()) ? null : keyword;
+
+        return courseRepository.searchCourseList(
+                normalizedCategory,
+                normalizedKeyword,
+                CourseStatus.ACTIVE
+        );
     }
 
 
