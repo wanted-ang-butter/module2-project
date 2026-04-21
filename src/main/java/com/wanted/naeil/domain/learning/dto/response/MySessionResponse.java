@@ -7,11 +7,9 @@ import lombok.Getter;
 @Builder
 public class MySessionResponse {
 
-    private Long sectionId;
-    private Integer sequence;
+    private Long sessionId;
+    private Integer sessionOrder;
     private String title;
-    private String videoUrl;
-    private String playTime;
-    private String attachmentUrl;
+    private Integer playTime;
     private boolean completed;
 }
