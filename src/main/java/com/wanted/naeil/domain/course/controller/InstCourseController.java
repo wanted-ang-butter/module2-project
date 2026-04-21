@@ -229,6 +229,6 @@ public class InstCourseController {
     // TODO : 병합 후 강사의 내 강의 페이지로 수정하기
     @GetMapping("/course/complete")
     public String showCompletePage() {
-        return "coursegk/InstructorCourseComplete";
+        return "course/InstructorCourseComplete";
     }
 }

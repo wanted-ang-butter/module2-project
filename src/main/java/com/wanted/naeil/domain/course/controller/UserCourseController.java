@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @Controller
-@RequestMapping("/courses")
+@RequestMapping("/course")
 @RequiredArgsConstructor
 @Slf4j
 public class UserCourseController {
@@ -69,7 +69,7 @@ public class UserCourseController {
         }
 
         mv.addObject("course", course);
-        mv.setViewName("courses/courseDetail");
+        mv.setViewName("course/courseDetail");
         return mv;
     }
 }

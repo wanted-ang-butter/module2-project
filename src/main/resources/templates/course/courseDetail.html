@@ -107,7 +107,7 @@
 
 <div class="border-b border-gray-200 bg-white">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-    <a th:href="@{/courses}"
+    <a th:href="@{/course}"
        class="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-blue-600 transition">
       <i class="fa-solid fa-chevron-left text-xs"></i>
       <span>전체 강의로 돌아가기</span>
@@ -255,7 +255,7 @@
             </button>
 
             <div class="hidden bg-gray-50 border-t border-gray-100">
-              <a th:href="@{/courses/{courseId}/sections/{sectionId}(courseId=${course.courseId}, sectionId=${section.sectionId})}"
+              <a th:href="@{/course/{courseId}/sections/{sectionId}(courseId=${course.courseId}, sectionId=${section.sectionId})}"
                  class="px-6 py-4 flex items-center gap-3 hover:bg-gray-100 transition">
                 <i class="fa-solid fa-play text-blue-500 text-xs"></i>
                 <span class="text-sm text-gray-700"
