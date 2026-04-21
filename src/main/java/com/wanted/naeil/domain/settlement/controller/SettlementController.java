@@ -5,6 +5,7 @@ import com.wanted.naeil.domain.settlement.entity.enums.SettlementStatus;
 import com.wanted.naeil.global.auth.model.dto.AuthDetails;
 import com.wanted.naeil.domain.settlement.service.SettlementService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +17,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/instructor/settlements")
 @RequiredArgsConstructor
+@PreAuthorize("hasAnyAuthority('ADMIN', 'INSTRUCTOR')")
 public class SettlementController {
 
     private final SettlementService settlementService;

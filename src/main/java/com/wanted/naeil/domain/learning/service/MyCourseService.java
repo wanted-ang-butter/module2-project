@@ -1,5 +1,11 @@
 package com.wanted.naeil.domain.learning.service;
 
+<<<<<<< feature-ajs
+import com.wanted.naeil.domain.course.entity.enums.SectionStatus;
+import com.wanted.naeil.domain.course.repository.SectionRepository;
+import com.wanted.naeil.domain.learning.dto.response.MyCourseResponse;
+=======
+>>>>>>> develop
 import com.wanted.naeil.domain.course.entity.Review;
 import com.wanted.naeil.domain.course.repository.ReviewRepository;
 import com.wanted.naeil.domain.learning.dto.response.MyCourseDetailResponse;
@@ -27,6 +33,7 @@ public class MyCourseService {
     private final EnrollmentRepository enrollmentRepository;
     private final ReviewRepository reviewRepository;
     private final LiveReservationRepository liveReservationRepository;
+    private final SectionRepository sectionRepository;
 
     @Transactional(readOnly = true)
     public List<MyCourseResponse> getMyCourses(User loginUser) {
@@ -39,6 +46,13 @@ public class MyCourseService {
                             loginUser,
                             enrollment.getCourse()
                     );
+                    Long firstSectionId = sectionRepository
+                            .findFirstByCourseIdAndStatusOrderBySequenceAsc(
+                                    enrollment.getCourse().getId(),
+                                    SectionStatus.ACTIVE
+                            )
+                            .map(section -> section.getId())
+                            .orElse(null);
 
                     return MyCourseResponse.builder()
                             .courseId(enrollment.getCourse().getId())
@@ -46,6 +60,8 @@ public class MyCourseService {
                             .title(enrollment.getCourse().getTitle())
                             .instructorName(enrollment.getCourse().getInstructor().getName())
                             .coursesRate(enrollment.getCoursesRate())
+                            .enrollmentStatus(enrollment.getStatus())
+                            .firstSectionId(firstSectionId)
                             .reviewId(review.map(Review::getId).orElse(null))
                             .rating(review.map(Review::getRating).orElse(null))
                             .reviewContent(review.map(Review::getContent).orElse(null))

@@ -12,9 +12,14 @@ import com.wanted.naeil.domain.course.entity.Section;
 import com.wanted.naeil.domain.course.entity.enums.SectionStatus;
 import com.wanted.naeil.domain.course.repository.CourseRepository;
 import com.wanted.naeil.domain.course.repository.SectionRepository;
+import com.wanted.naeil.domain.learning.entity.Enrollment;
+import com.wanted.naeil.domain.learning.entity.LearningProgress;
 import com.wanted.naeil.domain.learning.entity.enums.EnrollmentStatus;
 import com.wanted.naeil.domain.learning.entity.enums.ProgressStatus;
 import com.wanted.naeil.domain.learning.repository.EnrollmentRepository;
+import com.wanted.naeil.domain.learning.repository.LearningProgressRepository;
+import com.wanted.naeil.domain.user.entity.User;
+import com.wanted.naeil.domain.user.repository.UserRepository;
 import com.wanted.naeil.global.util.file.FileTransactionService;
 import com.wanted.naeil.global.util.file.LocalFileService;
 import jakarta.validation.Valid;
@@ -43,6 +48,8 @@ public class SectionService {
     private final LocalFileService localFileService;
     private final FileTransactionService fileTransactionService;
     private final EnrollmentRepository enrollmentRepository;
+    private final LearningProgressRepository learningProgressRepository;
+    private final UserRepository userRepository;
     // 시간 포멧팅
     private static final DateTimeFormatter PLAY_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
@@ -291,7 +298,7 @@ public class SectionService {
                 instructorId, courseId, sectionId);
     }
 
-    // 섹션 삭제
+    // 섹션 삭제 - 강사
     @Transactional
     public void deleteSection(Long instructorId, Long courseId, Long sectionId) {
 
@@ -308,8 +315,80 @@ public class SectionService {
                 instructorId, courseId, sectionId);
     }
 
+    // 학습 중단
+    @Transactional
+    public void stopLearning(Long userId, Long courseId, Long sectionId) {
+        validateEnrolled(userId, courseId);
+
+        LearningProgress progress = getOrCreateProgress(userId, sectionId);
+        progress.stop();
+
+        updateCourseProgress(userId, courseId);
+    }
+
+    // 학습 완료
+    @Transactional
+    public Long completeLearning(Long userId, Long courseId, Long sectionId) {
+        validateEnrolled(userId, courseId);
+
+        LearningProgress progress = getOrCreateProgress(userId, sectionId);
+        progress.complete();
+
+        updateCourseProgress(userId, courseId);
+
+        return sectionRepository.findNextActiveSectionIds(courseId, sectionId)
+                .stream()
+                .findFirst()
+                .orElse(null);
+    }
+
 
     // ============= 내부 편의 메서드 ================
+
+    private void validateEnrolled(Long userId, Long courseId) {
+        enrollmentRepository.findByUserIdAndCourseId(userId, courseId)
+                .orElseThrow(() -> new AccessDeniedException("수강 중인 강의가 아닙니다."));
+    }
+
+    private LearningProgress getOrCreateProgress(Long userId, Long sectionId) {
+        return learningProgressRepository.findByUserIdAndSectionId(userId, sectionId)
+                .orElseGet(() -> {
+                    User user = userRepository.findById(userId)
+                            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 사용자입니다."));
+
+                    Section section = sectionRepository.findById(sectionId)
+                            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 섹션입니다."));
+
+                    return learningProgressRepository.save(
+                            LearningProgress.builder()
+                                    .user(user)
+                                    .section(section)
+                                    .build()
+                    );
+                });
+    }
+
+    private void updateCourseProgress(Long userId, Long courseId) {
+        Enrollment enrollment = enrollmentRepository.findByUserIdAndCourseId(userId, courseId)
+                .orElseThrow(() -> new AccessDeniedException("수강 중인 강의가 아닙니다."));
+
+        int totalCount = sectionRepository.countByCourseIdAndStatus(courseId, SectionStatus.ACTIVE);
+
+        long completedCount = learningProgressRepository.findByUserIdAndSectionCourseId(userId, courseId)
+                .stream()
+                .filter(progress -> progress.getStatus() == ProgressStatus.COMPLETED)
+                .count();
+
+        double rate = totalCount == 0 ? 0 : completedCount * 100.0 / totalCount;
+
+        enrollment.updateProgress(rate);
+
+        if (rate >= 100.0) {
+            enrollment.updateStatus(EnrollmentStatus.COMPLETED);
+        } else if (rate > 0) {
+            enrollment.updateStatus(EnrollmentStatus.IN_PROGRESS);
+        }
+    }
 
     private String formatPlayTime(LocalTime playTime) {
         return playTime != null

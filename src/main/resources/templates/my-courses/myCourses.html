@@ -84,8 +84,11 @@
        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     <div th:each="course : ${myCourses}"
          class="bg-white border-2 border-gray-200 rounded-2xl p-6 hover:shadow-xl transition-all">
-      <a th:href="@{/my-courses/{courseId}(courseId=${course.courseId})}" class="block group">
-        <div class="aspect-video bg-gray-100 rounded-xl mb-4 overflow-hidden">
+      <a th:href="${course.firstSectionId != null}
+        ? @{/courses/{courseId}/sections/{sectionId}(courseId=${course.courseId}, sectionId=${course.firstSectionId})}
+        : @{/course/{id}(id=${course.courseId})}"
+         class="block group">
+      <div class="aspect-video bg-gray-100 rounded-xl mb-4 overflow-hidden">
           <img th:src="${course.thumbnail}" th:alt="${course.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"/>
         </div>
         <h3 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors" th:text="${course.title}">강의 제목</h3>
@@ -102,7 +105,10 @@
         <div class="mb-4">
           <div class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-xl font-bold">
             <i class="fa-solid fa-play text-sm"></i>
-            <span>이어보기</span>
+            <span th:text="${course.enrollmentStatus != null and course.enrollmentStatus.name() == 'BEFORE_START'} ? '수강 하기' :
+               (${course.enrollmentStatus != null and course.enrollmentStatus.name() == 'COMPLETED'} ? '복습하기' : '이어보기')">
+              수강 하기
+            </span>
           </div>
         </div>
       </a>

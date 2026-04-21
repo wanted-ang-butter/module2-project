@@ -4,6 +4,7 @@ import com.wanted.naeil.domain.course.dto.CurriculumSectionDTO;
 import com.wanted.naeil.domain.course.dto.SectionStudyMainDTO;
 import com.wanted.naeil.domain.course.entity.Course;
 import com.wanted.naeil.domain.course.entity.Section;
+import com.wanted.naeil.domain.course.entity.enums.SectionStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -59,4 +60,33 @@ public interface SectionRepository extends JpaRepository<Section, Long> {
     );
 
     int countByCourseId(Long courseId);
+
+    // 섹션 개수 조회
+    int countByCourseIdAndStatus(Long courseId, SectionStatus status);
+
+    // 첫 번째 활성 섹션 조회 추가
+    Optional<Section> findFirstByCourseIdAndStatusOrderBySequenceAsc(
+            Long courseId,
+            SectionStatus status
+    );
+
+    // 다음 섹션 찾기
+    @Query("""
+    select nextSection.id
+    from Section nextSection
+    where nextSection.course.id = :courseId
+      and nextSection.status = com.wanted.naeil.domain.course.entity.enums.SectionStatus.ACTIVE
+      and nextSection.sequence > (
+          select currentSection.sequence
+          from Section currentSection
+          where currentSection.id = :sectionId
+      )
+    order by nextSection.sequence asc
+    """)
+    List<Long> findNextActiveSectionIds(
+            @Param("courseId") Long courseId,
+            @Param("sectionId") Long sectionId
+    );
+
+
 }

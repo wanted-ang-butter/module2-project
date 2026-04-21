@@ -22,6 +22,7 @@ public class CourseDetailsResponse {
     private final long likeCount;
     private final long sectionCount;
     private final long studentCount;
+    private final boolean enrolled;
 
     private List<SectionListResponse> sections;
 
@@ -30,7 +31,7 @@ public class CourseDetailsResponse {
 
     public static CourseDetailsResponse of(Course course, long likeCount, long studentCount,
                                            Double avgRating, List<SectionListResponse> sections,
-                                           boolean isLiked, Long likeId
+                                           boolean isLiked, Long likeId, boolean enrolled
     ) {
         return CourseDetailsResponse.builder()
                 .courseId(course.getId())
@@ -47,6 +48,7 @@ public class CourseDetailsResponse {
                 .sections(sections)
                 .isLiked(isLiked)
                 .likeId(likeId)
+                .enrolled(enrolled)
                 .build();
     }
 }
