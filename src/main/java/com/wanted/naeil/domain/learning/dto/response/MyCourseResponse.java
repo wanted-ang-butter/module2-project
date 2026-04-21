@@ -1,5 +1,6 @@
 package com.wanted.naeil.domain.learning.dto.response;
 
+import com.wanted.naeil.domain.learning.entity.enums.EnrollmentStatus;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -20,4 +21,7 @@ public class MyCourseResponse {
     private Long reviewId;
     private Double rating;
     private String reviewContent;
+
+    private EnrollmentStatus enrollmentStatus;
+    private Long firstSectionId;
 }

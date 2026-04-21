@@ -37,7 +37,7 @@ public class SectionController {
                 userId, courseId, sectionId);
 
         mv.addObject("sectionStudy", response);
-        mv.setViewName("courses/sectionDetail");
+        mv.setViewName("course/sectionDetail");
 
         return mv;
     }
@@ -97,4 +97,37 @@ public class SectionController {
 
         return ResponseEntity.ok().build();
     }
+
+    // 학습 중단
+    @PostMapping("/courses/{courseId}/sections/{sectionId}/stop")
+    public String stopLearning(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @PathVariable Long courseId,
+            @PathVariable Long sectionId
+    ) {
+        Long userId = authDetails.getLoginUserDTO().getUserId();
+
+        sectionService.stopLearning(userId, courseId, sectionId);
+
+        return "redirect:/my-courses";
+    }
+
+    // 학습 완료
+    @PostMapping("/courses/{courseId}/sections/{sectionId}/complete")
+    public String completeLearning(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @PathVariable Long courseId,
+            @PathVariable Long sectionId
+    ) {
+        Long userId = authDetails.getLoginUserDTO().getUserId();
+
+        Long nextSectionId = sectionService.completeLearning(userId, courseId, sectionId);
+
+        if (nextSectionId != null) {
+            return "redirect:/courses/" + courseId + "/sections/" + nextSectionId;
+        }
+
+        return "redirect:/my-courses";
+    }
+
 }

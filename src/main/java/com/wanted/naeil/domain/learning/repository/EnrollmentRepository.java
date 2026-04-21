@@ -1,6 +1,7 @@
 package com.wanted.naeil.domain.learning.repository;
 
 import com.wanted.naeil.domain.learning.entity.Enrollment;
+import com.wanted.naeil.domain.learning.entity.LearningProgress;
 import com.wanted.naeil.domain.learning.entity.enums.EnrollmentStatus;
 import com.wanted.naeil.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -47,4 +48,7 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     List<Enrollment> findAllWithUserByCourseIdOrderByCreatedAtDesc(
             @Param("courseId") Long courseId
     );
+
+    // 수강 정보 조회
+    Optional<Enrollment> findByUserIdAndCourseId(Long userId, Long courseId);
 }
