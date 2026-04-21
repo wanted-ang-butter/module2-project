@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -24,6 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/instructor")
 @Slf4j
+@PreAuthorize("hasAnyAuthority('ADMIN', 'INSTRUCTOR')")
 public class InstLiveController {
 
     private final LiveLectureService liveLectureService;
@@ -39,10 +41,6 @@ public class InstLiveController {
             @AuthenticationPrincipal AuthDetails authDetails,
             ModelAndView mv
             ) {
-        // 로그인 검증
-        if (authDetails == null) {
-            throw new AccessDeniedException("로그인이 필요합니다.");
-        }
 
         Role userRole = authDetails.getLoginUserDTO().getRole();
 
@@ -77,10 +75,6 @@ public class InstLiveController {
             ModelAndView mv,
             RedirectAttributes redirectAttributes
     ) {
-
-        if (authDetails == null) {
-            throw new AccessDeniedException("로그인이 필요합니다.");
-        }
 
         Long instructorId = authDetails.getLoginUserDTO().getUserId();
 
@@ -125,10 +119,6 @@ public class InstLiveController {
             @PathVariable Long liveId,
             ModelAndView mv
     ) {
-        if (authDetails == null) {
-            throw new AccessDeniedException("로그인이 필요합니다.");
-        }
-
         Long instructorId = authDetails.getLoginUserDTO().getUserId();
 
         InstructorLiveDetailResponse response =
@@ -156,9 +146,6 @@ public class InstLiveController {
             @PathVariable Long liveId,
             ModelAndView mv
     ) {
-        if (authDetails == null) {
-            throw new AccessDeniedException("로그인이 필요합니다.");
-        }
 
         Long instructorId = authDetails.getLoginUserDTO().getUserId();
 
@@ -185,9 +172,6 @@ public class InstLiveController {
             @PathVariable Long liveId,
             @Valid @ModelAttribute CreateLiveLectureRequest request
     ) {
-        if (authDetails == null) {
-            throw new AccessDeniedException("로그인이 필요합니다.");
-        }
 
         Long instructorId = authDetails.getLoginUserDTO().getUserId();
 
@@ -206,14 +190,17 @@ public class InstLiveController {
         }
     }
 
+    /**
+     * 라이브 강의 삭제 기능
+     * @param authDetails
+     * @param liveId : 삭제할 실시간 강의 번호
+     * @return
+     */
     @DeleteMapping("/live-lecture/{liveId}")
     public ResponseEntity<String> deleteInstructorLiveLecture(
             @AuthenticationPrincipal AuthDetails authDetails,
             @PathVariable Long liveId
     ) {
-        if (authDetails == null) {
-            throw new AccessDeniedException("로그인이 필요합니다.");
-        }
 
         Long instructorId = authDetails.getLoginUserDTO().getUserId();
 
@@ -239,9 +226,6 @@ public class InstLiveController {
             @AuthenticationPrincipal AuthDetails authDetails,
             @PathVariable Long liveId
     ) {
-        if (authDetails == null) {
-            throw new AccessDeniedException("로그인 후 예약자 목록을 조회할 수 있습니다.");
-        }
 
         Long instructorId = authDetails.getLoginUserDTO().getUserId();
 
