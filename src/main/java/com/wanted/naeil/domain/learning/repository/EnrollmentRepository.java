@@ -51,7 +51,7 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
     // 수강 정보 조회
     Optional<Enrollment> findByUserIdAndCourseId(Long userId, Long courseId);
-}
+
     // 내 강의 상세 페이지용
     @Query("""
         select distinct e
