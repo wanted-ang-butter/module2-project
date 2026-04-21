@@ -28,6 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
+import com.wanted.naeil.domain.learning.repository.EnrollmentRepository;
+
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -46,6 +48,8 @@ public class CourseService {
     private final CategoryRepository categoryRepository;
     private final SectionService sectionService;
     private final ModelMapper modelMapper;
+    private final EnrollmentRepository enrollmentRepository;
+
 
     // 코스 등록 요청 - 강사
     @Transactional
@@ -364,6 +368,20 @@ public class CourseService {
         validateCourseOwner(course, instructorId);
         return getCourseDetail(courseId);
     }
+    // 강사 강의 상세 페이지 - 해당 강의를 수강 중인 수강생 목록 조회 성민수정
+    @Transactional(readOnly = true)
+    public List<InstructorCourseStudentResponse> getInstructorCourseStudents(Long instructorId, Long courseId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 강의입니다."));
+
+        validateCourseOwner(course, instructorId);
+
+        return enrollmentRepository.findAllWithUserByCourseIdOrderByCreatedAtDesc(courseId)
+                .stream()
+                .map(InstructorCourseStudentResponse::from)
+                .toList();
+    }
+
 
     // ==== 내부 편의 메서드 ====
     private void validateCourseOwner(Course course, Long instructorId) {

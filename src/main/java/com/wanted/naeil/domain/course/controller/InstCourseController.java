@@ -217,7 +217,9 @@ public class InstCourseController {
         Long instructorId = authDetails.getLoginUserDTO().getUserId();
         mv.addObject("user", authDetails.getLoginUserDTO());
         mv.addObject("course", courseService.getInstructorCourseDetail(instructorId, courseId));
+        mv.addObject("students", courseService.getInstructorCourseStudents(instructorId, courseId));
         mv.setViewName("course/InstructorCourseDetail");
+
         return mv;
     }
 
