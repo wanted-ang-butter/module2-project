@@ -49,7 +49,10 @@ public class SecurityConfig {
                                          AuthFailureHandler authFailureHandler) throws Exception {
 
         http.authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/auth/login", "/auth/signup", "/auth/fail", "/auth/find-id", "/auth/find-password",  "/", "/dashboard", "/dashboard/guest", "/course/**","/subscription/**",  "/community/**", "/error").permitAll();
+                    auth.requestMatchers("/auth/login", "/auth/signup", "/auth/fail",
+                            "/auth/find-id", "/auth/find-password",  "/", "/dashboard",
+                            "/dashboard/guest", "/course/**","/subscription/**",
+                            "/community/**", "/error","/uploads/**").permitAll();
                     auth.requestMatchers("/admin/**").hasAnyAuthority("ADMIN");
                     auth.requestMatchers("/instructor/**").hasAnyAuthority("ADMIN", "INSTRUCTOR");
                     auth.requestMatchers("/subscribe/**").hasAnyAuthority("ADMIN", "INSTRUCTOR", "SUBSCRIBER");
