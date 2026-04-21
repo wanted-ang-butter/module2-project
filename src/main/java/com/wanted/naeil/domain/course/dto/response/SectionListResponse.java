@@ -10,6 +10,7 @@ public class SectionListResponse {
     private final Long sectionId;
     private final String title;
     private final String videoUrl;
+    private final String attachmentUrl;
     private final String playTime;
     private final boolean isFree;
 
@@ -18,6 +19,7 @@ public class SectionListResponse {
                 .sectionId(section.getId())
                 .title(section.getTitle())
                 .videoUrl(section.getVideoUrl())
+                .attachmentUrl(section.getAttachmentUrl())
                 .playTime(section.getPlayTime() != null ? section.getPlayTime().toString() : "00:00")
                 .isFree(section.getIsFree())
                 .build();
