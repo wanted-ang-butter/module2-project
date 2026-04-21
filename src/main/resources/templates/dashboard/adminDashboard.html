@@ -3,13 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>관리자 대시보드 - 내일(Nae-il)</title>
+    <title>관리자 대시보드 | Nae-il</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
     <style>
-        .grid-bg { background-image: radial-gradient(#e5e7eb 1px, transparent 1px); background-size: 20px 20px; }
-        .detail-modal { display: none; }
-        .detail-modal.open { display: flex; }
+        .grid-bg {
+            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .detail-modal {
+            display: none;
+        }
+
+        .detail-modal.open {
+            display: flex;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -49,50 +58,54 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-        <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 hover:shadow-xl transition-all hover:border-blue-300">
+        <a th:href="@{/admin/user-management}" href="/admin/user-management"
+           class="block bg-white border-2 border-gray-200 rounded-2xl p-6 hover:shadow-xl transition-all hover:border-blue-300">
             <div class="flex items-center justify-between mb-3">
                 <h3 class="text-sm font-bold text-gray-700">전체 회원</h3>
                 <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
                     <i class="fa-solid fa-users text-blue-600"></i>
                 </div>
             </div>
-            <p class="text-4xl font-black text-gray-900 mb-2">12,458</p>
-            <p class="text-sm text-green-600 font-bold">+234 이번 주</p>
-        </div>
+            <p class="text-4xl font-black text-gray-900 mb-2" th:text="${totalMemberCount}">0</p>
+            <p class="text-sm text-green-600 font-bold" th:text="'+' + ${newMemberCount} + ' 이번 주'">+0 이번 주</p>
+        </a>
 
-        <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 hover:shadow-xl transition-all hover:border-green-300">
+        <a th:href="@{/admin/instructor-approval}" href="/admin/instructor-approval"
+           class="block bg-white border-2 border-gray-200 rounded-2xl p-6 hover:shadow-xl transition-all hover:border-green-300">
             <div class="flex items-center justify-between mb-3">
                 <h3 class="text-sm font-bold text-gray-700">등록 강사</h3>
                 <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
                     <i class="fa-solid fa-chalkboard-user text-green-600"></i>
                 </div>
             </div>
-            <p class="text-4xl font-black text-gray-900 mb-2">143</p>
+            <p class="text-4xl font-black text-gray-900 mb-2" th:text="${registeredInstructorCount}">0</p>
             <p class="text-sm text-orange-600 font-bold"
                th:text="${pendingInstructorApprovalCount} + '명 승인 대기'">0명 승인 대기</p>
-        </div>
+        </a>
 
-        <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 hover:shadow-xl transition-all hover:border-purple-300">
+        <a th:href="@{/admin/course-management/approval}" href="/admin/course-management/approval"
+           class="block bg-white border-2 border-gray-200 rounded-2xl p-6 hover:shadow-xl transition-all hover:border-purple-300">
             <div class="flex items-center justify-between mb-3">
                 <h3 class="text-sm font-bold text-gray-700">전체 강의</h3>
                 <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
                     <i class="fa-solid fa-book-open text-purple-600"></i>
                 </div>
             </div>
-            <p class="text-4xl font-black text-gray-900 mb-2">428</p>
-            <p class="text-sm text-purple-600 font-bold">운영중</p>
-        </div>
+            <p class="text-4xl font-black text-gray-900 mb-2" th:text="${totalCourseCount}">0</p>
+            <p class="text-sm text-purple-600 font-bold" th:text="${activeCourseCount} + '개 운영중'">0개 운영중</p>
+        </a>
 
-        <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 hover:shadow-xl transition-all hover:border-yellow-300">
+        <a th:href="@{/admin/settlement}" href="/admin/settlement"
+           class="block bg-white border-2 border-gray-200 rounded-2xl p-6 hover:shadow-xl transition-all hover:border-yellow-300">
             <div class="flex items-center justify-between mb-3">
                 <h3 class="text-sm font-bold text-gray-700">이번 달 매출</h3>
                 <div class="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center">
                     <i class="fa-solid fa-wallet text-yellow-600"></i>
                 </div>
             </div>
-            <p class="text-2xl font-black text-gray-900 mb-2">461,717 크레딧</p>
-            <p class="text-sm text-green-600 font-bold">+12% 전월 대비</p>
-        </div>
+            <p class="text-2xl font-black text-gray-900 mb-2" th:text="${#numbers.formatInteger(currentMonthSales, 0, 'COMMA')} + ' 크레딧'">0 크레딧</p>
+            <p class="text-sm text-green-600 font-bold" th:text="${salesTrendLabel}">비교 데이터 없음</p>
+        </a>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -125,7 +138,7 @@
                                 <p class="font-black text-gray-900"
                                    th:text="${approval.applicantName != null ? approval.applicantName : '강사 승인 요청'}">강사 승인 요청</p>
                                 <p class="text-sm text-gray-600 font-medium"
-                                   th:text="${(approval.categoryName != null ? approval.categoryName : '카테고리 미지정') + ' · ' + (approval.title != null ? approval.title : '강사 승인 요청')}">카테고리 · 강사 승인 요청</p>
+                                   th:text="${(approval.categoryName != null ? approval.categoryName : '카테고리 미정') + ' · ' + (approval.title != null ? approval.title : '강사 승인 요청')}">카테고리 · 강사 승인 요청</p>
                             </div>
                         </div>
                         <a th:href="@{/admin/instructor-approval}" href="/admin/instructor-approval"
@@ -143,32 +156,26 @@
                     </a>
                 </div>
                 <div class="space-y-4">
-                    <div class="flex items-center justify-between p-4 border-2 border-gray-200 rounded-xl hover:border-purple-300 transition-all">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-3 mb-2">
-                                <p class="font-black text-gray-900">Python 데이터 분석</p>
-                                <span class="px-2 py-1 text-xs font-bold rounded bg-yellow-100 text-yellow-700">승인대기</span>
-                            </div>
-                            <p class="text-sm text-gray-600 font-medium">강사: 김데이터 · 수강생 0명</p>
-                        </div>
-                        <button type="button" onclick="openModal()"
-                                class="px-4 py-2 border-2 border-gray-300 rounded-lg hover:border-purple-600 hover:bg-purple-50 transition-all font-bold text-gray-700 hover:text-purple-600">
-                            상세
-                        </button>
+                    <div th:if="${#lists.isEmpty(dashboardCourses)}"
+                         class="p-8 border-2 border-dashed border-gray-200 rounded-xl text-center text-gray-400">
+                        등록된 강의가 없습니다.
                     </div>
-
-                    <div class="flex items-center justify-between p-4 border-2 border-gray-200 rounded-xl hover:border-purple-300 transition-all">
+                    <div th:each="course : ${dashboardCourses}"
+                         class="flex items-center justify-between p-4 border-2 border-gray-200 rounded-xl hover:border-purple-300 transition-all">
                         <div class="flex-1">
                             <div class="flex items-center gap-3 mb-2">
-                                <p class="font-black text-gray-900">Vue.js 마스터클래스</p>
-                                <span class="px-2 py-1 text-xs font-bold rounded bg-green-100 text-green-700">운영중</span>
+                                <p class="font-black text-gray-900" th:text="${course.title}">강의명</p>
+                                <span th:text="${course.statusLabel}"
+                                      th:classappend="${course.statusName == 'ACTIVE'} ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'"
+                                      class="px-2 py-1 text-xs font-bold rounded">상태</span>
                             </div>
-                            <p class="text-sm text-gray-600 font-medium">강사: 박뷰 · 수강생 234명</p>
+                            <p class="text-sm text-gray-600 font-medium"
+                               th:text="'강사: ' + ${course.instructorName} + ' · 수강생 ' + ${course.studentCount} + '명'">강사: · 수강생 0명</p>
                         </div>
-                        <button type="button" onclick="openModal()"
-                                class="px-4 py-2 border-2 border-gray-300 rounded-lg hover:border-purple-600 hover:bg-purple-50 transition-all font-bold text-gray-700 hover:text-purple-600">
+                        <a th:href="@{/admin/course-management/{id}(id=${course.courseId})}"
+                           class="px-4 py-2 border-2 border-gray-300 rounded-lg hover:border-purple-600 hover:bg-purple-50 transition-all font-bold text-gray-700 hover:text-purple-600">
                             상세
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -178,18 +185,18 @@
                 <div class="grid grid-cols-3 gap-4">
                     <div class="p-5 border-2 border-gray-200 rounded-xl hover:border-blue-300 transition-all text-center">
                         <p class="text-sm font-bold text-gray-600 mb-2">신규 가입</p>
-                        <p class="text-3xl font-black text-gray-900">234</p>
+                        <p class="text-3xl font-black text-gray-900" th:text="${newMemberCount}">0</p>
                         <p class="text-xs text-gray-500 mt-1 font-medium">이번 주</p>
                     </div>
                     <div class="p-5 border-2 border-gray-200 rounded-xl hover:border-green-300 transition-all text-center">
                         <p class="text-sm font-bold text-gray-600 mb-2">활성 회원</p>
-                        <p class="text-3xl font-black text-gray-900">8,921</p>
+                        <p class="text-3xl font-black text-gray-900" th:text="${activeMemberCount}">0</p>
                         <p class="text-xs text-gray-500 mt-1 font-medium">최근 30일</p>
                     </div>
                     <div class="p-5 border-2 border-gray-200 rounded-xl hover:border-purple-300 transition-all text-center">
-                        <p class="text-sm font-bold text-gray-600 mb-2">탈퇴</p>
-                        <p class="text-3xl font-black text-gray-900">12</p>
-                        <p class="text-xs text-gray-500 mt-1 font-medium">이번 주</p>
+                        <p class="text-sm font-bold text-gray-600 mb-2">비활성 회원</p>
+                        <p class="text-3xl font-black text-gray-900" th:text="${inactiveMemberCount}">0</p>
+                        <p class="text-xs text-gray-500 mt-1 font-medium">전체 기준</p>
                     </div>
                 </div>
                 <a th:href="@{/admin/user-management}" href="/admin/user-management"
@@ -239,15 +246,18 @@
                 <div class="space-y-3 mb-4">
                     <div class="flex justify-between items-center pb-3 border-b border-gray-200">
                         <span class="text-sm font-bold text-gray-600">이번 달 매출</span>
-                        <span class="text-lg font-black text-gray-900">461,717 크레딧</span>
+                        <span class="text-lg font-black text-gray-900"
+                              th:text="${#numbers.formatInteger(currentMonthSales, 0, 'COMMA')} + ' 크레딧'">0 크레딧</span>
                     </div>
                     <div class="flex justify-between items-center pb-3 border-b border-gray-200">
                         <span class="text-sm font-bold text-gray-600">강사 정산 예정</span>
-                        <span class="text-lg font-black text-orange-600">323,202 크레딧</span>
+                        <span class="text-lg font-black text-orange-600"
+                              th:text="${#numbers.formatInteger(currentMonthInstructorAmount, 0, 'COMMA')} + ' 크레딧'">0 크레딧</span>
                     </div>
                     <div class="flex justify-between items-center pt-2">
                         <span class="text-sm font-black text-gray-900">플랫폼 수익</span>
-                        <span class="text-2xl font-black text-green-600">138,515 크레딧</span>
+                        <span class="text-2xl font-black text-green-600"
+                              th:text="${#numbers.formatInteger(currentMonthPlatformRevenue, 0, 'COMMA')} + ' 크레딧'">0 크레딧</span>
                     </div>
                 </div>
                 <p class="text-xs text-gray-500 text-center mb-3 font-medium">다음 정산일: 2026년 5월 5일</p>
@@ -257,41 +267,6 @@
                 </a>
             </div>
 
-            <div class="bg-white border-2 border-gray-200 rounded-2xl p-6">
-                <h2 class="text-xl font-black text-gray-900 mb-6 flex items-center gap-2">
-                    <i class="fa-solid fa-chart-bar text-blue-600"></i>
-                    <span>통계</span>
-                </h2>
-                <div class="space-y-4">
-                    <div>
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-sm font-bold text-gray-600">주간 활성 사용자</span>
-                            <span class="text-lg font-black text-gray-900">8,921</span>
-                        </div>
-                        <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div class="h-full bg-gradient-to-r from-blue-600 to-green-600 rounded-full" style="width: 72%"></div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-sm font-bold text-gray-600">강의 완강률</span>
-                            <span class="text-lg font-black text-gray-900">68%</span>
-                        </div>
-                        <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div class="h-full bg-gradient-to-r from-green-600 to-emerald-600 rounded-full" style="width: 68%"></div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-sm font-bold text-gray-600">평균 만족도</span>
-                            <span class="text-lg font-black text-gray-900">4.7/5.0</span>
-                        </div>
-                        <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div class="h-full bg-gradient-to-r from-purple-600 to-pink-600 rounded-full" style="width: 94%"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>

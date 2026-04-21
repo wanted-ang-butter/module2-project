@@ -1,5 +1,7 @@
 package com.wanted.naeil.domain.settlement.controller;
 
+import com.wanted.naeil.domain.settlement.entity.Settlement;
+import com.wanted.naeil.domain.settlement.entity.enums.SettlementStatus;
 import com.wanted.naeil.global.auth.model.dto.AuthDetails;
 import com.wanted.naeil.domain.settlement.service.SettlementService;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +9,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.YearMonth;
+import java.util.List;
 
 @Controller
 @RequestMapping("/instructor/settlements")
@@ -21,7 +26,34 @@ public class SettlementController {
                                  Model model) {
 
         Long instructorId = authDetails.getLoginUserDTO().getUserId();
-        model.addAttribute("settlements", settlementService.getMySettlements(instructorId));
+        List<Settlement> settlements = settlementService.getMySettlements(instructorId);
+        String currentMonth = YearMonth.now().toString();
+
+        int currentMonthSales = settlements.stream()
+                .filter(settlement -> currentMonth.equals(settlement.getSettlementMonth()))
+                .mapToInt(Settlement::getTotalSalesAmount)
+                .sum();
+
+        int currentMonthFee = settlements.stream()
+                .filter(settlement -> currentMonth.equals(settlement.getSettlementMonth()))
+                .mapToInt(Settlement::getPlatformFee)
+                .sum();
+
+        int availableAmount = settlements.stream()
+                .filter(settlement -> settlement.getStatus() == SettlementStatus.READY)
+                .mapToInt(Settlement::getFinalAmount)
+                .sum();
+
+        int totalCompletedAmount = settlements.stream()
+                .filter(settlement -> settlement.getStatus() == SettlementStatus.APPROVED)
+                .mapToInt(Settlement::getFinalAmount)
+                .sum();
+
+        model.addAttribute("settlements", settlements);
+        model.addAttribute("currentMonthSales", currentMonthSales);
+        model.addAttribute("currentMonthFee", currentMonthFee);
+        model.addAttribute("availableAmount", availableAmount);
+        model.addAttribute("totalCompletedAmount", totalCompletedAmount);
 
         return "instructor/settlement";
     }

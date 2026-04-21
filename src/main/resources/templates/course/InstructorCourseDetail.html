@@ -218,7 +218,7 @@
 
 </div>
 
-<script>
+<script th:inline="javascript">
     function switchTab(tab) {
         const tabs = ['lecture', 'student'];
         tabs.forEach(t => {
@@ -230,6 +230,13 @@
             content.classList.toggle('hidden', t !== tab);
         });
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const initialTab = /*[[${activeTab}]]*/ 'lecture';
+        if (initialTab === 'student') {
+            switchTab('student');
+        }
+    });
 </script>
 </body>
 </html>
