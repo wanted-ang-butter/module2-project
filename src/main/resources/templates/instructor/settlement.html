@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>정산 관리</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
     <style>
         * {
             box-sizing: border-box;
@@ -366,6 +368,7 @@
     </style>
 </head>
 <body>
+<div th:replace="~{fragments/instructorHeader :: instructorHeader}"></div>
 <div class="page-wrap">
 
     <a href="javascript:history.back()" class="back-link">〈 이전으로</a>
@@ -376,25 +379,25 @@
     <section class="summary-cards">
         <div class="summary-card blue">
             <p class="label">이번 달 총 매출</p>
-            <h3 th:text="'₩' + ${#numbers.formatInteger(currentMonthSales, 3, 'COMMA')}">₩3,100,000</h3>
+            <h3 th:text="'₩' + ${#numbers.formatInteger(currentMonthSales, 1, 'COMMA')}">₩3,100,000</h3>
             <span>전체 매출</span>
         </div>
 
         <div class="summary-card red">
             <p class="label">이번 달 수수료</p>
-            <h3 th:text="'₩' + ${#numbers.formatInteger(currentMonthFee, 3, 'COMMA')}">₩930,000</h3>
+            <h3 th:text="'₩' + ${#numbers.formatInteger(currentMonthFee, 1, 'COMMA')}">₩930,000</h3>
             <span>플랫폼 수수료</span>
         </div>
 
         <div class="summary-card green">
             <p class="label">정산 가능 금액</p>
-            <h3 th:text="'₩' + ${#numbers.formatInteger(availableAmount, 3, 'COMMA')}">₩2,170,000</h3>
+            <h3 th:text="'₩' + ${#numbers.formatInteger(availableAmount, 1, 'COMMA')}">₩2,170,000</h3>
             <span>출금 가능</span>
         </div>
 
         <div class="summary-card purple">
             <p class="label">누적 정산 완료</p>
-            <h3 th:text="'₩' + ${#numbers.formatInteger(totalCompletedAmount, 3, 'COMMA')}">₩18,500,000</h3>
+            <h3 th:text="'₩' + ${#numbers.formatInteger(totalCompletedAmount, 1, 'COMMA')}">₩18,500,000</h3>
             <span>총 정산액</span>
         </div>
     </section>
@@ -403,14 +406,14 @@
         <h2 class="section-title">정산 내역</h2>
 
         <div class="filter-tabs">
-            <button type="button" class="filter-tab active">전체</button>
-            <button type="button" class="filter-tab">정산 가능</button>
-            <button type="button" class="filter-tab">정산 대기</button>
-            <button type="button" class="filter-tab">정산 완료</button>
+            <button type="button" class="filter-tab active" onclick="filterSettlements('ALL', this)">전체</button>
+            <button type="button" class="filter-tab" onclick="filterSettlements('READY', this)">정산 가능</button>
+            <button type="button" class="filter-tab" onclick="filterSettlements('PENDING', this)">정산 대기</button>
+            <button type="button" class="filter-tab" onclick="filterSettlements('APPROVED', this)">정산 완료</button>
         </div>
 
         <div class="settlement-list" th:if="${settlements != null and !#lists.isEmpty(settlements)}">
-            <div class="settlement-card" th:each="settlement : ${settlements}">
+            <div class="settlement-card" th:each="settlement : ${settlements}" th:attr="data-status=${settlement.status.name()}">
                 <div class="card-header">
                     <div>
                         <h3 th:text="${settlement.settlementMonth} + ' 정산'">2026-04 정산</h3>
@@ -436,19 +439,19 @@
                 <div class="settlement-info">
                     <div>
                         <span>총 판매 금액</span>
-                        <strong th:text="'₩' + ${#numbers.formatInteger(settlement.totalSalesAmount, 3, 'COMMA')}">₩1,850,000</strong>
+                        <strong th:text="'₩' + ${#numbers.formatInteger(settlement.totalSalesAmount, 1, 'COMMA')}">₩1,850,000</strong>
                     </div>
 
                     <div>
                         <span>수수료 (30%)</span>
                         <strong class="fee"
-                                th:text="'-₩' + ${#numbers.formatInteger(settlement.platformFee, 3, 'COMMA')}">-₩555,000</strong>
+                                th:text="'-₩' + ${#numbers.formatInteger(settlement.platformFee, 1, 'COMMA')}">-₩555,000</strong>
                     </div>
 
                     <div>
                         <span>정산 금액</span>
                         <strong class="amount"
-                                th:text="'₩' + ${#numbers.formatInteger(settlement.finalAmount, 3, 'COMMA')}">₩1,295,000</strong>
+                                th:text="'₩' + ${#numbers.formatInteger(settlement.finalAmount, 1, 'COMMA')}">₩1,295,000</strong>
                     </div>
 
                     <div>
@@ -484,5 +487,15 @@
         </div>
     </section>
 </div>
+<script>
+    function filterSettlements(status, btn) {
+        document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        document.querySelectorAll('.settlement-card').forEach(card => {
+            card.style.display = (status === 'ALL' || card.dataset.status === status) ? '' : 'none';
+        });
+    }
+</script>
 </body>
 </html>
