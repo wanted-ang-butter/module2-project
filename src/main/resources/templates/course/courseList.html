@@ -41,25 +41,43 @@
         <p class="text-gray-500 font-medium">// 원하는 분야의 강의를 선택하세요</p>
     </div>
 
-    <div class="relative mb-8">
-        <input type="text" placeholder="강의명, 강사명으로 검색하세요"
+    <form th:action="@{/course}" method="get" class="relative mb-8">
+        <input type="hidden"
+               name="category"
+               th:if="${selectedCategory != null and !#strings.isEmpty(selectedCategory)}"
+               th:value="${selectedCategory}">
+
+        <input type="text"
+               name="keyword"
+               th:value="${keyword}"
+               placeholder="강의명으로 검색하세요"
                class="w-full bg-white border-2 border-gray-100 rounded-2xl px-12 py-4 focus:border-blue-500 focus:outline-none transition-all shadow-sm">
-        <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5"></i>
+
+        <button type="submit"
+                class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600">
+            <i data-lucide="search" class="w-5 h-5"></i>
+        </button>
+    </form>
+
+
+    <div class="flex items-center gap-3 overflow-x-auto no-scrollbar">
+        <a th:href="@{/course}"
+           th:class="${selectedCategory == null or #strings.isEmpty(selectedCategory)}
+           ? 'px-5 py-2.5 rounded-full bg-gray-900 text-white font-bold text-sm shadow-lg'
+           : 'px-5 py-2.5 rounded-full bg-white border-2 border-gray-100 text-gray-600 font-bold text-sm hover:border-blue-200 transition-all'">
+            전체
+        </a>
+
+        <a th:each="category : ${categories}"
+           th:href="@{/course(category=${category.name})}"
+           th:text="${category.name}"
+           th:class="${selectedCategory != null and selectedCategory == category.name}
+           ? 'px-5 py-2.5 rounded-full bg-gray-900 text-white font-bold text-sm shadow-lg'
+           : 'px-5 py-2.5 rounded-full bg-white border-2 border-gray-100 text-gray-600 font-bold text-sm hover:border-blue-200 transition-all'">
+            Backend
+        </a>
     </div>
 
-    <div class="flex items-center justify-between mb-8">
-        <div class="flex items-center gap-3 overflow-x-auto no-scrollbar">
-            <button class="px-5 py-2.5 rounded-full bg-gray-900 text-white font-bold text-sm shadow-lg">전체</button>
-            <button class="px-5 py-2.5 rounded-full bg-white border-2 border-gray-100 text-gray-600 font-bold text-sm hover:border-blue-200 transition-all">Frontend</button>
-            <button class="px-5 py-2.5 rounded-full bg-white border-2 border-gray-100 text-gray-600 font-bold text-sm hover:border-blue-200 transition-all">Backend</button>
-            <button class="px-5 py-2.5 rounded-full bg-white border-2 border-gray-100 text-gray-600 font-bold text-sm hover:border-blue-200 transition-all">Programming</button>
-            <button class="px-5 py-2.5 rounded-full bg-white border-2 border-gray-100 text-gray-600 font-bold text-sm hover:border-blue-200 transition-all">Design</button>
-        </div>
-        <select class="bg-white border-2 border-gray-100 rounded-xl px-4 py-2 text-sm font-bold text-gray-700 outline-none">
-            <option>최신순</option>
-            <option>인기순</option>
-        </select>
-    </div>
 
     <p class="text-sm font-bold text-gray-500 mb-6">
         <span id="courseCount" th:text="${courses.size()}" class="text-blue-600 text-lg">0</span>개의 강의
