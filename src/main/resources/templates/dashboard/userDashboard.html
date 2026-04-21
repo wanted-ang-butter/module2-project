@@ -193,23 +193,6 @@
         </div>
     </section>
 
-    <!-- Categories Filter Pills -->
-    <section class="mb-16">
-        <div class="flex items-center gap-3 mb-8">
-            <div class="w-1 h-8 bg-gradient-to-b from-blue-500 to-green-500 rounded-full"></div>
-            <h2 class="text-2xl font-bold text-gray-900">카테고리</h2>
-        </div>
-        <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
-            <button onclick="selectCategory(this,'전체')" class="category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap flex-shrink-0 bg-[#111827] text-white">전체</button>
-            <button onclick="selectCategory(this,'Frontend')" class="category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap flex-shrink-0 bg-white border border-gray-300 text-gray-700">Frontend</button>
-            <button onclick="selectCategory(this,'Backend')" class="category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap flex-shrink-0 bg-white border border-gray-300 text-gray-700">Backend</button>
-            <button onclick="selectCategory(this,'Programming')" class="category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap flex-shrink-0 bg-white border border-gray-300 text-gray-700">Programming</button>
-            <button onclick="selectCategory(this,'Data Science')" class="category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap flex-shrink-0 bg-white border border-gray-300 text-gray-700">Data Science</button>
-            <button onclick="selectCategory(this,'Design')" class="category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap flex-shrink-0 bg-white border border-gray-300 text-gray-700">Design</button>
-            <button onclick="selectCategory(this,'DevOps')" class="category-pill px-4 py-2 rounded-full font-medium text-sm transition-all whitespace-nowrap flex-shrink-0 bg-white border border-gray-300 text-gray-700">DevOps</button>
-        </div>
-    </section>
-
     <!-- Popular Courses -->
     <section class="mb-16">
         <div class="flex items-center justify-between mb-6">
@@ -373,22 +356,6 @@
             document.getElementById('profileDropdown').classList.remove('open');
         }
     });
-    function selectCategory(btn, category) {
-        document.querySelectorAll('.category-pill').forEach(el => {
-            el.classList.remove('bg-[#111827]', 'text-white');
-            el.classList.add('bg-white', 'border', 'border-gray-300', 'text-gray-700');
-        });
-        btn.classList.remove('bg-white', 'border', 'border-gray-300', 'text-gray-700');
-        btn.classList.add('bg-[#111827]', 'text-white');
-
-        document.querySelectorAll('.course-card').forEach(card => {
-            if (category === '전체' || card.dataset.category === category) {
-                card.style.display = '';
-            } else {
-                card.style.display = 'none';
-            }
-        });
-    }
 </script>
 </body>
 </html>
