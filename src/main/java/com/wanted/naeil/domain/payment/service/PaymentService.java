@@ -19,6 +19,7 @@ import com.wanted.naeil.domain.payment.repository.CreditRepository;
 import com.wanted.naeil.domain.payment.repository.PaymentRepository;
 import com.wanted.naeil.domain.payment.repository.SubscriptionRepository;
 import com.wanted.naeil.domain.user.entity.User;
+import com.wanted.naeil.domain.user.entity.enums.Role;
 import com.wanted.naeil.domain.user.repository.UserRepository;
 import lombok.Builder;
 import lombok.Getter;
@@ -206,6 +207,8 @@ public class PaymentService {
 
         credit.deduct(finalAmount);
         payment.markSuccess();
+
+        user.changeRole(Role.SUBSCRIBER);
 
         Payment savedPayment = paymentRepository.save(payment);
         subscriptionRepository.save(subscription);
