@@ -47,4 +47,18 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     List<Enrollment> findAllWithUserByCourseIdOrderByCreatedAtDesc(
             @Param("courseId") Long courseId
     );
+
+    // 내 강의 상세 페이지용
+    @Query("""
+        select distinct e
+        from Enrollment e
+        join fetch e.course c
+        join fetch c.instructor
+        where e.user = :user
+          and c.id = :courseId
+    """)
+    Optional<Enrollment> findByUserAndCourseIdWithDetails(
+            @Param("user") User user,
+            @Param("courseId") Long courseId
+    );
 }
