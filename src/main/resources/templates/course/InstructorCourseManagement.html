@@ -283,12 +283,13 @@
               <i class="fa-regular fa-trash-can"></i>
             </button>
 
-            <a th:href="@{/instructor/live-lecture/{id}(id=${liveCourse.liveId})}"
-               href="/instructor/live-lecture/1"
-               class="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-blue-300 text-blue-600 transition-all hover:bg-blue-50"
-               title="조회">
+            <button type="button"
+                    th:data-id="${liveCourse.liveId}"
+                    onclick="openLiveDetailModal(this.dataset.id)"
+                    class="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-blue-300 text-blue-600 transition-all hover:bg-blue-50"
+                    title="조회">
               <i class="fa-regular fa-eye"></i>
-            </a>
+            </button>
 
             <a th:if="${liveCourse.status != null and (liveCourse.status.name() == 'PENDING' or liveCourse.status.name() == 'REJECTED')}"
                th:href="@{/instructor/live-lecture/{id}/edit(id=${liveCourse.liveId})}"
@@ -399,6 +400,38 @@
               class="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all font-bold">
         삭제 요청하기
       </button>
+    </div>
+  </div>
+</div>
+
+<div id="liveDetailModal" class="modal-overlay">
+  <div class="bg-white rounded-2xl p-8 max-w-2xl w-full mx-4 shadow-xl max-h-[90vh] overflow-y-auto relative">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-2xl font-black text-gray-900">실시간 강의 신청 상세</h3>
+      <button type="button" onclick="closeLiveDetailModal()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+        <i class="fa-solid fa-x"></i>
+      </button>
+    </div>
+    <div class="bg-gray-50 rounded-xl p-6 space-y-4">
+      <div class="flex justify-between border-b border-gray-200 pb-3">
+        <span class="font-bold text-gray-600">강의명</span>
+        <span id="det-title" class="font-bold text-gray-900"></span>
+      </div>
+      <div class="flex flex-col gap-2 border-b border-gray-200 pb-3">
+        <span class="font-bold text-gray-600">코스 설명</span>
+        <div id="det-description" class="text-sm text-gray-700 bg-white p-3 rounded-lg border border-gray-100 min-h-[80px]"></div>
+      </div>
+      <div class="flex justify-between border-b border-gray-200 pb-3">
+        <span class="font-bold text-gray-600">강의 예정 일시</span>
+        <span id="det-time" class="font-mono font-bold text-blue-600"></span>
+      </div>
+      <div class="flex justify-between">
+        <span class="font-bold text-gray-600">신청 현황</span>
+        <span id="det-capacity" class="font-bold text-gray-900"></span>
+      </div>
+    </div>
+    <div class="mt-8">
+      <button type="button" onclick="closeLiveDetailModal()" class="w-full px-6 py-4 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition-all">닫기</button>
     </div>
   </div>
 </div>
@@ -540,6 +573,23 @@
 
     document.body.appendChild(form);
     form.submit();
+  }
+  async function openLiveDetailModal(liveId) {
+    try {
+      const response = await fetch(`/api/instructor/live-lecture/${liveId}`);
+      const data = await response.json();
+      if (response.ok) {
+        document.getElementById('det-title').textContent = data.title;
+        document.getElementById('det-description').textContent = data.description || '내용이 없습니다.';
+        document.getElementById('det-time').textContent = (data.startAt || '') + ' ~ ' + (data.endAt || '');
+        document.getElementById('det-capacity').textContent = (data.currentCount || 0) + ' / ' + (data.maxCapacity || 0) + ' 명';
+        document.getElementById('liveDetailModal').classList.add('open');
+      }
+    } catch (e) { console.error(e); alert('정보를 불러오지 못했습니다.'); }
+  }
+
+  function closeLiveDetailModal() {
+    document.getElementById('liveDetailModal').classList.remove('open');
   }
 </script>
 </body>
