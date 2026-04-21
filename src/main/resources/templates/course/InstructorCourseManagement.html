@@ -284,8 +284,13 @@
             </button>
 
             <button type="button"
-                    th:data-id="${liveCourse.liveId}"
-                    onclick="openLiveDetailModal(this.dataset.id)"
+                    onclick="openLiveDetailModal(this)"
+                    th:data-status="${liveCourse.statusDescription}"
+                    th:data-title="${liveCourse.title}"
+                    th:data-instructor="${liveCourse.instructorName}"
+                    th:data-description="${liveCourse.description ?: ''}"
+                    th:data-startat="${liveCourse.startAt != null ? #temporals.format(liveCourse.startAt, 'yyyy-MM-dd HH:mm') : '-'}"
+                    th:data-createdat="${liveCourse.createdAt != null ? #temporals.format(liveCourse.createdAt, 'yyyy-MM-dd') : '-'}"
                     class="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-blue-300 text-blue-600 transition-all hover:bg-blue-50"
                     title="조회">
               <i class="fa-regular fa-eye"></i>
@@ -340,6 +345,50 @@
       </a>
     </div>
   </section>
+</div>
+
+<!-- 실시간 강의 상세 모달 -->
+<div id="liveDetailModal" class="modal-overlay">
+  <div class="bg-white rounded-2xl p-8 max-w-2xl w-full mx-4 shadow-xl max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-2xl font-black text-gray-900">실시간 강의 신청 상세</h3>
+      <button type="button" onclick="closeLiveDetailModal()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+        <i class="fa-solid fa-x"></i>
+      </button>
+    </div>
+    <div class="space-y-4">
+      <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl">
+        <span class="text-gray-500 font-semibold">상태</span>
+        <span id="modal-status" class="px-4 py-1 rounded-full text-sm font-bold bg-yellow-100 text-yellow-700"></span>
+      </div>
+      <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl">
+        <span class="text-gray-500 font-semibold">강의명</span>
+        <span id="modal-title" class="font-bold text-gray-900"></span>
+      </div>
+      <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl">
+        <span class="text-gray-500 font-semibold">강사명</span>
+        <span id="modal-instructor" class="font-bold text-gray-900"></span>
+      </div>
+      <div class="p-4 bg-gray-50 rounded-xl">
+        <span class="text-gray-500 font-semibold block mb-2">코스 설명</span>
+        <p id="modal-description" class="font-bold text-gray-900"></p>
+      </div>
+      <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl">
+        <span class="text-gray-500 font-semibold">강의 예정 일시</span>
+        <span id="modal-startAt" class="font-bold text-gray-900"></span>
+      </div>
+      <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl">
+        <span class="text-gray-500 font-semibold">신청일</span>
+        <span id="modal-createdAt" class="font-bold text-gray-900"></span>
+      </div>
+    </div>
+    <div class="flex gap-3 mt-6">
+      <button type="button" onclick="closeLiveDetailModal()"
+              class="flex-1 py-3 border-2 border-gray-300 rounded-xl font-bold text-gray-700 hover:bg-gray-50 transition-all">
+        닫기
+      </button>
+    </div>
+  </div>
 </div>
 
 <div id="deleteModal" class="modal-overlay">
@@ -548,6 +597,20 @@
 
     alert(message || successMessage);
     location.reload();
+  }
+
+  function openLiveDetailModal(btn) {
+    document.getElementById('modal-status').textContent = btn.dataset.status;
+    document.getElementById('modal-title').textContent = btn.dataset.title;
+    document.getElementById('modal-instructor').textContent = btn.dataset.instructor;
+    document.getElementById('modal-description').textContent = btn.dataset.description || '-';
+    document.getElementById('modal-startAt').textContent = btn.dataset.startat;
+    document.getElementById('modal-createdAt').textContent = btn.dataset.createdat;
+    document.getElementById('liveDetailModal').classList.add('open');
+  }
+
+  function closeLiveDetailModal() {
+    document.getElementById('liveDetailModal').classList.remove('open');
   }
 
   function openDeleteModal(button) {

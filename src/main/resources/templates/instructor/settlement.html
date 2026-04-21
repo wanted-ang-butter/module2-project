@@ -465,8 +465,6 @@
                 </div>
 
                 <div class="card-actions">
-                    <a th:href="@{'/instructor/settlements/' + ${settlement.id}}" class="btn-detail">상세 보기</a>
-
                     <form th:if="${settlement.status.name() == 'READY'}"
                           th:action="@{'/instructor/settlements/' + ${settlement.id} + '/request'}"
                           method="post">
