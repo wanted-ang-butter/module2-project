@@ -29,8 +29,9 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             "JOIN c.instructor u " +
             "LEFT join Review r ON r.course = c " +
             "LEFT JOIN Enrollment e ON e.course = c " +
+            "WHERE c.status = :status " +
             "GROUP BY c.id, cat.name, u.name, c.thumbnail, c.title, c.description, c.price")
-    List<CourseListResponse> findAllWithStatus();
+    List<CourseListResponse> findAllWithStatus(@Param("status") CourseStatus status);
 
     @Query("select new com.wanted.naeil.domain.course.dto.response.CourseListResponse(" +
             "c.id, c.thumbnail, cat.name, c.title, c.description, u.name, " +
@@ -40,9 +41,11 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             "JOIN c.instructor u " +
             "LEFT join Review r ON r.course = c " +
             "LEFT JOIN Enrollment e ON e.course = c " +
+            "WHERE c.status = :status " +
             "GROUP BY c.id, cat.name, u.name, c.thumbnail, c.title, c.description, c.price " +
             "ORDER BY c.createdAt DESC")
-    List<CourseListResponse> findAllOrderByCreatedAtDesc();
+    List<CourseListResponse> findAllOrderByCreatedAtDesc(@Param("status") CourseStatus status);
+
 
     @Query("select new com.wanted.naeil.domain.course.dto.response.CourseListResponse(" +
             "c.id, c.thumbnail, cat.name, c.title, c.description, u.name, " +
@@ -52,9 +55,11 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             "JOIN c.instructor u " +
             "LEFT join Review r ON r.course = c " +
             "LEFT JOIN Enrollment e ON e.course = c " +
+            "WHERE c.status = :status " +
             "GROUP BY c.id, cat.name, u.name, c.thumbnail, c.title, c.description, c.price " +
             "ORDER BY COUNT(distinct e.id) DESC")
-    List<CourseListResponse> findAllOrderByStudentCountDesc();
+    List<CourseListResponse> findAllOrderByStudentCountDesc(@Param("status") CourseStatus status);
+
 
     @Query("select new com.wanted.naeil.domain.course.dto.response.CourseListResponse(" +
             "c.id, c.thumbnail, cat.name, c.title, c.description, u.name, " +
@@ -85,4 +90,41 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     @Query("select avg(r.rating) from Review r where r.course.id = :courseId")
     Double getAverageRatingByCourseId(@Param("courseId") Long courseId);
+
+    // 특정 카테고리 + 승인된 강의 전체 조회
+    @Query("select new com.wanted.naeil.domain.course.dto.response.CourseListResponse(" +
+            "c.id, c.thumbnail, cat.name, c.title, c.description, u.name, " +
+            "AVG(r.rating), COUNT(distinct e.id), c.price) " +
+            "FROM Course c " +
+            "JOIN c.category cat " +
+            "JOIN c.instructor u " +
+            "LEFT join Review r ON r.course = c " +
+            "LEFT JOIN Enrollment e ON e.course = c " +
+            "WHERE c.status = :status " +
+            "AND cat.name = :category " +
+            "GROUP BY c.id, cat.name, u.name, c.thumbnail, c.title, c.description, c.price")
+    List<CourseListResponse> findAllByCategoryNameAndStatus(
+            @Param("category") String category,
+            @Param("status") CourseStatus status
+    );
+
+    // 강의 검색 기능
+    @Query("select new com.wanted.naeil.domain.course.dto.response.CourseListResponse(" +
+            "c.id, c.thumbnail, cat.name, c.title, c.description, u.name, " +
+            "AVG(r.rating), COUNT(distinct e.id), c.price) " +
+            "FROM Course c " +
+            "JOIN c.category cat " +
+            "JOIN c.instructor u " +
+            "LEFT join Review r ON r.course = c " +
+            "LEFT JOIN Enrollment e ON e.course = c " +
+            "WHERE c.status = :status " +
+            "AND (:category IS NULL OR cat.name = :category) " +
+            "AND (:keyword IS NULL OR (c.title LIKE %:keyword% OR c.description LIKE %:keyword% OR u.name LIKE %:keyword%)) " +
+            "GROUP BY c.id, cat.name, u.name, c.thumbnail, c.title, c.description, c.price")
+    List<CourseListResponse> searchCourseList(
+            @Param("category") String category,
+            @Param("keyword") String keyword,
+            @Param("status") CourseStatus status
+    );
+
 }

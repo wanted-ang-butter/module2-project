@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
@@ -32,11 +33,13 @@ public class UserCourseController {
     @GetMapping
     public ModelAndView showAllCourses(
             @AuthenticationPrincipal AuthDetails authDetails,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String keyword,
             ModelAndView mv) {
 
-        log.info("[Course] 전체 코스 목록 페이지 조회");
+        log.info("[Course] 전체 코스 목록 페이지 조회 - category: {}, keyword: {}", category, keyword);
 
-        List<CourseListResponse> courses = courseService.getAllCourses();
+        List<CourseListResponse> courses = courseService.getCourses(category, keyword);
 
         if (authDetails != null) {
             mv.addObject("user", authDetails.getLoginUserDTO());
@@ -44,6 +47,8 @@ public class UserCourseController {
 
         mv.addObject("courses", courses);
         mv.addObject("categories", categoryRepository.findAll());
+        mv.addObject("selectedCategory", category);
+        mv.addObject("keyword", keyword);
         mv.setViewName("course/courseList");
         return mv;
     }
