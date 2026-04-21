@@ -300,9 +300,28 @@
     }
 
     function handleCancelReservation(btn) {
+        const liveId = btn.dataset.id;
         const title = btn.dataset.title;
-        alert(`"${title}" 예약 취소 기능은 아직 준비 중입니다.`);
+
+        if (!confirm(`"${title}" 예약을 취소하시겠습니까?`)) {
+            return;
+        }
+
+        const form = document.createElement('form');
+        form.method = 'post';
+        form.action = `/live-lecture/${liveId}/reservations/cancel`;
+
+        document.body.appendChild(form);
+        form.submit();
     }
+
+</script>
+<script th:if="${errorMessage != null}" th:inline="javascript">
+    alert([[${errorMessage}]]);
+</script>
+
+<script th:if="${message != null}" th:inline="javascript">
+    alert([[${message}]]);
 </script>
 </body>
 </html>
