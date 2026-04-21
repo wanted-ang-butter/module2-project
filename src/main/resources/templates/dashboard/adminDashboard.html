@@ -172,7 +172,7 @@
                             <p class="text-sm text-gray-600 font-medium"
                                th:text="'강사: ' + ${course.instructorName} + ' · 수강생 ' + ${course.studentCount} + '명'">강사: · 수강생 0명</p>
                         </div>
-                        <a th:href="@{/admin/course-management/{id}(id=${course.courseId})}"
+                        <a th:href="@{/admin/course-management/approval}"
                            class="px-4 py-2 border-2 border-gray-300 rounded-lg hover:border-purple-600 hover:bg-purple-50 transition-all font-bold text-gray-700 hover:text-purple-600">
                             상세
                         </a>
