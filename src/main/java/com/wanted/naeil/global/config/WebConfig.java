@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.nio.file.Paths;
+
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
@@ -13,10 +15,11 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // 브라우저에서 /uploads/** 로 요청이 오면
+        String absolutePath = Paths.get(uploadDir).toAbsolutePath().normalize().toString()
+                .replace("\\", "/");
+        if (!absolutePath.endsWith("/")) absolutePath += "/";
+
         registry.addResourceHandler("/uploads/**")
-                // 실제 파일 시스템의 uploadDir 위치에서 파일을 찾도록 설정합니다.
-                // file:/// 접두사가 반드시 필요합니다.
-                .addResourceLocations("file:" + uploadDir);
+                .addResourceLocations("file:" + absolutePath);
     }
 }
