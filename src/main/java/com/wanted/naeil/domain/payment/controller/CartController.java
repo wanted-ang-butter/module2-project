@@ -1,9 +1,11 @@
 package com.wanted.naeil.domain.payment.controller;
 
-import com.wanted.naeil.global.auth.model.dto.AuthDetails;
 import com.wanted.naeil.domain.payment.dto.response.CartPageResponse;
+import com.wanted.naeil.domain.payment.entity.PaymentItem;
+import com.wanted.naeil.domain.payment.entity.Subscription;
 import com.wanted.naeil.domain.payment.service.CartService;
 import com.wanted.naeil.domain.payment.service.PaymentService;
+import com.wanted.naeil.global.auth.model.dto.AuthDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -19,7 +21,6 @@ public class CartController {
 
     private final CartService cartService;
     private final PaymentService paymentService;
-
 
     // 로그인 사용자 확인
     private Long getLoginUserId(AuthDetails authDetails) {
@@ -56,6 +57,21 @@ public class CartController {
 
         CartPageResponse cartPage = cartService.getCartPage(loginUserId, selectedCartItemId);
         model.addAttribute("cartPage", cartPage);
+
+        // 구독 여부/무료 횟수
+        Subscription subscription = paymentService.getActiveSubscriptionForView(loginUserId);
+        boolean isSubscriber = subscription != null;
+        int remainingFreeCount = isSubscriber ? subscription.getRemainingFreeCount() : 0;
+
+        // 장바구니 전체 기준 할인 예상 금액 계산
+        List<PaymentItem> previewItems = paymentService.getPreviewPaymentItemsFromCart(loginUserId);
+        int discountAmount = previewItems.stream()
+                .mapToInt(PaymentItem::getDiscountAmount)
+                .sum();
+
+        model.addAttribute("isSubscriber", isSubscriber);
+        model.addAttribute("remainingFreeCount", remainingFreeCount);
+        model.addAttribute("discountAmount", discountAmount);
 
         return "payment/cart";
     }
