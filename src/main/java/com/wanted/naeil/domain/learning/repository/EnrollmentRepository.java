@@ -1,7 +1,6 @@
 package com.wanted.naeil.domain.learning.repository;
 
 import com.wanted.naeil.domain.learning.entity.Enrollment;
-import com.wanted.naeil.domain.learning.entity.LearningProgress;
 import com.wanted.naeil.domain.learning.entity.enums.EnrollmentStatus;
 import com.wanted.naeil.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -51,7 +50,7 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
     // 수강 정보 조회
     Optional<Enrollment> findByUserIdAndCourseId(Long userId, Long courseId);
-}
+
     // 내 강의 상세 페이지용
     @Query("""
         select distinct e

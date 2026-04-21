@@ -1,15 +1,11 @@
 package com.wanted.naeil.domain.learning.service;
 
-<<<<<<< feature-ajs
 import com.wanted.naeil.domain.course.entity.enums.SectionStatus;
 import com.wanted.naeil.domain.course.repository.SectionRepository;
 import com.wanted.naeil.domain.learning.dto.response.MyCourseResponse;
-=======
->>>>>>> develop
 import com.wanted.naeil.domain.course.entity.Review;
 import com.wanted.naeil.domain.course.repository.ReviewRepository;
 import com.wanted.naeil.domain.learning.dto.response.MyCourseDetailResponse;
-import com.wanted.naeil.domain.learning.dto.response.MyCourseResponse;
 import com.wanted.naeil.domain.learning.dto.response.MySessionResponse;
 import com.wanted.naeil.domain.learning.entity.Enrollment;
 import com.wanted.naeil.domain.learning.repository.EnrollmentRepository;
