@@ -1,8 +1,10 @@
 package com.wanted.naeil.domain.learning.service;
 
-import com.wanted.naeil.domain.learning.dto.response.MyCourseResponse;
 import com.wanted.naeil.domain.course.entity.Review;
 import com.wanted.naeil.domain.course.repository.ReviewRepository;
+import com.wanted.naeil.domain.learning.dto.response.MyCourseDetailResponse;
+import com.wanted.naeil.domain.learning.dto.response.MyCourseResponse;
+import com.wanted.naeil.domain.learning.dto.response.MySessionResponse;
 import com.wanted.naeil.domain.learning.entity.Enrollment;
 import com.wanted.naeil.domain.learning.repository.EnrollmentRepository;
 import com.wanted.naeil.domain.live.dto.response.MyLiveReservationResponse;
@@ -14,10 +16,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
-import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -27,17 +28,18 @@ public class MyCourseService {
     private final ReviewRepository reviewRepository;
     private final LiveReservationRepository liveReservationRepository;
 
-    // 내 강의 목록 조회
     @Transactional(readOnly = true)
     public List<MyCourseResponse> getMyCourses(User loginUser) {
 
         List<Enrollment> enrollments = enrollmentRepository.findByUserWithCourse(loginUser);
+
         return enrollments.stream()
                 .map(enrollment -> {
                     Optional<Review> review = reviewRepository.findByUserAndCourse(
                             loginUser,
                             enrollment.getCourse()
                     );
+
                     return MyCourseResponse.builder()
                             .courseId(enrollment.getCourse().getId())
                             .thumbnail(enrollment.getCourse().getThumbnail())
@@ -52,7 +54,27 @@ public class MyCourseService {
                 .toList();
     }
 
-    // 실시간 강의 예약 목록 조회
+    @Transactional(readOnly = true)
+    public MyCourseDetailResponse getMyCourseDetail(User loginUser, Long courseId) {
+
+        Enrollment enrollment = enrollmentRepository.findByUserAndCourseIdWithDetails(loginUser, courseId)
+                .orElseThrow(() -> new IllegalArgumentException("수강 중인 강의만 조회할 수 있습니다."));
+
+        List<MySessionResponse> sessions = Collections.emptyList();
+
+        return MyCourseDetailResponse.builder()
+                .courseId(enrollment.getCourse().getId())
+                .thumbnail(enrollment.getCourse().getThumbnail())
+                .title(enrollment.getCourse().getTitle())
+                .instructorName(enrollment.getCourse().getInstructor().getName())
+                .description(enrollment.getCourse().getDescription())
+                .coursesRate(enrollment.getCoursesRate())
+                .completedCount(0)
+                .totalCount(0)
+                .sessions(sessions)
+                .build();
+    }
+
     @Transactional(readOnly = true)
     public List<MyLiveReservationResponse> getLiveReservations(User loginUser) {
 
