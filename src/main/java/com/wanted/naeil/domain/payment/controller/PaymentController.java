@@ -1,5 +1,6 @@
 package com.wanted.naeil.domain.payment.controller;
 
+import com.wanted.naeil.domain.payment.dto.response.PaymentPreviewResponse;
 import com.wanted.naeil.global.auth.model.dto.AuthDetails;
 import com.wanted.naeil.domain.payment.dto.request.SubscriptionPaymentRequest;
 import com.wanted.naeil.domain.payment.service.CartService;
@@ -7,6 +8,7 @@ import com.wanted.naeil.domain.payment.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
         import java.util.List;
@@ -48,6 +50,22 @@ public class PaymentController {
         paymentService.checkoutSelectedCartItems(loginUserId, selectedCartItemIds);
 
         return "redirect:/my-courses";
+    }
+
+    @GetMapping("/courses")
+    public String paymentPage(@RequestParam List<Long> selectedCartItemIds,
+                              @AuthenticationPrincipal AuthDetails authDetails,
+                              Model model) {
+
+        Long loginUserId = getLoginUserId(authDetails);
+
+        PaymentPreviewResponse preview =
+                paymentService.getPaymentPreview(loginUserId, selectedCartItemIds);
+
+        model.addAttribute("preview", preview);
+        model.addAttribute("selectedCartItemIds", selectedCartItemIds);
+
+        return "payment/payment";
     }
 
     // 구독권 구매

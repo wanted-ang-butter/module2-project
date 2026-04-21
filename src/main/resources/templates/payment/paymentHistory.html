@@ -50,175 +50,6 @@
             font: inherit;
         }
 
-        .topbar {
-            width: 100%;
-            background: rgba(255,255,255,0.96);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .topbar-inner {
-            max-width: 1360px;
-            margin: 0 auto;
-            padding: 18px 28px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 24px;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            min-width: 250px;
-        }
-
-        .brand-logo {
-            width: 58px;
-            height: 58px;
-            border-radius: 18px;
-            background: linear-gradient(135deg, #5b5ce6, #66c37a);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-            font-weight: 800;
-            box-shadow: 0 10px 24px rgba(91, 92, 230, 0.22);
-        }
-
-        .brand-text {
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-        }
-
-        .brand-title {
-            font-size: 19px;
-            font-weight: 900;
-            line-height: 1;
-        }
-
-        .brand-subtitle {
-            font-size: 12px;
-            color: var(--text-sub);
-        }
-
-        .nav {
-            display: flex;
-            align-items: center;
-            gap: 34px;
-            flex: 1;
-            justify-content: center;
-        }
-
-        .nav a {
-            font-size: 15px;
-            font-weight: 700;
-            color: #374151;
-        }
-
-        .nav a:hover {
-            color: var(--primary);
-        }
-
-        .topbar-right {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .logout-link {
-            font-size: 15px;
-            font-weight: 700;
-            color: #374151;
-        }
-
-        .profile-dropdown {
-            position: relative;
-        }
-
-        .profile-button {
-            border: none;
-            background: transparent;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            padding: 0;
-        }
-
-        .profile-info {
-            text-align: right;
-        }
-
-        .profile-name {
-            font-size: 15px;
-            font-weight: 800;
-        }
-
-        .profile-email {
-            font-size: 13px;
-            color: var(--text-sub);
-            margin-top: 2px;
-        }
-
-        .profile-avatar {
-            width: 44px;
-            height: 44px;
-            border-radius: 14px;
-            background: linear-gradient(135deg, #5b5ce6, #66c37a);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 15px;
-            font-weight: 800;
-            overflow: hidden;
-        }
-
-        .profile-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .dropdown-menu {
-            position: absolute;
-            top: 58px;
-            right: 0;
-            width: 220px;
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 18px;
-            box-shadow: var(--shadow);
-            padding: 10px;
-            display: none;
-        }
-
-        .dropdown-menu.show {
-            display: block;
-        }
-
-        .dropdown-item {
-            display: block;
-            padding: 14px 14px;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 600;
-            color: #374151;
-        }
-
-        .dropdown-item:hover,
-        .dropdown-item.active {
-            background: #f3f4f6;
-            color: var(--primary);
-        }
-
         .page {
             max-width: 1360px;
             margin: 0 auto;
@@ -579,10 +410,6 @@
         }
 
         @media (max-width: 1024px) {
-            .nav {
-                display: none;
-            }
-
             .content-grid,
             .subscription-stats {
                 grid-template-columns: 1fr;
@@ -590,7 +417,6 @@
         }
 
         @media (max-width: 768px) {
-            .topbar-inner,
             .page {
                 padding-left: 16px;
                 padding-right: 16px;
@@ -598,10 +424,6 @@
 
             .page-title {
                 font-size: 34px;
-            }
-
-            .profile-info {
-                display: none;
             }
         }
     </style>
@@ -617,14 +439,14 @@
 
     <section class="page-header">
         <h1 class="page-title">결제 내역</h1>
-        <p class="page-subtitle">// 지금까지의 모든 결제 내역과 현재 구독 정보를 확인하세요</p>
+        <p class="page-subtitle">지금까지의 모든 결제 내역과 현재 구독 정보를 확인하세요</p>
     </section>
 
     <section class="subscription-hero">
         <div class="subscription-hero-header">
             <div>
                 <h2 class="subscription-title" id="subscriptionPlanName">프리미엄 구독</h2>
-                <p class="subscription-desc">// 매달 3개의 강의를 무료로 수강하세요</p>
+                <p class="subscription-desc" id="subscriptionDesc">매달 3개의 강의를 무료로 수강하세요</p>
             </div>
             <div class="subscription-icon">□</div>
         </div>
@@ -648,16 +470,19 @@
     <section class="content-grid">
         <div class="info-card">
             <h3 class="card-title">내 보유 크레딧</h3>
-            <div class="credit-main" id="creditBalance">9,900 크레딧</div>
-            <p class="card-description">// 강의 결제와 구독 결제는 모두 크레딧으로 진행됩니다.</p>
+            <div class="credit-main"
+                 th:text="${#numbers.formatInteger(balance, 3, 'COMMA')} + ' 크레딧'">
+                0 크레딧
+            </div>
+            <p class="card-description">강의 결제와 구독 결제는 모두 크레딧으로 진행됩니다.</p>
             <button type="button" class="button button-primary" onclick="goToCreditPage()">크레딧 충전</button>
         </div>
 
         <div class="info-card">
             <h3 class="card-title">구독 관리</h3>
             <p class="card-description">
-                // 구독을 해지하면 다음 결제일부터 자동 결제가 중단됩니다.<br>
-                // 현재 구독 기간은 계속 유지됩니다.
+                구독을 해지하면 다음 결제일부터 자동 결제가 중단됩니다.<br>
+                현재 구독 기간은 계속 유지됩니다.
             </p>
             <button type="button" class="button button-outline-danger" onclick="cancelSubscription()">구독 해지</button>
         </div>
@@ -666,7 +491,7 @@
     <section class="history-section">
         <div class="history-header">
             <h2 class="history-title">결제 내역</h2>
-            <p class="history-subtitle">// 최신순으로 10개씩 조회됩니다</p>
+            <p class="history-subtitle">최신순으로 10개씩 조회됩니다</p>
         </div>
 
         <div class="history-toolbar">
@@ -709,14 +534,16 @@
     let currentPage = 0;
     const pageSize = 10;
 
-    profileButton.addEventListener('click', function (e) {
-        e.stopPropagation();
-        dropdownMenu.classList.toggle('show');
-    });
+    if (profileButton && dropdownMenu) {
+        profileButton.addEventListener('click', function (e) {
+            e.stopPropagation();
+            dropdownMenu.classList.toggle('show');
+        });
 
-    document.addEventListener('click', function () {
-        dropdownMenu.classList.remove('show');
-    });
+        document.addEventListener('click', function () {
+            dropdownMenu.classList.remove('show');
+        });
+    }
 
     function goBack() {
         window.history.back();
@@ -731,6 +558,7 @@
 
             if (!data.subscribed) {
                 document.getElementById('subscriptionPlanName').innerText = '구독 중인 상품이 없습니다';
+                document.getElementById('subscriptionDesc').innerText = '구독권을 구매하면 매달 3개의 강의를 무료로 수강할 수 있습니다.';
                 document.getElementById('subscriptionStartAt').innerText = '-';
                 document.getElementById('subscriptionEndAt').innerText = '-';
                 document.getElementById('subscriptionUsage').innerText = '0 / 3 강의';
@@ -738,6 +566,7 @@
             }
 
             document.getElementById('subscriptionPlanName').innerText = data.planName ?? '프리미엄 구독';
+            document.getElementById('subscriptionDesc').innerText = '매달 3개의 강의를 무료로 수강하세요';
             document.getElementById('subscriptionStartAt').innerText = formatDateOnly(data.startAt);
             document.getElementById('subscriptionEndAt').innerText = formatDateOnly(data.endAt);
             document.getElementById('subscriptionUsage').innerText =
@@ -745,6 +574,30 @@
 
         } catch (error) {
             console.error(error);
+        }
+    }
+
+    async function cancelSubscription() {
+        const confirmed = confirm('구독을 해지하시겠습니까?\n다음 결제일부터 자동 결제가 중단됩니다.');
+        if (!confirmed) return;
+
+        try {
+            const response = await fetch('/api/subscription/cancel', {
+                method: 'PATCH'
+            });
+
+            if (!response.ok) {
+                throw new Error('구독 해지 실패');
+            }
+
+            const data = await response.json();
+            alert(data.message);
+
+            await loadSubscription();
+
+        } catch (error) {
+            console.error(error);
+            alert('구독 해지 중 오류가 발생했습니다.');
         }
     }
 
@@ -761,17 +614,9 @@
             const data = await response.json();
             renderPaymentTable(data.content || []);
             renderPagination(data);
-            updateCreditBalance(data.content || []);
 
         } catch (error) {
             console.error(error);
-        }
-    }
-
-    function updateCreditBalance(items) {
-        const creditItem = items.find(item => item.itemType === 'CREDIT');
-        if (creditItem) {
-            document.getElementById('creditBalance').innerText = creditItem.displayAmount.replace('+', '');
         }
     }
 
@@ -855,26 +700,6 @@
         loadPayments(currentPage, currentType);
     }
 
-    async function cancelSubscription() {
-        const confirmed = confirm('구독을 해지하시겠습니까?\n다음 결제일부터 자동 결제가 중단됩니다.');
-        if (!confirmed) return;
-
-        try {
-            const response = await fetch('/api/subscription/cancel', { method: 'PATCH' });
-
-            if (!response.ok) {
-                throw new Error('구독 해지 실패');
-            }
-
-            alert('구독이 해지되었습니다.');
-            await loadSubscription();
-
-        } catch (error) {
-            console.error(error);
-            alert('구독 해지 중 오류가 발생했습니다.');
-        }
-    }
-
     function goToCreditPage() {
         window.location.href = '/credit/charge';
     }
@@ -930,7 +755,6 @@
         await loadSubscription();
         await loadPayments();
     });
-
 </script>
 
 </body>

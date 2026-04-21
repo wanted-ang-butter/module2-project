@@ -32,7 +32,6 @@ public class MySubscriptionService {
                     .usedFreeCount(0)
                     .totalFreeCount(TOTAL_FREE_COUNT)
                     .autoRenew(false)
-                    .nextResetAt(null)
                     .build();
         }
 
@@ -46,7 +45,6 @@ public class MySubscriptionService {
                 .status(subscription.getStatus().name())
                 .startAt(subscription.getStartAt())
                 .endAt(subscription.getEndAt())
-                .nextResetAt(subscription.getNextResetAt())
                 .remainingFreeCount(remainingFreeCount)
                 .usedFreeCount(usedFreeCount)
                 .totalFreeCount(TOTAL_FREE_COUNT)
@@ -56,8 +54,8 @@ public class MySubscriptionService {
 
     private String getPlanName(PlanType planType) {
         return switch (planType) {
-            case MONTHLY -> "1개월 구독권";
-            case YEARLY -> "12개월 구독권";
+            case MONTHLY -> "프리미엄 구독";
+            case YEARLY -> "프리미엄 연간 구독";
         };
     }
 }
