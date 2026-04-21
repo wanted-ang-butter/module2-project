@@ -8,7 +8,6 @@
 </head>
 <body class="bg-gray-50 min-h-screen">
 
-<!-- 🔥 공통 관리자 헤더 -->
 <div th:replace="fragments/adminHeader :: adminHeader"></div>
 
 <div class="max-w-7xl mx-auto px-6 py-10 flex gap-8">
@@ -17,19 +16,15 @@
     <aside class="w-56 shrink-0">
         <div class="bg-white border-2 border-gray-200 rounded-2xl p-4">
             <p class="text-sm font-black text-gray-900 px-3 py-2 mb-1">회원 관리</p>
-
             <nav class="space-y-1">
                 <a href="/admin/user-management"
                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-700 hover:bg-gray-50">
                     <i class="fa-solid fa-users text-gray-400 w-4"></i>회원 조회
                 </a>
-
-                <!-- 🔥 여기 수정됨 -->
                 <a href="/admin/instructor-approval"
                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-purple-700 bg-purple-50">
                     <i class="fa-solid fa-chalkboard-teacher text-purple-500 w-4"></i>강사 승인
                 </a>
-
                 <a href="/admin/blacklist"
                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-700 hover:bg-gray-50">
                     <i class="fa-solid fa-ban text-gray-400 w-4"></i>블랙리스트
@@ -43,16 +38,16 @@
 
         <button type="button"
                 onclick="history.back()"
-                class="flex items-center gap-2 px-4 py-2 border-2 border-gray-200 rounded-xl text-gray-700 hover:bg-gray-100 font-medium text-sm mb-4">
+                class="flex items-center gap-2 px-4 py-2 border-2 border-gray-200 rounded-xl text-gray-700 hover:bg-gray-100 font-medium text-sm mb-6">
             <i class="fa-solid fa-arrow-left text-sm"></i>뒤로가기
         </button>
 
         <h1 class="text-4xl font-black text-gray-900 mb-2">강사 승인</h1>
         <p class="text-gray-600 font-medium mb-8">강사 신청 목록을 확인하고 승인/반려합니다</p>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
 
-            <!-- Left -->
+            <!-- Left: 신청 목록 -->
             <div>
                 <h2 class="text-xl font-black text-gray-900 mb-4">
                     신청 목록 (<span th:text="${#lists.size(approvals)}">0</span>)
@@ -63,7 +58,7 @@
                     <p class="text-gray-500 text-sm">대기중인 신청이 없습니다</p>
                 </div>
 
-                <div class="space-y-4">
+                <div class="space-y-3">
                     <div th:each="app : ${approvals}"
                          th:attr="data-id=${app.approvalId},
                                   data-title=${app.title},
@@ -75,50 +70,85 @@
                                   data-date=${app.createdAt != null ? #temporals.format(app.createdAt, 'yyyy-MM-dd') : '-'},
                                   data-status=${app.status.name()}"
                          onclick="selectApplication(this)"
-                         class="p-6 border-2 rounded-2xl cursor-pointer transition-all hover:shadow-lg border-gray-200 bg-white hover:border-blue-300">
+                         class="application-card p-5 border-2 rounded-2xl cursor-pointer transition-all hover:shadow-md border-gray-200 bg-white hover:border-blue-300">
 
-                        <h3 class="text-lg font-black text-gray-900 mb-1"
-                            th:text="${app.title ?: '-'}"></h3>
-
-                        <p class="text-sm text-gray-600"
+                        <div class="flex items-start justify-between mb-2">
+                            <h3 class="text-base font-black text-gray-900"
+                                th:text="${app.title ?: '-'}"></h3>
+                            <i class="fa-regular fa-file-lines text-gray-400 mt-0.5"></i>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3"
                            th:text="${app.applicantName ?: '-'}"></p>
+                        <div class="flex items-center gap-3">
+                            <span class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-md text-xs font-bold"
+                                  th:text="${app.categoryName ?: '-'}"></span>
+                            <span class="text-xs text-gray-400"
+                                  th:text="${app.createdAt != null ? #temporals.format(app.createdAt, 'yyyy-MM-dd') : '-'}"></span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Right -->
-            <div>
+            <!-- Right: 상세 패널 -->
+            <div class="sticky top-24">
+
                 <div id="detail-empty"
-                     class="bg-white border-2 border-gray-200 rounded-2xl p-8 text-center sticky top-24">
-                    <p class="text-gray-500 text-sm">신청을 선택하세요</p>
+                     class="bg-white border-2 border-gray-200 rounded-2xl p-12 text-center">
+                    <i class="fa-regular fa-file-lines text-gray-300 text-4xl mb-3"></i>
+                    <p class="text-gray-400 text-sm font-medium">신청을 선택하세요</p>
                 </div>
 
-                <div id="detail-panel"
-                     class="hidden bg-white border-2 border-gray-200 rounded-2xl p-8 sticky top-24">
+                <div id="detail-panel" class="hidden bg-white border-2 border-gray-200 rounded-2xl p-8">
 
-                    <h2 class="text-2xl font-black mb-6">신청 상세</h2>
+                    <h2 class="text-2xl font-black text-gray-900 mb-6">신청 상세</h2>
 
-                    <p id="d-title"></p>
-                    <p id="d-applicant"></p>
-                    <p id="d-category"></p>
-                    <p id="d-introduction"></p>
-                    <p id="d-career"></p>
+                    <div class="space-y-1 mb-6">
+                        <div class="flex flex-col gap-1 py-3 border-b border-gray-100">
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-wide">제목</span>
+                            <span id="d-title" class="text-sm font-semibold text-gray-900"></span>
+                        </div>
+                        <div class="flex flex-col gap-1 py-3 border-b border-gray-100">
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-wide">신청자</span>
+                            <span id="d-applicant" class="text-sm font-semibold text-gray-900"></span>
+                        </div>
+                        <div class="flex flex-col gap-1 py-3 border-b border-gray-100">
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-wide">분야</span>
+                            <span id="d-category" class="text-sm font-semibold text-gray-900"></span>
+                        </div>
+                        <div class="flex flex-col gap-1 py-3 border-b border-gray-100">
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-wide">경력</span>
+                            <span id="d-career" class="text-sm font-semibold text-gray-900"></span>
+                        </div>
+                        <div id="proof-row" class="flex flex-col gap-1 py-3 border-b border-gray-100">
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-wide">증빙 자료</span>
+                            <a id="d-proof" href="#" target="_blank"
+                               class="text-sm text-blue-600 font-medium hover:underline flex items-center gap-1">
+                                <i class="fa-regular fa-file text-xs"></i>
+                                <span id="d-proof-name"></span>
+                            </a>
+                        </div>
+                        <div class="flex flex-col gap-1 py-3">
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-wide">신청일</span>
+                            <span id="d-date" class="text-sm font-semibold text-gray-900"></span>
+                        </div>
+                    </div>
 
-                    <div class="flex gap-3 mt-6">
-                        <form id="approve-form" method="post">
-                            <button class="px-4 py-2 bg-blue-600 text-white rounded-xl">승인</button>
+                    <div class="flex gap-3">
+                        <form id="approve-form" method="post" class="flex-1">
+                            <button type="submit"
+                                    class="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold hover:opacity-90 transition">
+                                <i class="fa-solid fa-circle-check"></i> 승인
+                            </button>
                         </form>
-
-                        <button onclick="openRejectModal()"
-                                class="px-4 py-2 border border-red-400 text-red-500 rounded-xl">
-                            반려
+                        <button type="button" onclick="openRejectModal()"
+                                class="flex-1 flex items-center justify-center gap-2 py-3 border-2 border-red-300 text-red-500 rounded-xl font-bold hover:bg-red-50 transition">
+                            <i class="fa-solid fa-circle-xmark"></i> 반려
                         </button>
                     </div>
                 </div>
             </div>
 
         </div>
-
     </main>
 </div>
 
@@ -126,33 +156,56 @@
 <div id="reject-modal"
      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
      style="display:none">
-
-    <div class="bg-white p-6 rounded-xl w-full max-w-md">
+    <div class="bg-white p-8 rounded-2xl w-full max-w-md shadow-xl">
+        <h3 class="text-xl font-black text-gray-900 mb-4">반려 사유 입력</h3>
         <form id="reject-form" method="post">
-            <textarea name="rejectReason" class="w-full border p-2"></textarea>
-
-            <div class="flex gap-2 mt-4">
-                <button class="flex-1 bg-red-500 text-white py-2">반려</button>
-                <button type="button" onclick="closeRejectModal()" class="flex-1 border py-2">취소</button>
+            <textarea name="rejectReason" rows="4"
+                      placeholder="반려 사유를 입력하세요"
+                      class="w-full border-2 border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:border-red-400 resize-none"></textarea>
+            <div class="flex gap-3 mt-4">
+                <button type="submit"
+                        class="flex-1 py-3 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition">반려</button>
+                <button type="button" onclick="closeRejectModal()"
+                        class="flex-1 py-3 border-2 border-gray-200 rounded-xl font-bold text-gray-700 hover:bg-gray-50 transition">취소</button>
             </div>
         </form>
     </div>
 </div>
 
 <script>
-    let selectedId = null;
+    let selectedCard = null;
 
     function selectApplication(el) {
-        selectedId = el.dataset.id;
+        if (selectedCard) {
+            selectedCard.classList.remove('border-blue-500', 'bg-blue-50');
+            selectedCard.classList.add('border-gray-200', 'bg-white');
+        }
+        el.classList.remove('border-gray-200', 'bg-white');
+        el.classList.add('border-blue-500', 'bg-blue-50');
+        selectedCard = el;
 
-        document.getElementById('d-title').textContent = el.dataset.title;
-        document.getElementById('d-applicant').textContent = el.dataset.applicant;
-        document.getElementById('d-category').textContent = el.dataset.category;
-        document.getElementById('d-introduction').textContent = el.dataset.introduction;
-        document.getElementById('d-career').textContent = el.dataset.career;
+        const id = el.dataset.id;
+        const proofUrl = el.dataset.proof;
 
-        document.getElementById('approve-form').action = '/admin/approvals/' + selectedId + '/approve';
-        document.getElementById('reject-form').action = '/admin/approvals/' + selectedId + '/reject';
+        document.getElementById('d-title').textContent = el.dataset.title || '-';
+        document.getElementById('d-applicant').textContent = el.dataset.applicant || '-';
+        document.getElementById('d-category').textContent = el.dataset.category || '-';
+        document.getElementById('d-career').textContent = el.dataset.career || '-';
+        document.getElementById('d-date').textContent = el.dataset.date || '-';
+
+        const proofRow = document.getElementById('proof-row');
+        const proofLink = document.getElementById('d-proof');
+        const proofName = document.getElementById('d-proof-name');
+        if (proofUrl && proofUrl !== 'null' && proofUrl !== '') {
+            proofLink.href = proofUrl;
+            proofName.textContent = proofUrl.split('/').pop();
+            proofRow.classList.remove('hidden');
+        } else {
+            proofRow.classList.add('hidden');
+        }
+
+        document.getElementById('approve-form').action = '/admin/approvals/' + id + '/approve';
+        document.getElementById('reject-form').action = '/admin/approvals/' + id + '/reject';
 
         document.getElementById('detail-empty').classList.add('hidden');
         document.getElementById('detail-panel').classList.remove('hidden');
@@ -161,6 +214,7 @@
     function openRejectModal() {
         document.getElementById('reject-modal').style.display = 'flex';
     }
+
     function closeRejectModal() {
         document.getElementById('reject-modal').style.display = 'none';
     }

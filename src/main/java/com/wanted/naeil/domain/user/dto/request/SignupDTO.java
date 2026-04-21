@@ -3,6 +3,7 @@ package com.wanted.naeil.domain.user.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
@@ -41,6 +42,7 @@ public class SignupDTO {
     private String phone;
 
     @NotNull(message = "생년월일은 필수 입력 값입니다.")
+    @PastOrPresent(message = "생년월일은 미래의 날짜일 수 없습니다.")
     private LocalDate birthDate;
 
     private MultipartFile profileImg;
