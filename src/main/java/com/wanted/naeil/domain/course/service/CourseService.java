@@ -4,6 +4,8 @@ import com.wanted.naeil.domain.admin.entity.AdminApproval;
 import com.wanted.naeil.domain.admin.entity.enums.ApprovalRequestType;
 import com.wanted.naeil.domain.admin.entity.enums.ApprovalStatus;
 import com.wanted.naeil.domain.admin.repository.AdminApprovalRepository;
+import com.wanted.naeil.domain.community.entity.Like;
+import com.wanted.naeil.domain.community.repository.LikeRepository;
 import com.wanted.naeil.domain.course.dto.request.CourseCreateRequest;
 import com.wanted.naeil.domain.course.dto.request.CourseStatusUpdateRequest;
 import com.wanted.naeil.domain.course.dto.request.CourseUpdateRequest;
@@ -33,6 +35,7 @@ import com.wanted.naeil.domain.learning.repository.EnrollmentRepository;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +52,7 @@ public class CourseService {
     private final SectionService sectionService;
     private final ModelMapper modelMapper;
     private final EnrollmentRepository enrollmentRepository;
+    private final LikeRepository likeRepository;
 
 
     // 코스 등록 요청 - 강사
@@ -168,15 +172,20 @@ public class CourseService {
         return CourseEditResponse.of(course, sections);
     }
 
-    // 강의 전체 조회 - 공통
+    // 코스 전체 조회
     @Transactional(readOnly = true)
-    public List<CourseListResponse> getAllCourses() {
-        return courseRepository.findAllWithStatus();
+    public List<CourseListResponse> getAllCourses(String category) {
+        if (category == null || category.isBlank()) {
+            return courseRepository.findAllWithStatus(CourseStatus.ACTIVE);
+        }
+
+        return courseRepository.findAllByCategoryNameAndStatus(category, CourseStatus.ACTIVE);
     }
+
 
     // 코스 단일 조회 - 공통
     @Transactional(readOnly = true)
-    public CourseDetailsResponse getCourseDetail(Long courseId) {
+    public CourseDetailsResponse getCourseDetail(Long courseId, User loginUser) {
         
         // 강의,카테고리,강사,섹션 한 번에 조회
         Course course = courseRepository.findCourseDetailsById(courseId)
@@ -189,12 +198,24 @@ public class CourseService {
         // 섹션 리스트 조회
         List<SectionListResponse> sectionsResponses = sectionService.getSectionsByCourseId(courseId);
 
+        // 좋아요 여부 확인
+        boolean isLiked = false;
+        Long likeId = null;
+        if (loginUser != null) {
+            Optional<Like> like = likeRepository.findByUserAndCourse(loginUser, course);
+            if (like.isPresent()) {
+                isLiked = true;
+                likeId = like.get().getLikeId();
+            }
+        }
         return CourseDetailsResponse.of(
                 course,
                 studentCount,
                 likeCount,
                 avgRating,
-                sectionsResponses);
+                sectionsResponses,
+                isLiked,
+                likeId);
     }
 
     // 코스 수정
@@ -366,7 +387,7 @@ public class CourseService {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 강의입니다."));
         validateCourseOwner(course, instructorId);
-        return getCourseDetail(courseId);
+        return getCourseDetail(courseId, null);
     }
     // 강사 강의 상세 페이지 - 해당 강의를 수강 중인 수강생 목록 조회 성민수정
     @Transactional(readOnly = true)
@@ -380,6 +401,19 @@ public class CourseService {
                 .stream()
                 .map(InstructorCourseStudentResponse::from)
                 .toList();
+    }
+
+    // 검색기능
+    @Transactional(readOnly = true)
+    public List<CourseListResponse> getCourses(String category, String keyword) {
+        String normalizedCategory = (category == null || category.isBlank()) ? null : category;
+        String normalizedKeyword = (keyword == null || keyword.isBlank()) ? null : keyword;
+
+        return courseRepository.searchCourseList(
+                normalizedCategory,
+                normalizedKeyword,
+                CourseStatus.ACTIVE
+        );
     }
 
 

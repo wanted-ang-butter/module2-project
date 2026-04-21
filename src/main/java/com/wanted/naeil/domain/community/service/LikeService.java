@@ -61,7 +61,7 @@ public class LikeService {
                     .targetType(LikeTargetType.COURSE)
                     .course(course)
                     .build());
-            return "/courses/" + course.getId();
+            return "/course/" + course.getId();
         } else {
             throw new IllegalArgumentException("지원하지 않는 좋아요 대상입니다.");
         }
@@ -80,7 +80,7 @@ public class LikeService {
 
         String redirectUrl = like.getTargetType() == LikeTargetType.POST
                 ? "/community/" + like.getPost().getCategory().name().toLowerCase() + "/" + like.getPost().getPostId()
-                : "/courses/" + like.getCourse().getId();
+                : "/course/" + like.getCourse().getId();
 
         likeRepository.delete(like);
         return redirectUrl;
