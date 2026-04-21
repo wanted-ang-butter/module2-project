@@ -1,5 +1,6 @@
 package com.wanted.naeil.domain.learning.controller;
 
+import com.wanted.naeil.domain.learning.dto.response.MyCourseDetailResponse;
 import com.wanted.naeil.domain.learning.dto.response.MyCourseResponse;
 import com.wanted.naeil.domain.learning.service.MyCourseService;
 import com.wanted.naeil.domain.live.dto.response.MyLiveReservationResponse;
@@ -12,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
@@ -35,6 +37,7 @@ public class MyCourseController {
 
         User loginUser = getLoginUser(authDetails);
         model.addAttribute("user", authDetails.getLoginUserDTO());
+
         List<MyCourseResponse> myCourses = myCourseService.getMyCourses(loginUser);
         List<MyLiveReservationResponse> liveReservations = myCourseService.getLiveReservations(loginUser);
 
@@ -53,11 +56,31 @@ public class MyCourseController {
         return "my-courses/myCourses";
     }
 
+    // 내 강의 상세 페이지 조회
+    @GetMapping("/{courseId}")
+    public String myCourseDetailPage(@PathVariable Long courseId,
+                                     @AuthenticationPrincipal AuthDetails authDetails,
+                                     Model model) {
+
+        log.info("[내 강의 상세] 조회 시작. courseId={}", courseId);
+
+        User loginUser = getLoginUser(authDetails);
+        model.addAttribute("user", authDetails.getLoginUserDTO());
+
+        MyCourseDetailResponse courseDetail = myCourseService.getMyCourseDetail(loginUser, courseId);
+        model.addAttribute("courseDetail", courseDetail);
+
+        log.info("[내 강의 상세] 조회 완료. courseId={}", courseId);
+
+        return "my-courses/myCourseDetail";
+    }
+
     // 로그인 유저 조회 공통 메서드
     private User getLoginUser(AuthDetails authDetails) {
         if (authDetails == null) {
             throw new NoSuchElementException("로그인이 필요합니다.");
         }
+
         return userRepository.findByUsername(authDetails.getUsername())
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
     }

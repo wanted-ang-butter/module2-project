@@ -57,7 +57,7 @@
        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     <div th:each="course : ${myCourses}"
          class="bg-white border-2 border-gray-200 rounded-2xl p-6 hover:shadow-xl transition-all">
-      <a th:href="@{/course/{id}(id=${course.courseId})}" class="block group">
+      <a th:href="@{/my-courses/{courseId}(courseId=${course.courseId})}" class="block group">
         <div class="aspect-video bg-gray-100 rounded-xl mb-4 overflow-hidden">
           <img th:src="${course.thumbnail}" th:alt="${course.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"/>
         </div>
