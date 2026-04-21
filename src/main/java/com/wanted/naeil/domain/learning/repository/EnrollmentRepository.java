@@ -1,6 +1,7 @@
 package com.wanted.naeil.domain.learning.repository;
 
 import com.wanted.naeil.domain.learning.entity.Enrollment;
+import com.wanted.naeil.domain.learning.entity.LearningProgress;
 import com.wanted.naeil.domain.learning.entity.enums.EnrollmentStatus;
 import com.wanted.naeil.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -52,8 +53,6 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     // 수강 정보 조회
     Optional<Enrollment> findByUserIdAndCourseId(Long userId, Long courseId);
 
-<<<<<<< HEAD
-=======
     // 강사 신규 수강생 수 (이번 달)
     @Query("""
         SELECT COUNT(e) FROM Enrollment e
@@ -70,7 +69,6 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     """)
     Double findAvgCompletionRateByInstructorId(@Param("instructorId") Long instructorId);
 
->>>>>>> 69db346cf252954831ec6784e89d2de700b9635c
     // 내 강의 상세 페이지용
     @Query("""
         select distinct e

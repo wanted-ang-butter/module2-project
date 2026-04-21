@@ -4,6 +4,7 @@ import com.wanted.naeil.domain.settlement.entity.enums.SettlementStatus;
 import com.wanted.naeil.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -81,5 +82,30 @@ public class Settlement {
         }
 
         this.status = SettlementStatus.CANCELED;
+    }
+
+    @Builder
+    public Settlement(User instructor,
+                      User admin,
+                      String settlementMonth,
+                      int totalSalesAmount,
+                      int platformFee,
+                      int finalAmount,
+                      int totalAmount,
+                      int requestedAmount,
+                      SettlementStatus status,
+                      LocalDateTime createdAt,
+                      LocalDateTime completedAt) {
+        this.instructor = instructor;
+        this.admin = admin;
+        this.settlementMonth = settlementMonth;
+        this.totalSalesAmount = totalSalesAmount;
+        this.platformFee = platformFee;
+        this.finalAmount = finalAmount;
+        this.totalAmount = totalAmount;
+        this.requestedAmount = requestedAmount;
+        this.status = status;
+        this.createdAt = createdAt;
+        this.completedAt = completedAt;
     }
 }
