@@ -223,35 +223,64 @@
 
         <div class="divide-y divide-gray-200">
           <div th:each="section, stat : ${course.sections}">
-            <button type="button"
-                    class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-gray-50 transition"
-                    onclick="this.nextElementSibling.classList.toggle('hidden')">
+
+            <!-- 미리보기 섹션: 누구나 펼치기 가능 -->
+            <div th:if="${section.isFree}">
+              <button type="button"
+                      class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-gray-50 transition"
+                      onclick="this.nextElementSibling.classList.toggle('hidden')">
+                <div class="min-w-0 pr-4">
+                  <p class="font-bold text-gray-900 break-words"
+                     th:text="|섹션 ${stat.count}. ${section.title}|">섹션명</p>
+                </div>
+
+                <div class="flex items-center gap-3 shrink-0">
+          <span class="text-[11px] font-bold text-green-700 bg-green-100 px-2 py-1 rounded-md">
+            미리보기
+          </span>
+                  <span class="text-sm text-gray-500 font-medium"
+                        th:text="${section.playTime}">00:15</span>
+                  <i class="fa-solid fa-chevron-down text-sm text-gray-400"></i>
+                </div>
+              </button>
+
+              <div class="hidden bg-gray-50 border-t border-gray-100">
+                <a th:href="@{/courses/{courseId}/sections/{sectionId}(courseId=${course.courseId}, sectionId=${section.sectionId})}"
+                   class="px-6 py-4 flex items-center gap-3 hover:bg-gray-100 transition">
+                  <i class="fa-solid fa-play text-blue-500 text-xs"></i>
+                  <span class="text-sm text-gray-700"
+                        th:text="${section.title} + ' 미리보기'">미리보기</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- 일반 섹션: 제목만 표시, 펼치기/링크 없음 -->
+            <div th:unless="${section.isFree}"
+                 class="w-full px-6 py-5 flex items-center justify-between text-left bg-white">
               <div class="min-w-0 pr-4">
                 <p class="font-bold text-gray-900 break-words"
                    th:text="|섹션 ${stat.count}. ${section.title}|">섹션명</p>
               </div>
 
               <div class="flex items-center gap-3 shrink-0">
-                <span th:if="${section.isFree}"
-                      class="text-[11px] font-bold text-green-700 bg-green-100 px-2 py-1 rounded-md">
-                  무료공개
-                </span>
-                <span class="text-sm text-gray-500 font-medium"
-                      th:text="${section.playTime}">00:15</span>
-                <i class="fa-solid fa-chevron-down text-sm text-gray-400"></i>
+        <span class="text-sm text-gray-500 font-medium"
+              th:text="${section.playTime}">00:15</span>
+                <i class="fa-solid fa-lock text-sm text-gray-400"></i>
               </div>
             </button>
 
             <div class="hidden bg-gray-50 border-t border-gray-100">
-              <a th:href="@{/course/{courseId}/sections/{sectionId}(courseId=${course.courseId}, sectionId=${section.sectionId})}"
+              <a th:href="@{/courses/{courseId}/sections/{sectionId}(courseId=${course.courseId}, sectionId=${section.sectionId})}"
                  class="px-6 py-4 flex items-center gap-3 hover:bg-gray-100 transition">
                 <i class="fa-solid fa-play text-blue-500 text-xs"></i>
                 <span class="text-sm text-gray-700"
                       th:text="${section.title} + ' 학습하기'">강의명</span>
               </a>
             </div>
+
           </div>
         </div>
+
       </div>
 
       <!-- Reviews placeholder -->
@@ -272,23 +301,45 @@
           </div>
 
           <div class="space-y-3">
-            <!-- 바로 결제 -->
-            <form th:action="@{/payments/courses/direct/{courseId}(courseId=${course.courseId})}" method="post">
-              <button type="submit"
-                      class="w-full h-14 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg flex items-center justify-center gap-2 transition">
-                <i class="fa-regular fa-credit-card"></i>
-                <span>바로 결제</span>
-              </button>
-            </form>
 
-            <!-- 장바구니 담기 -->
-            <form th:action="@{/cart/add/{courseId}(courseId=${course.courseId})}" method="post">
-              <button type="submit"
-                      class="w-full h-14 rounded-2xl border border-gray-300 bg-white hover:bg-gray-50 text-gray-900 font-bold text-lg flex items-center justify-center gap-2 transition">
-                <i class="fa-solid fa-cart-shopping"></i>
-                <span>장바구니 담기</span>
+            <!-- 구매한 사용자: 수강하기 버튼만 표시 -->
+            <div th:if="${course.enrolled}">
+              <a th:if="${course.enrolled}"
+                 th:href="@{/my-courses}"
+                 class="w-full h-14 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg flex items-center justify-center gap-2 transition">
+                <i class="fa-solid fa-play"></i>
+                <span>수강 하기</span>
+              </a>
+
+
+              <button th:if="${course.sectionCount == 0}"
+                      type="button"
+                      disabled
+                      class="w-full h-14 rounded-2xl bg-gray-300 text-white font-bold text-lg flex items-center justify-center gap-2 cursor-not-allowed">
+                <i class="fa-solid fa-play"></i>
+                <span>등록된 강의가 없습니다</span>
               </button>
-            </form>
+            </div>
+
+            <!-- 구매하지 않은 사용자: 결제 / 장바구니 표시 -->
+            <div th:unless="${course.enrolled}" class="space-y-3">
+              <form th:action="@{/payments/courses/direct/{courseId}(courseId=${course.courseId})}" method="post">
+                <button type="submit"
+                        class="w-full h-14 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg flex items-center justify-center gap-2 transition">
+                  <i class="fa-regular fa-credit-card"></i>
+                  <span>바로 결제</span>
+                </button>
+              </form>
+
+              <form th:action="@{/cart/add/{courseId}(courseId=${course.courseId})}" method="post">
+                <button type="submit"
+                        class="w-full h-14 rounded-2xl border border-gray-300 bg-white hover:bg-gray-50 text-gray-900 font-bold text-lg flex items-center justify-center gap-2 transition">
+                  <i class="fa-solid fa-cart-shopping"></i>
+                  <span>장바구니 담기</span>
+                </button>
+              </form>
+            </div>
+
           </div>
 
           <div class="mt-6 pt-6 border-t border-gray-200 space-y-3">

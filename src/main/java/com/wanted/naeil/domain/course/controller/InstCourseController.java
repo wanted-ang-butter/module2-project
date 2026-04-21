@@ -17,6 +17,7 @@ import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -30,6 +31,7 @@ import java.util.List;
 @RequestMapping("/instructor")
 @RequiredArgsConstructor
 @Slf4j
+@PreAuthorize("hasAnyAuthority('ADMIN', 'INSTRUCTOR')")
 public class InstCourseController {
 
     private final CourseService courseService;
@@ -215,6 +217,7 @@ public class InstCourseController {
                                          @RequestParam(defaultValue = "lecture") String tab,
                                          ModelAndView mv,
                                          @AuthenticationPrincipal AuthDetails authDetails) {
+
         Long instructorId = authDetails.getLoginUserDTO().getUserId();
         mv.addObject("user", authDetails.getLoginUserDTO());
         mv.addObject("course", courseService.getInstructorCourseDetail(instructorId, courseId));

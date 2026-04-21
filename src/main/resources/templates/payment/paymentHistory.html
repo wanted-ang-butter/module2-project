@@ -433,6 +433,36 @@
 <div th:replace="fragments/userHeader :: userHeader"></div>
 
 <main class="page">
+    <div style="display:grid; grid-template-columns: 256px 1fr; gap: 32px; align-items: start;">
+
+    <!-- 사이드바 -->
+    <div style="background:white; border:2px solid #e5e7eb; border-radius:16px; padding:24px; position:sticky; top:96px;">
+        <h2 style="font-size:18px; font-weight:900; color:#111827; margin:0 0 20px;">설정</h2>
+        <nav style="display:flex; flex-direction:column; gap:6px;">
+            <a href="/my-courses"
+               style="display:flex; align-items:center; gap:12px; padding:12px 16px; border-radius:12px; color:#374151; font-weight:500; font-size:14px; text-decoration:none; transition:background .15s;"
+               onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='transparent'">
+                <i class="fa-solid fa-video" style="width:18px;"></i>내 강의
+            </a>
+            <a href="/user/me"
+               style="display:flex; align-items:center; gap:12px; padding:12px 16px; border-radius:12px; color:#374151; font-weight:500; font-size:14px; text-decoration:none;"
+               onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='transparent'">
+                <i class="fa-solid fa-gear" style="width:18px;"></i>계정 설정
+            </a>
+            <a href="/payment/history"
+               style="display:flex; align-items:center; gap:12px; padding:12px 16px; border-radius:12px; background:#eff6ff; color:#2563eb; font-weight:700; font-size:14px; text-decoration:none;">
+                <i class="fa-solid fa-user" style="width:18px;"></i>결제 내역
+            </a>
+            <a href="/user/me/instructor-application/history"
+               style="display:flex; align-items:center; gap:12px; padding:12px 16px; border-radius:12px; color:#374151; font-weight:500; font-size:14px; text-decoration:none;"
+               onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='transparent'">
+                <i class="fa-solid fa-chalkboard-user" style="width:18px;"></i>강사 신청
+            </a>
+        </nav>
+    </div>
+
+    <!-- 메인 콘텐츠 -->
+    <div>
     <div class="back-row">
         <button type="button" class="back-button" onclick="goBack()">← 이전으로 돌아가기</button>
     </div>
@@ -524,6 +554,9 @@
         <div class="empty-box" id="emptyBox">조회된 결제 내역이 없습니다.</div>
         <div class="pagination" id="pagination"></div>
     </section>
+
+    </div><!-- 메인 콘텐츠 끝 -->
+    </div><!-- grid 끝 -->
 </main>
 
 <script>

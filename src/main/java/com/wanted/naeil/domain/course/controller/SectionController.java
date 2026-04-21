@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +37,7 @@ public class SectionController {
                 userId, courseId, sectionId);
 
         mv.addObject("sectionStudy", response);
-        mv.setViewName("courses/sectionDetail");
+        mv.setViewName("course/sectionDetail");
 
         return mv;
     }
@@ -44,6 +45,7 @@ public class SectionController {
     // 섹션 수정 - 강사
     @PatchMapping(value = "/instructor/courses/{courseId}/sections/{sectionId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'INSTRUCTOR')")
     public ResponseEntity<Void> updateSection(
             @AuthenticationPrincipal AuthDetails authDetails,
             @PathVariable Long courseId,
@@ -62,6 +64,7 @@ public class SectionController {
     // 섹션 추가 - 강사
     @PostMapping("/instructor/courses/{courseId}/sections")
     @ResponseBody
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'INSTRUCTOR')")
     public ResponseEntity<Void> addSection(
             @AuthenticationPrincipal AuthDetails authDetails,
             @PathVariable Long courseId,
@@ -79,6 +82,7 @@ public class SectionController {
     // 섹션 삭제 - 강사
     @DeleteMapping("/instructor/courses/{courseId}/sections/{sectionId}")
     @ResponseBody
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'INSTRUCTOR')")
     public ResponseEntity<Void> deleteSection(
             @AuthenticationPrincipal AuthDetails authDetails,
             @PathVariable Long courseId,
@@ -93,4 +97,37 @@ public class SectionController {
 
         return ResponseEntity.ok().build();
     }
+
+    // 학습 중단
+    @PostMapping("/courses/{courseId}/sections/{sectionId}/stop")
+    public String stopLearning(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @PathVariable Long courseId,
+            @PathVariable Long sectionId
+    ) {
+        Long userId = authDetails.getLoginUserDTO().getUserId();
+
+        sectionService.stopLearning(userId, courseId, sectionId);
+
+        return "redirect:/my-courses";
+    }
+
+    // 학습 완료
+    @PostMapping("/courses/{courseId}/sections/{sectionId}/complete")
+    public String completeLearning(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @PathVariable Long courseId,
+            @PathVariable Long sectionId
+    ) {
+        Long userId = authDetails.getLoginUserDTO().getUserId();
+
+        Long nextSectionId = sectionService.completeLearning(userId, courseId, sectionId);
+
+        if (nextSectionId != null) {
+            return "redirect:/courses/" + courseId + "/sections/" + nextSectionId;
+        }
+
+        return "redirect:/my-courses";
+    }
+
 }

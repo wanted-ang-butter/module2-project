@@ -198,6 +198,11 @@ public class CourseService {
         // 섹션 리스트 조회
         List<SectionListResponse> sectionsResponses = sectionService.getSectionsByCourseId(courseId);
 
+        boolean enrolled = false;
+
+        if (loginUser != null) {
+            enrolled = enrollmentRepository.existsByUserIdAndCourseId(loginUser.getId(), courseId);
+        }
         // 좋아요 여부 확인
         boolean isLiked = false;
         Long likeId = null;
@@ -210,12 +215,13 @@ public class CourseService {
         }
         return CourseDetailsResponse.of(
                 course,
-                studentCount,
                 likeCount,
+                studentCount,
                 avgRating,
                 sectionsResponses,
                 isLiked,
-                likeId);
+                likeId,
+                enrolled);
     }
 
     // 코스 수정
