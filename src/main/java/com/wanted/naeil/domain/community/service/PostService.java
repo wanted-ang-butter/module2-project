@@ -21,9 +21,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,19 +36,58 @@ public class PostService {
 
     // 글 목록 조회
     @Transactional(readOnly = true)
-    public List<PostListResponse> getPostList(PostCategory category, String sortType) {
-        List<Post> posts = switch (sortType) {
-            case "oldest"  -> postRepository.findByCategoryAndIsPublicTrueOrderByCreatedAtAsc(category);
-            case "popular" -> postRepository.findByCategoryAndIsPublicTrueOrderByViewCountDesc(category);
-            default        -> postRepository.findByCategoryAndIsPublicTrueOrderByCreatedAtDesc(category);
-        };
+    public List<PostListResponse> getPostList(PostCategory category, String sortType, User loginUser) {
+
+        List<Post> posts;
+
+        // A. 관리자: 모든 글 조회
+        if (loginUser != null && loginUser.getRole() == Role.ADMIN) {
+            posts = switch (sortType) {
+                case "oldest"  -> postRepository.findByCategoryOrderByCreatedAtAsc(category);
+                case "popular" -> postRepository.findByCategoryOrderByViewCountDesc(category);
+                default        -> postRepository.findByCategoryOrderByCreatedAtDesc(category);
+            };
+        }
+        // B. 일반 유저 및 비로그인
+        else {
+            // 1. 공개글을 가져오기
+            posts = switch (sortType) {
+                case "oldest"  -> postRepository.findByCategoryAndIsPublicTrueOrderByCreatedAtAsc(category);
+                case "popular" -> postRepository.findByCategoryAndIsPublicTrueOrderByViewCountDesc(category);
+                default        -> postRepository.findByCategoryAndIsPublicTrueOrderByCreatedAtDesc(category);
+            };
+
+            // 2. 로그인 상태라면 '내가 쓴 글(비공개 포함)'을 가져와서 합침
+            if (loginUser != null) {
+                List<Post> myPosts = switch (sortType) {
+                    case "oldest"  -> postRepository.findByCategoryAndUserOrderByCreatedAtAsc(category, loginUser);
+                    case "popular" -> postRepository.findByCategoryAndUserOrderByViewCountDesc(category, loginUser);
+                    default        -> postRepository.findByCategoryAndUserOrderByCreatedAtDesc(category, loginUser);
+                };
+
+                // 중복 제거 및 병합
+                Set<Post> combinedSet = new LinkedHashSet<>(posts);
+                combinedSet.addAll(myPosts);
+
+                posts = new ArrayList<>(combinedSet);
+
+                // 리스트 정렬 유지
+                sortPosts(posts, sortType);
+            }
+        }
 
         return posts.stream()
-                .map(post -> {
-                    long likeCount = likeRepository.countByPost(post);
-                    return PostListResponse.from(post, likeCount);
-                })
+                .map(post -> PostListResponse.from(post, likeRepository.countByPost(post)))
                 .collect(Collectors.toList());
+    }
+
+    // 정렬 형식을 맞추기 위한 헬퍼 메서드
+    private void sortPosts(List<Post> posts, String sortType) {
+        switch (sortType) {
+            case "oldest"  -> posts.sort(Comparator.comparing(Post::getCreatedAt));
+            case "popular" -> posts.sort(Comparator.comparing(Post::getViewCount).reversed());
+            default        -> posts.sort(Comparator.comparing(Post::getCreatedAt).reversed());
+        }
     }
 
     // 글 상세 조회
@@ -97,7 +134,7 @@ public class PostService {
                 .category(request.getCategory())
                 .title(request.getTitle())
                 .content(request.getContent())
-                .isPublic(request.getIsPublic() == null || request.getIsPublic())
+                .isPublic(request.getIsPublic() != null && request.getIsPublic())
                 .build();
 
         postRepository.save(post);
@@ -111,8 +148,8 @@ public class PostService {
 
         validateOwner(post, loginUser);
 
-        post.update(request.getTitle(), request.getContent(),
-                request.getIsPublic() != null ? request.getIsPublic() : post.isPublic());
+        boolean isPublicParam = (request.getIsPublic() != null && request.getIsPublic());
+        post.update(request.getTitle(), request.getContent(), isPublicParam);
     }
 
     // 글 삭제

@@ -49,12 +49,13 @@ public class PostController {
 
         log.info("[게시글 목록] 조회 시작. category: {}, sortType: {}", category, sortType);
 
+        User loginUser = getLoginUser(authDetails);
         if (authDetails != null) {
             mv.addObject("user", authDetails.getLoginUserDTO());
         }
 
         PostCategory postCategory = PostCategory.valueOf(category.toUpperCase());
-        List<PostListResponse> posts = postService.getPostList(postCategory, sortType);
+        List<PostListResponse> posts = postService.getPostList(postCategory, sortType, loginUser);
 
         mv.addObject("posts", posts);
         mv.addObject("sortType", sortType);
@@ -93,6 +94,7 @@ public class PostController {
         mv.addObject("category", category);
         mv.addObject("isOwner", isOwner);
         mv.addObject("isAdmin", isAdmin);
+        mv.addObject("user", authDetails != null ? authDetails.getLoginUserDTO() : null);
         mv.addObject("loginUser", loginUser);
 
         PostCategory postCategory = PostCategory.valueOf(category.toUpperCase());

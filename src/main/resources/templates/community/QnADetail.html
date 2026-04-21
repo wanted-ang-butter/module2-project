@@ -97,7 +97,14 @@
           </span>
         </div>
 
-        <h1 class="text-3xl font-black text-gray-900 mb-6" th:text="${post.title}">제목</h1>
+        <h1 class="text-3xl font-black text-gray-900 mb-6 flex items-center gap-3">
+          <span th:text="${post.title}">제목</span>
+          <span th:if="${!post.isPublic}"
+                class="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-100 text-gray-500 rounded-lg text-sm font-bold border border-gray-200">
+    <i class="fa-solid fa-lock text-xs"></i>
+    비공개
+  </span>
+        </h1>
 
         <div class="flex items-center gap-3 mb-6">
           <span th:class="${post.isResolved} ? 'px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-700' : 'px-3 py-1 rounded-full text-sm font-bold bg-gray-100 text-gray-600'"

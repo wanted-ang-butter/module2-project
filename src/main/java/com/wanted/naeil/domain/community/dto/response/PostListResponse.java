@@ -18,6 +18,7 @@ public class PostListResponse {
     private long likeCount;
     private String courseTitle;
     private boolean isResolved;
+    public boolean isPublic;
 
     public static PostListResponse from(Post post, long likeCount) {
         return PostListResponse.builder()
@@ -29,6 +30,7 @@ public class PostListResponse {
                 .likeCount(likeCount)
                 .courseTitle(post.getCourse() != null ? post.getCourse().getTitle() : null)
                 .isResolved(post.isResolved())
+                .isPublic(post.isPublic())
                 .build();
     }
 }
