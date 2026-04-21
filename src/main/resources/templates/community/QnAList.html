@@ -77,8 +77,11 @@
                       class="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full text-xs font-bold border border-blue-200"
                       th:text="${post.courseTitle}">강의명</span>
 
-                <h3 class="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors"
-                    th:text="${post.title}">제목</h3>
+                <div class="flex items-center gap-2">
+                  <h3 class="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors"
+                      th:text="${post.title}">제목</h3>
+                  <i th:if="${!post.isPublic}" class="fa-solid fa-lock text-gray-400 text-sm"></i>
+                </div>
 
                 <span th:if="${post.isResolved}"
                       class="px-2 py-0.5 bg-green-100 text-green-700 rounded text-[11px] font-bold border border-green-200">해결됨</span>
