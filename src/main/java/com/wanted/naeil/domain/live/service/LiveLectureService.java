@@ -1,11 +1,11 @@
 package com.wanted.naeil.domain.live.service;
 
 import com.wanted.naeil.domain.admin.entity.AdminApproval;
+import com.wanted.naeil.domain.admin.entity.BlacklistHistory;
 import com.wanted.naeil.domain.admin.repository.AdminApprovalRepository;
+import com.wanted.naeil.domain.admin.repository.BlacklistRepository;
 import com.wanted.naeil.domain.live.dto.request.CreateLiveLectureRequest;
-import com.wanted.naeil.domain.live.dto.response.InstructorLiveDetailResponse;
-import com.wanted.naeil.domain.live.dto.response.InstructorLiveLectureResponse;
-import com.wanted.naeil.domain.live.dto.response.LiveLectureListResponse;
+import com.wanted.naeil.domain.live.dto.response.*;
 import com.wanted.naeil.domain.live.entity.LiveLecture;
 import com.wanted.naeil.domain.live.entity.LiveReservation;
 import com.wanted.naeil.domain.live.entity.enums.LiveLectureStatus;
@@ -23,10 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +32,7 @@ public class LiveLectureService {
 
     private final LiveLectureRepository liveLectureRepository;
     private final LiveReservationRepository liveReservationRepository;
+    private final BlacklistRepository bblacklistRepository;
     private final UserRepository userRepository;
     private final AdminApprovalRepository adminApprovalRepository;
 
@@ -238,15 +236,17 @@ public class LiveLectureService {
             throw new AccessDeniedException("강의를 예약하려면 로그인을 해주세요.");
         }
 
-        boolean alreadyReserved = liveReservationRepository.existsByUser_IdAndLiveLecture_IdAndStatus(
-                userId,
-                liveId,
-                LiveReservationStatus.RESERVED
-        );
+        boolean alreadyReserved = liveReservationRepository
+                .findByUserIdAndLiveLectureIdAndStatus(
+                        userId, liveId, LiveReservationStatus.RESERVED)
+                .isPresent();
 
         if (alreadyReserved) {
             throw new IllegalStateException("이미 예약하신 강의입니다.");
         }
+
+        // 10초 검증 로직
+        validateReReservationDelay(userId, liveId);
 
         // 예약 시간 검증
         validateLiveLectureReservable(liveLecture);
@@ -263,8 +263,141 @@ public class LiveLectureService {
         log.info("[LiveLectureReserve] 실시간 강의 예약 완료 - userId: {}, liveId: {}", userId, liveId);
     }
 
+    // 실시간 강의 취소 기능 - 유저
+    @Transactional
+    public void cancelLiveLectureReservation(Long userId, Long liveId) {
+
+        log.info("[LiveLectureCancel] 실시간 강의 예약 취소 시작 - userId: {}, liveId: {}", userId, liveId);
+
+        // 내 예약 조회
+        LiveReservation reservation = liveReservationRepository
+                .findByUserIdAndLiveLectureIdAndStatus(userId, liveId, LiveReservationStatus.RESERVED)
+                .orElseThrow(() -> new IllegalArgumentException("예약된 실시간 강의를 찾을 수 없습니다."));
+
+        User user = reservation.getUser();
+        LiveLecture liveLecture = reservation.getLiveLecture();
+
+        LocalDateTime createdAt = reservation.getCreatedAt();
+
+        // null 처리
+        if (createdAt == null) {
+            throw new IllegalStateException("예약 생성 시간이 없어 취소할 수 없습니다.");
+        }
+
+        // 테스트를 위해, 10초 뒤 취소 가능! 원래는 30분입니다!
+        LocalDateTime cancelAvailableAt = createdAt.plusSeconds(10);
+        LocalDateTime now = LocalDateTime.now();
+
+        if (now.isBefore(cancelAvailableAt)) {
+            throw new IllegalStateException("예약 후 10초가 지나야 취소할 수 있습니다.");
+        }
+
+        long cancelCount =
+                liveReservationRepository.countByUserIdAndLiveLectureIdAndStatus(
+                        userId, liveId, LiveReservationStatus.CANCELED
+                ) + 1;
+
+        reservation.cancel();
+        // 인원 감소
+        liveLecture.decrementReservation();
+        // user 테이블 경고 올리기
+        user.increaseWarningCount();
+
+        if (cancelCount >= 3) {
+            user.ban();
+
+            BlacklistHistory history = BlacklistHistory.builder()
+                    .user(user)
+                    .admin(null)
+                    .reason("같은 실시간 강의 예약을 3회 취소하여 자동 블랙리스트 등록")
+                    .build();
+
+            bblacklistRepository.save(history);
+        }
+
+        log.info("[LiveLectureCancel] 실시간 강의 예약 취소 완료 - userId: {}, liveId: {}, cancelCount: {}",
+                userId, liveId, cancelCount);
+    }
+
+    // 실시간 강의 조회 - 강사
+    @Transactional(readOnly = true)
+    public List<InstructorLiveReservationResponse> getInstructorLiveReservations(
+            Long loginUserId, Long liveId) {
+
+        log.info("[LiveReservationList] 실시간 강의 예약자 목록 조회 Service 시작 - instructorId: {}, liveId: {}",
+                loginUserId, liveId);
+
+        User loginUser = userRepository.findById(loginUserId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자 정보를 찾을 수 없습니다. ID: " + loginUserId));
+
+        LiveLecture liveLecture = liveLectureRepository.findById(liveId)
+                .orElseThrow(() -> new IllegalArgumentException("실시간 강의를 찾을 수 없습니다. ID: " + liveId));
+
+        validateLiveLectureReservationReadable(loginUser, liveLecture);
+
+        return liveReservationRepository
+                .findByLiveLectureIdAndStatusWithUserOrderByCreatedAtDesc(
+                        liveId, LiveReservationStatus.RESERVED).stream()
+                .map(InstructorLiveReservationResponse::of)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public UserLiveLectureRoomResponse getUserLiveLectureRoom(Long userId, Long liveId) {
+        log.info("[LiveLectureRoom] 실시간 강의 입장 상세 조회 시작 - userId: {}, liveId: {}", userId, liveId);
+
+        LiveReservation reservation = liveReservationRepository
+                .findReservedLiveRoomByUserIdAndLiveId(
+                        userId,
+                        liveId,
+                        LiveReservationStatus.RESERVED
+                )
+                .orElseThrow(() -> new AccessDeniedException("예약한 실시간 강의만 입장할 수 있습니다."));
+
+        LiveLecture liveLecture = reservation.getLiveLecture();
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startAt = liveLecture.getStartAt();
+        LocalDateTime endAt = liveLecture.getEndAt();
+
+        if (startAt == null || endAt == null) {
+            throw new IllegalStateException("실시간 강의 시간이 등록되지 않았습니다.");
+        }
+
+        if (now.isBefore(startAt)) {
+            throw new IllegalStateException("아직 실시간 강의가 시작되지 않았습니다.");
+        }
+
+        if (!now.isBefore(endAt)) {
+            throw new IllegalStateException("이미 종료된 실시간 강의입니다.");
+        }
+
+        LiveLectureStatus status = liveLecture.getStatus();
+
+        if (status != LiveLectureStatus.APPROVED && status != LiveLectureStatus.IN_PROGRESS) {
+            throw new IllegalStateException("입장 가능한 실시간 강의 상태가 아닙니다.");
+        }
+
+        log.info("[LiveLectureRoom] 실시간 강의 입장 상세 조회 완료 - userId: {}, liveId: {}", userId, liveId);
+
+        return UserLiveLectureRoomResponse.of(liveLecture, true);
+    }
+
 
     // ====== 내부 편의 메서드 =======
+
+    // 관리자, 강사 권한 체크
+    private void validateLiveLectureReservationReadable(User loginUser, LiveLecture liveLecture) {
+        if (loginUser.getRole() == Role.ADMIN) {
+            return;
+        }
+        if (loginUser.getRole() == Role.INSTRUCTOR
+                && liveLecture.getInstructor().getId().equals(loginUser.getId())) {
+            return;
+        }
+        throw new AccessDeniedException("해당 실시간 강의 예약자 목록을 조회할 권한이 없습니다.");
+    }
+
 
     // 강의 예약 변환 메서드
     private LiveLectureListResponse toLiveLectureListResponse(
@@ -300,6 +433,40 @@ public class LiveLectureService {
         );
     }
 
+    // 재예약시 방어시간 검증 로직
+    private void validateReReservationDelay(Long userId, Long liveId) {
+        // 취소가 있다면, 취소 중 최근 1건 가져오기
+        Optional<LiveReservation> lastCanceledReservation =
+                liveReservationRepository.findTopByUserIdAndLiveLectureIdAndStatusOrderByUpdatedAtDesc(
+                        userId,
+                        liveId,
+                        LiveReservationStatus.CANCELED
+                );
+
+        if (lastCanceledReservation.isEmpty()) {
+            return;
+        }
+
+        LiveReservation canceledReservation = lastCanceledReservation.get();
+
+        // 가장 최근 업데이트 시간 가져오기
+        LocalDateTime canceledAt = canceledReservation.getUpdatedAt();
+
+        if (canceledAt == null) {
+            canceledAt = canceledReservation.getCreatedAt();
+        }
+
+        if (canceledAt == null) {
+            return;
+        }
+
+        LocalDateTime reReservationAvailableAt = canceledAt.plusSeconds(10);
+        LocalDateTime now = LocalDateTime.now();
+
+        if (now.isBefore(reReservationAvailableAt)) {
+            throw new IllegalStateException("예약 취소 후 10초가 지나야 다시 신청할 수 있습니다.");
+        }
+    }
 
     // 실시간 강의 등록 시간값 검증
     private void validateLiveLectureTime(CreateLiveLectureRequest request) {

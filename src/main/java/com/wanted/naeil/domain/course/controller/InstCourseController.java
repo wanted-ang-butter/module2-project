@@ -212,12 +212,16 @@ public class InstCourseController {
     // 강사 강의 상세 조회
     @GetMapping("/course/{courseId}/detail")
     public ModelAndView courseDetailPage(@PathVariable Long courseId,
+                                         @RequestParam(defaultValue = "lecture") String tab,
                                          ModelAndView mv,
                                          @AuthenticationPrincipal AuthDetails authDetails) {
         Long instructorId = authDetails.getLoginUserDTO().getUserId();
         mv.addObject("user", authDetails.getLoginUserDTO());
         mv.addObject("course", courseService.getInstructorCourseDetail(instructorId, courseId));
+        mv.addObject("students", courseService.getInstructorCourseStudents(instructorId, courseId));
+        mv.addObject("activeTab", "student".equals(tab) ? "student" : "lecture");
         mv.setViewName("course/InstructorCourseDetail");
+
         return mv;
     }
 

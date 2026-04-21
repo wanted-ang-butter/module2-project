@@ -2,6 +2,7 @@ package com.wanted.naeil.domain.live.controller;
 
 import com.wanted.naeil.domain.live.dto.request.CreateLiveLectureRequest;
 import com.wanted.naeil.domain.live.dto.response.InstructorLiveDetailResponse;
+import com.wanted.naeil.domain.live.dto.response.InstructorLiveReservationResponse;
 import com.wanted.naeil.domain.live.service.LiveLectureService;
 import com.wanted.naeil.domain.user.entity.enums.Role;
 import com.wanted.naeil.global.auth.model.dto.AuthDetails;
@@ -229,5 +230,27 @@ public class InstLiveController {
             log.warn("[LiveLectureDelete] 삭제 불가 상태 - liveId: {}, message: {}", liveId, e.getMessage());
             return ResponseEntity.status(409).body(e.getMessage());
         }
+    }
+
+    // 실시간 강의 신청자 조회
+    @GetMapping("/live-lecture/{liveId}/reservations")
+    @ResponseBody
+    public ResponseEntity<List<InstructorLiveReservationResponse>> getLiveLectureReservations(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @PathVariable Long liveId
+    ) {
+        if (authDetails == null) {
+            throw new AccessDeniedException("로그인 후 예약자 목록을 조회할 수 있습니다.");
+        }
+
+        Long instructorId = authDetails.getLoginUserDTO().getUserId();
+
+        log.info("[LiveReservationList] 실시간 강의 예약자 목록 조회 요청 - instructorId: {}, liveId: {}",
+                instructorId, liveId);
+
+        List<InstructorLiveReservationResponse> reservations =
+                liveLectureService.getInstructorLiveReservations(instructorId, liveId);
+
+        return ResponseEntity.ok(reservations);
     }
 }

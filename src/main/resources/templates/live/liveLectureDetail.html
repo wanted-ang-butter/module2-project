@@ -3,389 +3,415 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>실시간 강의 상세 | Nae-Il</title>
+    <title>실시간 강의 | Nae-Il</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
     <style>
-        body {
-            background-color: #f8fafc;
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
-        .tab-panel {
+        .modal-overlay {
             display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .5);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
         }
 
-        .tab-panel.active {
-            display: block;
+        .modal-overlay.open {
+            display: flex;
         }
     </style>
 </head>
 
-<body>
-<div th:replace="~{fragments/instructorHeader :: instructorHeader}"></div>
+<body class="bg-white text-gray-900">
 
-<div class="max-w-6xl mx-auto px-6 py-12">
+<div th:replace="~{fragments/userHeader :: userHeader}"></div>
 
-    <a th:href="@{/instructor/course-management}"
-       href="/instructor/course-management"
-       class="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors mb-6">
-        <i class="fa-solid fa-arrow-left text-sm"></i>
-        <span class="text-sm font-bold">이전으로</span>
-    </a>
+<div class="max-w-7xl mx-auto px-6 py-12">
 
     <div class="mb-8">
-        <div class="flex items-start justify-between gap-6 mb-4">
-            <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-3 mb-3">
-                    <span th:if="${liveCourse.status != null and liveCourse.status.name() == 'PENDING'}"
-                          class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-bold">
-                        승인 대기
-                    </span>
+        <a th:href="@{/dashboard}"
+           href="/dashboard"
+           class="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors">
+            <i class="fa-solid fa-chevron-left text-xs"></i>
+            <span class="text-sm font-medium">이전으로</span>
+        </a>
+    </div>
 
-                    <span th:if="${liveCourse.status != null and liveCourse.status.name() == 'APPROVED'}"
-                          class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-bold">
-                        승인 완료
-                    </span>
+    <header class="mb-12">
+        <h1 class="text-4xl font-black text-gray-900 mb-3">실시간 강의</h1>
+        <p class="text-lg text-gray-600 font-medium">강사와 함께하는 라이브 세션</p>
+    </header>
 
-                    <span th:if="${liveCourse.status != null and liveCourse.status.name() == 'REJECTED'}"
-                          class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-bold">
-                        반려됨
-                    </span>
-
-                    <span th:if="${liveCourse.status != null and liveCourse.status.name() == 'IN_PROGRESS'}"
-                          class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-bold">
-                        방송 중
-                    </span>
-
-                    <span th:if="${liveCourse.status != null and liveCourse.status.name() == 'ENDED'}"
-                          class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-bold">
-                        종료됨
-                    </span>
-
-                    <span th:if="${liveCourse.status != null and liveCourse.status.name() == 'CANCELLED'}"
-                          class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-bold">
-                        요청 취소
-                    </span>
-
-                    <span th:if="${liveCourse.status == null}"
-                          class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-bold">
-                        상태 없음
-                    </span>
-                </div>
-
-                <h1 class="text-4xl font-black text-gray-900 mb-3 truncate"
-                    th:text="${liveCourse.title}">
-                    실시간 강의명
-                </h1>
-
-                <p class="text-gray-500 font-medium">
-                    실시간 강의 정보와 예약생 현황을 확인할 수 있습니다.
+    <section class="mb-14 rounded-2xl bg-gradient-to-br from-blue-500 via-teal-500 to-green-500 p-10 text-white shadow-sm">
+        <div class="flex items-center justify-between gap-8">
+            <div>
+                <h2 class="text-3xl font-black mb-4">실시간 강의 예약</h2>
+                <p class="text-white/90 text-lg mb-6">
+                    강사와 직접 소통하며 학습할 수 있는 라이브 세션입니다.
                 </p>
+
+                <ul class="space-y-3 text-sm text-white/95 font-medium">
+                    <li class="flex items-center gap-3">
+                        <span class="w-1.5 h-1.5 bg-white rounded-full inline-block"></span>
+                        실시간 Q&amp;A 및 코드 리뷰
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <span class="w-1.5 h-1.5 bg-white rounded-full inline-block"></span>
+                        소규모 그룹으로 진행
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <span class="w-1.5 h-1.5 bg-white rounded-full inline-block"></span>
+                        녹화 영상 제공
+                    </li>
+                </ul>
             </div>
 
-            <a th:if="${liveCourse.status != null and liveCourse.status.name() == 'PENDING'}"
-               th:href="@{/instructor/live-lecture/{id}/edit(id=${liveCourse.liveId})}"
-               href="/instructor/live-lecture/1/edit"
-               class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-xl hover:shadow-xl transition-all font-bold">
-                <i class="fa-solid fa-pen text-sm"></i>
-                수정하기
-            </a>
-        </div>
-    </div>
-
-    <div class="mb-8">
-        <div class="flex gap-2 border-b-2 border-gray-200">
-            <button type="button"
-                    onclick="switchTab('info')"
-                    id="tab-btn-info"
-                    class="px-6 py-3 font-bold transition-all text-blue-600 border-b-2 border-blue-600 -mb-[2px]">
-                강의 조회
-            </button>
-
-            <button type="button"
-                    onclick="switchTab('reservations')"
-                    id="tab-btn-reservations"
-                    class="px-6 py-3 font-bold transition-all text-gray-600 hover:text-gray-900">
-                예약생 조회
-            </button>
-        </div>
-    </div>
-
-    <div id="tab-info" class="tab-panel active">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-            <div class="lg:col-span-2 space-y-6">
-                <div class="bg-white border-2 border-gray-200 rounded-2xl p-8 shadow-sm">
-                    <h2 class="text-2xl font-black text-gray-900 mb-6">강의 정보</h2>
-
-                    <div class="space-y-7">
-                        <div>
-                            <h3 class="text-sm font-bold text-gray-600 mb-2">강의 제목</h3>
-                            <p class="text-base text-gray-900 font-bold"
-                               th:text="${liveCourse.title}">
-                                실시간 강의 제목
-                            </p>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <h3 class="text-sm font-bold text-gray-600 mb-2">강의 시작 일시</h3>
-                                <p class="text-base text-gray-900 font-bold"
-                                   th:text="${liveCourse.startAt != null ? #temporals.format(liveCourse.startAt, 'yyyy-MM-dd HH:mm') : '-'}">
-                                    2026-04-20 19:00
-                                </p>
-                            </div>
-
-                            <div>
-                                <h3 class="text-sm font-bold text-gray-600 mb-2">강의 종료 일시</h3>
-                                <p class="text-base text-gray-900 font-bold"
-                                   th:text="${liveCourse.endAt != null ? #temporals.format(liveCourse.endAt, 'yyyy-MM-dd HH:mm') : '-'}">
-                                    2026-04-20 21:00
-                                </p>
-                            </div>
-                        </div>
-
-                        <div>
-                            <h3 class="text-sm font-bold text-gray-600 mb-2">예약 시작 일시</h3>
-                            <p class="text-base text-gray-900 font-bold"
-                               th:text="${liveCourse.reservationStartAt != null ? #temporals.format(liveCourse.reservationStartAt, 'yyyy-MM-dd HH:mm') : '-'}">
-                                2026-04-18 09:00
-                            </p>
-                        </div>
-
-                        <div>
-                            <h3 class="text-sm font-bold text-gray-600 mb-2">강의 상태</h3>
-
-                            <span th:if="${liveCourse.status != null and liveCourse.status.name() == 'PENDING'}"
-                                  class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-bold">
-                                승인 대기
-                            </span>
-
-                            <span th:if="${liveCourse.status != null and liveCourse.status.name() == 'APPROVED'}"
-                                  class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-bold">
-                                승인 완료
-                            </span>
-
-                            <span th:if="${liveCourse.status != null and liveCourse.status.name() == 'REJECTED'}"
-                                  class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-bold">
-                                반려됨
-                            </span>
-
-                            <span th:if="${liveCourse.status != null and liveCourse.status.name() == 'IN_PROGRESS'}"
-                                  class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-bold">
-                                방송 중
-                            </span>
-
-                            <span th:if="${liveCourse.status != null and liveCourse.status.name() == 'ENDED'}"
-                                  class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-bold">
-                                종료됨
-                            </span>
-
-                            <span th:if="${liveCourse.status != null and liveCourse.status.name() == 'CANCELLED'}"
-                                  class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-bold">
-                                요청 취소
-                            </span>
-
-                            <span th:if="${liveCourse.status == null}"
-                                  class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-bold">
-                                상태 없음
-                            </span>
-                        </div>
-
-                        <div>
-                            <h3 class="text-sm font-bold text-gray-600 mb-2">강의 내용</h3>
-                            <p class="text-base text-gray-700 leading-relaxed font-medium whitespace-pre-line"
-                               th:text="${liveCourse.description}">
-                                실시간 강의 설명
-                            </p>
-                        </div>
-
-                        <div>
-                            <h3 class="text-sm font-bold text-gray-600 mb-2">방송 URL</h3>
-                            <a th:if="${liveCourse.streamingUrl != null and !#strings.isEmpty(liveCourse.streamingUrl)}"
-                               th:href="${liveCourse.streamingUrl}"
-                               th:text="${liveCourse.streamingUrl}"
-                               target="_blank"
-                               rel="noopener noreferrer"
-                               class="text-base text-blue-600 hover:text-blue-700 font-bold break-all">
-                                https://...
-                            </a>
-
-                            <p th:if="${liveCourse.streamingUrl == null or #strings.isEmpty(liveCourse.streamingUrl)}"
-                               class="text-base text-gray-400 font-bold">
-                                등록된 방송 URL이 없습니다
-                            </p>
-                        </div>
-
-                        <div>
-                            <h3 class="text-sm font-bold text-gray-600 mb-2">생성일</h3>
-                            <p class="text-base text-gray-900 font-medium"
-                               th:text="${liveCourse.createdAt != null ? #temporals.format(liveCourse.createdAt, 'yyyy-MM-dd') : '-'}">
-                                2026-04-01
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="lg:col-span-1">
-                <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 shadow-sm sticky top-24">
-                    <h2 class="text-xl font-black text-gray-900 mb-6">강의 상세</h2>
-
-                    <div class="space-y-4">
-                        <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
-                            <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                                <i class="fa-solid fa-calendar-check text-blue-600"></i>
-                            </div>
-
-                            <div class="flex-1 min-w-0">
-                                <p class="text-xs font-bold text-gray-600 mb-1">예약 일시</p>
-                                <p class="text-sm font-black text-gray-900"
-                                   th:text="${liveCourse.reservationStartAt != null ? #temporals.format(liveCourse.reservationStartAt, 'yyyy-MM-dd HH:mm') : '-'}">
-                                    2026-04-18 09:00
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
-                            <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                                <i class="fa-solid fa-users text-green-600"></i>
-                            </div>
-
-                            <div class="flex-1 min-w-0">
-                                <p class="text-xs font-bold text-gray-600 mb-1">예약 현황</p>
-
-                                <p class="text-sm font-black text-gray-900">
-                                    <span th:text="${liveCourse.currentCount}">0</span>/<span th:text="${liveCourse.maxCapacity}">0</span>명
-                                </p>
-
-                                <div class="mt-2 w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                                    <div class="bg-gradient-to-r from-green-500 to-green-600 h-2 rounded-full transition-all"
-                                         th:style="${liveCourse.maxCapacity > 0 ? 'width:' + (liveCourse.currentCount * 100 / liveCourse.maxCapacity) + '%' : 'width:0%'}">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
-                            <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                                <i class="fa-solid fa-clock text-purple-600"></i>
-                            </div>
-
-                            <div class="flex-1 min-w-0">
-                                <p class="text-xs font-bold text-gray-600 mb-1">정원</p>
-                                <p class="text-sm font-black text-gray-900">
-                                    <span th:text="${liveCourse.maxCapacity}">0</span>명
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
-                            <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                                <i class="fa-solid fa-video text-orange-600"></i>
-                            </div>
-
-                            <div class="flex-1 min-w-0">
-                                <p class="text-xs font-bold text-gray-600 mb-1">강의 시작</p>
-                                <p class="text-sm font-black text-gray-900"
-                                   th:text="${liveCourse.startAt != null ? #temporals.format(liveCourse.startAt, 'yyyy-MM-dd HH:mm') : '-'}">
-                                    2026-04-20 19:00
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="hidden lg:flex h-28 w-28 items-center justify-center rounded-3xl bg-white/20">
+                <i class="fa-solid fa-video text-5xl text-white"></i>
             </div>
         </div>
-    </div>
+    </section>
 
-    <div id="tab-reservations" class="tab-panel">
-        <div class="bg-white border-2 border-gray-200 rounded-2xl p-8 shadow-sm">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-2xl font-black text-gray-900">
-                    예약생 목록
-                    <span class="text-blue-600">
-                        (<span th:text="${reservations != null ? #lists.size(reservations) : 0}">0</span>명)
+    <section th:if="${sessions != null and not #lists.isEmpty(sessions)}"
+             class="grid grid-cols-1 lg:grid-cols-2 gap-7">
+
+        <article th:each="liveLecture : ${sessions}"
+                 class="live-lecture-card overflow-hidden rounded-2xl border border-gray-200 bg-white transition-all hover:border-blue-300 hover:shadow-xl"
+                 th:data-live-id="${liveLecture.liveId}"
+                 th:data-title="${liveLecture.title}"
+                 th:data-start-at="${liveLecture.startAt}"
+                 th:data-end-at="${liveLecture.endAt}"
+                 th:data-my-reserved="${liveLecture.myReserved}"
+                 th:data-reservable="${liveLecture.reservable}"
+                 th:data-full="${liveLecture.full}">
+
+            <div class="p-7">
+                <div class="mb-5 flex items-center gap-2">
+                    <span class="live-badge hidden inline-flex items-center gap-1.5 rounded-full bg-red-500 px-3 py-1.5 text-xs font-black text-white">
+                        <span class="h-2 w-2 rounded-full bg-white animate-pulse"></span>
+                        LIVE
                     </span>
+
+                    <span th:if="${liveLecture.closingSoon}"
+                          class="inline-flex items-center rounded-full bg-yellow-500 px-3 py-1.5 text-xs font-black text-white">
+                        마감임박
+                    </span>
+                </div>
+
+                <h2 class="mb-5 line-clamp-2 text-2xl font-black text-gray-900 transition-colors hover:text-blue-600"
+                    th:text="${liveLecture.title}">
+                    실시간 강의명
                 </h2>
+
+                <div class="mb-7 flex items-center gap-3">
+                    <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-indigo-500 text-white">
+                        <i class="fa-solid fa-code text-xs"></i>
+                    </div>
+
+                    <span class="text-sm font-bold text-gray-600"
+                          th:text="${liveLecture.instructorName}">
+                        강사명
+                    </span>
+                </div>
             </div>
 
-            <div th:if="${reservations != null and not #lists.isEmpty(reservations)}" class="space-y-3">
-                <div th:each="reservation : ${reservations}"
-                     class="bg-gray-50 border-2 border-gray-200 rounded-xl p-5">
-                    <div class="flex items-center justify-between">
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-3 mb-2">
-                                <h3 class="text-lg font-black text-gray-900"
-                                    th:text="${reservation.name}">
-                                    예약자 이름
-                                </h3>
+            <div class="border-t border-gray-100 px-7 py-6">
+                <div class="mb-5 space-y-4">
+                    <div class="flex items-center gap-3 text-sm text-gray-700">
+                        <i class="fa-regular fa-calendar text-blue-600"></i>
+                        <span class="font-black">강의 날짜:</span>
+                        <span class="font-mono"
+                              th:text="${liveLecture.startAt != null ? #temporals.format(liveLecture.startAt, 'yyyy-MM-dd') : '-'}">
+                            2026-04-21
+                        </span>
+                    </div>
 
-                                <span th:if="${reservation.status != null and reservation.status.name() == 'RESERVED'}"
-                                      class="px-2.5 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">
-                                    예약 완료
-                                </span>
+                    <div class="flex items-center gap-3 text-sm text-gray-700">
+                        <i class="fa-regular fa-clock text-blue-600"></i>
+                        <span class="font-black">강의 시간:</span>
+                        <span class="font-mono">
+                            <span th:text="${liveLecture.startAt != null ? #temporals.format(liveLecture.startAt, 'HH:mm') : '-'}">19:00</span>
+                            <span> - </span>
+                            <span th:text="${liveLecture.endAt != null ? #temporals.format(liveLecture.endAt, 'HH:mm') : '-'}">21:00</span>
+                        </span>
+                    </div>
 
-                                <span th:if="${reservation.status != null and reservation.status.name() == 'CANCELED'}"
-                                      class="px-2.5 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold">
-                                    취소됨
-                                </span>
+                    <div class="flex items-center gap-3 text-sm text-gray-700">
+                        <i class="fa-regular fa-bell text-blue-600"></i>
+                        <span class="font-black">예약 시작:</span>
+                        <span class="font-mono"
+                              th:text="${liveLecture.reservationStartAt != null ? #temporals.format(liveLecture.reservationStartAt, 'yyyy-MM-dd HH:mm') : '-'}">
+                            2026-04-20 10:00
+                        </span>
+                    </div>
 
-                                <span th:if="${reservation.status == null}"
-                                      class="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-bold">
-                                    상태 없음
+                    <div>
+                        <div class="mb-2 flex items-center justify-between text-sm">
+                            <div class="flex items-center gap-3 text-gray-700">
+                                <i class="fa-solid fa-users text-blue-600"></i>
+                                <span class="font-mono">
+                                    <span th:text="${liveLecture.currentCount}">0</span>/<span th:text="${liveLecture.maxCapacity}">0</span>
+                                    명 예약
                                 </span>
                             </div>
 
-                            <div class="flex flex-wrap items-center gap-4 text-sm">
-                                <div class="flex items-center gap-2">
-                                    <i class="fa-solid fa-envelope text-gray-500 text-xs"></i>
-                                    <span class="text-gray-600 font-medium"
-                                          th:text="${reservation.email}">
-                                        user@example.com
-                                    </span>
-                                </div>
+                            <span th:class="${liveLecture.closingSoon} ? 'text-xs font-mono font-black text-red-600' : 'text-xs font-mono font-bold text-gray-500'"
+                                  th:text="${liveLecture.reservationRate + '%'}">
+                                27%
+                            </span>
+                        </div>
 
-                                <div class="flex items-center gap-2">
-                                    <i class="fa-solid fa-calendar text-gray-500 text-xs"></i>
-                                    <span class="text-gray-600 font-medium">
-                                        예약일:
-                                        <span th:text="${reservation.reservedAt != null ? #temporals.format(reservation.reservedAt, 'yyyy-MM-dd HH:mm') : '-'}">
-                                            2026-04-18 10:00
-                                        </span>
-                                    </span>
-                                </div>
+                        <div class="h-2.5 overflow-hidden rounded-full bg-gray-100">
+                            <div th:class="${liveLecture.closingSoon} ? 'h-full rounded-full bg-red-500' : (${liveLecture.reservationRate >= 50} ? 'h-full rounded-full bg-green-500' : 'h-full rounded-full bg-yellow-400')"
+                                 th:style="'width:' + ${liveLecture.reservationRate} + '%'">
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div th:if="${reservations == null or #lists.isEmpty(reservations)}" class="text-center py-16">
-                <i class="fa-solid fa-users text-gray-300 text-5xl mb-4 block"></i>
-                <p class="text-gray-500 font-bold">예약한 수강생이 없습니다</p>
+                <div class="space-y-3">
+                    <a th:href="@{/live-lecture/{id}/room(id=${liveLecture.liveId})}"
+                       href="/live-lecture/1/room"
+                       class="live-enter-action hidden flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-green-600 py-4 text-center font-black text-white transition-all hover:shadow-lg">
+                        <i class="fa-solid fa-video text-sm"></i>
+                        입장하기
+                    </a>
+
+                    <button type="button"
+                            th:data-id="${liveLecture.liveId}"
+                            th:data-title="${liveLecture.title}"
+                            onclick="handleCancelReservation(this)"
+                            class="live-cancel-action hidden w-full rounded-lg border-2 border-red-300 bg-white py-4 font-black text-red-600 transition-all hover:bg-red-50">
+                        취소하기
+                    </button>
+
+                    <button type="button"
+                            th:data-id="${liveLecture.liveId}"
+                            th:data-title="${liveLecture.title}"
+                            th:data-reserved="${liveLecture.myReserved}"
+                            onclick="handleReservation(this)"
+                            class="live-reserve-action hidden w-full rounded-lg bg-blue-600 py-4 font-black text-white transition-all hover:bg-blue-700 hover:shadow-lg">
+                        예약하기
+                    </button>
+
+                    <button type="button"
+                            disabled
+                            class="live-full-action hidden w-full cursor-not-allowed rounded-lg bg-gray-100 py-4 font-black text-gray-400">
+                        마감됨
+                    </button>
+
+                    <button type="button"
+                            disabled
+                            class="live-ended-action hidden w-full cursor-not-allowed rounded-lg bg-gray-100 py-4 font-black text-gray-400">
+                        종료된 강의입니다
+                    </button>
+
+                    <button type="button"
+                            disabled
+                            class="live-unavailable-action hidden w-full cursor-not-allowed rounded-lg bg-gray-100 py-4 font-black text-gray-400">
+                        예약 불가
+                    </button>
+                </div>
             </div>
+        </article>
+    </section>
+
+    <section th:if="${sessions == null or #lists.isEmpty(sessions)}"
+             class="py-24 text-center">
+        <div class="mx-auto mb-6 flex h-28 w-28 items-center justify-center rounded-3xl bg-gray-100">
+            <i class="fa-solid fa-video text-5xl text-gray-400"></i>
         </div>
+
+        <h3 class="mb-3 text-2xl font-black text-gray-900">예정된 실시간 강의가 없습니다</h3>
+        <p class="text-gray-500 font-medium">곧 새로운 세션이 열립니다</p>
+    </section>
+</div>
+
+<footer class="mt-20 border-t border-gray-200 bg-gray-50">
+    <div class="max-w-7xl mx-auto flex flex-col gap-4 px-6 py-8 text-sm text-gray-500 md:flex-row md:items-center md:justify-between">
+        <p class="font-medium">↗ © 2026 Nae-Il. 코딩으로 만드는 내일</p>
+
+        <div class="flex gap-6">
+            <a href="#" class="hover:text-gray-900">이용약관</a>
+            <a href="#" class="hover:text-gray-900">개인정보처리방침</a>
+            <a href="#" class="hover:text-gray-900">고객센터</a>
+        </div>
+    </div>
+</footer>
+
+<div id="confirmModal" class="modal-overlay">
+    <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-xl">
+        <h3 class="text-xl font-black text-gray-900 mb-4">실시간 강의 예약</h3>
+        <p id="confirmMessage" class="text-gray-600 mb-6 font-medium">해당 강의를 예약하시겠습니까?</p>
+
+        <form id="reservationForm" method="post">
+            <div class="flex gap-3">
+                <button type="button"
+                        onclick="closeModal()"
+                        class="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:border-gray-400 transition-all font-bold">
+                    취소
+                </button>
+
+                <button type="submit"
+                        class="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-xl hover:shadow-lg transition-all font-bold">
+                    예약하기
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="alertModal" class="modal-overlay">
+    <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-xl text-center">
+        <p id="alertMessage" class="text-gray-800 font-bold mb-6">이미 예약한 강의입니다</p>
+
+        <button type="button"
+                onclick="document.getElementById('alertModal').classList.remove('open')"
+                class="px-6 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all">
+            확인
+        </button>
     </div>
 </div>
 
 <script>
-    function switchTab(tab) {
-        ['info', 'reservations'].forEach(t => {
-            document.getElementById('tab-' + t).classList.remove('active');
-
-            const btn = document.getElementById('tab-btn-' + t);
-            btn.className = 'px-6 py-3 font-bold transition-all text-gray-600 hover:text-gray-900';
-        });
-
-        document.getElementById('tab-' + tab).classList.add('active');
-
-        const activeBtn = document.getElementById('tab-btn-' + tab);
-        activeBtn.className = 'px-6 py-3 font-bold transition-all text-blue-600 border-b-2 border-blue-600 -mb-[2px]';
+    function initLiveLectureActions() {
+        updateLiveLectureActions();
+        setInterval(updateLiveLectureActions, 10000);
     }
+
+    function updateLiveLectureActions() {
+        const cards = document.querySelectorAll('.live-lecture-card');
+        const now = new Date();
+
+        cards.forEach(card => {
+            const startAt = new Date(card.dataset.startAt);
+            const endAt = new Date(card.dataset.endAt);
+            const myReserved = card.dataset.myReserved === 'true';
+            const reservable = card.dataset.reservable === 'true';
+            const full = card.dataset.full === 'true';
+
+            const liveBadge = card.querySelector('.live-badge');
+            const enterAction = card.querySelector('.live-enter-action');
+            const cancelAction = card.querySelector('.live-cancel-action');
+            const reserveAction = card.querySelector('.live-reserve-action');
+            const fullAction = card.querySelector('.live-full-action');
+            const endedAction = card.querySelector('.live-ended-action');
+            const unavailableAction = card.querySelector('.live-unavailable-action');
+
+            hideElement(liveBadge);
+            hideElement(enterAction);
+            hideElement(cancelAction);
+            hideElement(reserveAction);
+            hideElement(fullAction);
+            hideElement(endedAction);
+            hideElement(unavailableAction);
+
+            if (now >= endAt) {
+                showElement(endedAction);
+                return;
+            }
+
+            const liveNow = now >= startAt && now < endAt;
+
+            if (liveNow) {
+                showElement(liveBadge);
+            }
+
+            if (myReserved && liveNow) {
+                showElement(enterAction);
+                return;
+            }
+
+            if (myReserved && !liveNow) {
+                showElement(cancelAction);
+                return;
+            }
+
+            if (!myReserved && full) {
+                showElement(fullAction);
+                return;
+            }
+
+            if (!myReserved && reservable) {
+                showElement(reserveAction);
+                return;
+            }
+
+            showElement(unavailableAction);
+        });
+    }
+
+    function showElement(element) {
+        if (!element) {
+            return;
+        }
+
+        element.classList.remove('hidden');
+    }
+
+    function hideElement(element) {
+        if (!element) {
+            return;
+        }
+
+        element.classList.add('hidden');
+    }
+
+    function handleReservation(btn) {
+        const liveId = btn.dataset.id;
+        const title = btn.dataset.title;
+        const isReserved = btn.dataset.reserved === 'true';
+
+        if (isReserved) {
+            document.getElementById('alertMessage').textContent = '이미 예약한 강의입니다.';
+            document.getElementById('alertModal').classList.add('open');
+            return;
+        }
+
+        document.getElementById('confirmMessage').textContent = `"${title}" 강의를 예약하시겠습니까?`;
+        document.getElementById('reservationForm').action = `/live-lecture/${liveId}/reservations`;
+        document.getElementById('confirmModal').classList.add('open');
+    }
+
+    function closeModal() {
+        document.getElementById('confirmModal').classList.remove('open');
+    }
+
+    function handleCancelReservation(btn) {
+        const liveId = btn.dataset.id;
+        const title = btn.dataset.title;
+
+        if (!confirm(`"${title}" 예약을 취소하시겠습니까?`)) {
+            return;
+        }
+
+        const form = document.createElement('form');
+        form.method = 'post';
+        form.action = `/live-lecture/${liveId}/reservations/cancel`;
+
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    initLiveLectureActions();
+</script>
+
+<script th:if="${errorMessage != null}" th:inline="javascript">
+    alert([[${errorMessage}]]);
+</script>
+
+<script th:if="${message != null}" th:inline="javascript">
+    alert([[${message}]]);
 </script>
 </body>
 </html>

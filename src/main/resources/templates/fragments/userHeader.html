@@ -6,6 +6,7 @@
 </head>
 <body>
 <header th:fragment="userHeader" class="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
     <div class="max-w-7xl mx-auto px-6 py-4">
         <div class="flex items-center justify-between">
 
@@ -105,28 +106,28 @@
             </div>
         </div>
     </div>
-</header>
-
-<script>
-    function toggleNoticeDropdown() {
-        document.getElementById('noticeDropdown').classList.toggle('hidden');
-        document.getElementById('profileDropdown').classList.add('hidden');
-    }
-    function toggleProfileDropdown() {
-        document.getElementById('profileDropdown').classList.toggle('hidden');
-        document.getElementById('noticeDropdown').classList.add('hidden');
-    }
-    document.addEventListener('click', function(e) {
-        const noticeWrapper = document.getElementById('noticeDropdownWrapper');
-        const profileWrapper = document.getElementById('profileDropdownWrapper');
-        if (noticeWrapper && !noticeWrapper.contains(e.target)) {
-            document.getElementById('noticeDropdown').classList.add('hidden');
-        }
-        if (profileWrapper && !profileWrapper.contains(e.target)) {
+    <script>
+        function toggleNoticeDropdown() {
+            document.getElementById('noticeDropdown').classList.toggle('hidden');
             document.getElementById('profileDropdown').classList.add('hidden');
         }
-    });
-</script>
+        function toggleProfileDropdown() {
+            document.getElementById('profileDropdown').classList.toggle('hidden');
+            document.getElementById('noticeDropdown').classList.add('hidden');
+        }
+        document.addEventListener('click', function(e) {
+            const noticeWrapper = document.getElementById('noticeDropdownWrapper');
+            const profileWrapper = document.getElementById('profileDropdownWrapper');
+            if (noticeWrapper && !noticeWrapper.contains(e.target)) {
+                document.getElementById('noticeDropdown').classList.add('hidden');
+            }
+            if (profileWrapper && !profileWrapper.contains(e.target)) {
+                document.getElementById('profileDropdown').classList.add('hidden');
+            }
+        });
+
+    </script>
+</header>
 
 </body>
 </html>

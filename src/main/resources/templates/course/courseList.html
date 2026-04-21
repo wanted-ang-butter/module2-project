@@ -7,10 +7,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-    </style>
+<!--    <style>-->
+<!--        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');-->
+<!--        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }-->
+<!--    </style>-->
 </head>
 <body>
 <th:block th:if="${user == null or user.role == null}">
@@ -88,11 +88,11 @@
                             <span th:text="${course.rating}" class="text-sm font-black">0.0</span>
                         </div>
                         <div class="flex items-center gap-1 text-gray-400">
-                            <i data-lucide="users" class="w-4 h-4"></i>
+                            <i class="fa-solid fa-users text-gray-400 text-xs"></i>
                             <span th:text="${#numbers.formatInteger(course.studentCount, 0, 'COMMA')}" class="text-sm font-bold">0</span>
                         </div>
                     </div>
-                    <span th:text="|₩${#numbers.formatInteger(course.price, 3, 'COMMA')}|" class="text-lg font-black text-gray-900">₩0</span>
+                    <span th:text="|${#numbers.formatInteger(course.price, 3, 'COMMA')}|" class="text-lg font-black text-gray-900">₩0</span>
                 </div>
             </div>
         </a>

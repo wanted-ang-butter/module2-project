@@ -98,11 +98,8 @@ public class User extends BaseTimeEntity {
 
     // 비즈니스 로직
     // 경고 올리기
-    public void addWarning() {
+    public void increaseWarningCount() {
         this.warningCount++;
-        if (this.warningCount >= 3) {
-            this.status = UserStatus.BANNED; // 경고 3회 누적 시 정지 (예시)
-        }
     }
 
     // role 값 바꾸기

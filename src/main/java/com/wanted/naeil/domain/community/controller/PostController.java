@@ -34,13 +34,24 @@ public class PostController {
     private final EnrollmentRepository enrollmentRepository;
     private final UserRepository userRepository;
 
+    // 커뮤니티 기본 페이지
+    @GetMapping
+    public ModelAndView communityHome() {
+        return new ModelAndView("redirect:/community/free");
+    }
+
     // 글 목록 조회
     @GetMapping("/{category}")
     public ModelAndView postList(@PathVariable String category,
                                  @RequestParam(defaultValue = "latest") String sortType,
+                                 @AuthenticationPrincipal AuthDetails authDetails,
                                  ModelAndView mv) {
 
         log.info("[게시글 목록] 조회 시작. category: {}, sortType: {}", category, sortType);
+
+        if (authDetails != null) {
+            mv.addObject("user", authDetails.getLoginUserDTO());
+        }
 
         PostCategory postCategory = PostCategory.valueOf(category.toUpperCase());
         List<PostListResponse> posts = postService.getPostList(postCategory, sortType);
