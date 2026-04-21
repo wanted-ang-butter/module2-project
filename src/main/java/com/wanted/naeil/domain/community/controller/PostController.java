@@ -44,9 +44,14 @@ public class PostController {
     @GetMapping("/{category}")
     public ModelAndView postList(@PathVariable String category,
                                  @RequestParam(defaultValue = "latest") String sortType,
+                                 @AuthenticationPrincipal AuthDetails authDetails,
                                  ModelAndView mv) {
 
         log.info("[게시글 목록] 조회 시작. category: {}, sortType: {}", category, sortType);
+
+        if (authDetails != null) {
+            mv.addObject("user", authDetails.getLoginUserDTO());
+        }
 
         PostCategory postCategory = PostCategory.valueOf(category.toUpperCase());
         List<PostListResponse> posts = postService.getPostList(postCategory, sortType);
