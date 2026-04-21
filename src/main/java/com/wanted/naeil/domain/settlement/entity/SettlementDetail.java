@@ -45,4 +45,11 @@ public class SettlementDetail {
     public void assignSettlement(Settlement settlement) {
         this.settlement = settlement;
     }
+
+    // 성민 수정: 같은 코스가 다시 결제되면 상세 판매 수량/금액을 누적
+    public void accumulateSale(int saleCount, int totalSalesAmount, int finalAmount) {
+        this.saleCount += saleCount;
+        this.totalSalesAmount += totalSalesAmount;
+        this.finalAmount += finalAmount;
+    }
 }
