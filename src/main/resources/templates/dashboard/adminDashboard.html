@@ -11,19 +11,11 @@
             background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
             background-size: 20px 20px;
         }
-
-        .detail-modal {
-            display: none;
-        }
-
-        .detail-modal.open {
-            display: flex;
-        }
     </style>
 </head>
 <body class="bg-gray-50">
 
-<div th:replace="fragments/adminHeader :: adminHeader"></div>
+<div th:replace="~{fragments/adminHeader :: adminHeader}"></div>
 
 <div class="max-w-7xl mx-auto px-6 py-12">
 
@@ -66,8 +58,10 @@
                     <i class="fa-solid fa-users text-blue-600"></i>
                 </div>
             </div>
-            <p class="text-4xl font-black text-gray-900 mb-2" th:text="${totalMemberCount}">0</p>
-            <p class="text-sm text-green-600 font-bold" th:text="'+' + ${newMemberCount} + ' 이번 주'">+0 이번 주</p>
+            <p class="text-4xl font-black text-gray-900 mb-2"
+               th:text="${#numbers.formatInteger(totalMemberCount, 1, 'COMMA')}">0</p>
+            <p class="text-sm font-bold text-green-600"
+               th:text="'+' + ${#numbers.formatInteger(newMemberCount, 1, 'COMMA')} + ' 이번 주'">+0 이번 주</p>
         </a>
 
         <a th:href="@{/admin/instructor-approval}" href="/admin/instructor-approval"
@@ -78,8 +72,9 @@
                     <i class="fa-solid fa-chalkboard-user text-green-600"></i>
                 </div>
             </div>
-            <p class="text-4xl font-black text-gray-900 mb-2" th:text="${registeredInstructorCount}">0</p>
-            <p class="text-sm text-orange-600 font-bold"
+            <p class="text-4xl font-black text-gray-900 mb-2"
+               th:text="${#numbers.formatInteger(registeredInstructorCount, 1, 'COMMA')}">0</p>
+            <p class="text-sm font-bold text-orange-600"
                th:text="${pendingInstructorApprovalCount} + '명 승인 대기'">0명 승인 대기</p>
         </a>
 
@@ -91,8 +86,10 @@
                     <i class="fa-solid fa-book-open text-purple-600"></i>
                 </div>
             </div>
-            <p class="text-4xl font-black text-gray-900 mb-2" th:text="${totalCourseCount}">0</p>
-            <p class="text-sm text-purple-600 font-bold" th:text="${activeCourseCount} + '개 운영중'">0개 운영중</p>
+            <p class="text-4xl font-black text-gray-900 mb-2"
+               th:text="${#numbers.formatInteger(totalCourseCount, 1, 'COMMA')}">0</p>
+            <p class="text-sm font-bold text-purple-600"
+               th:text="${activeCourseCount} + '개 운영중'">0개 운영중</p>
         </a>
 
         <a th:href="@{/admin/settlement}" href="/admin/settlement"
@@ -103,8 +100,11 @@
                     <i class="fa-solid fa-wallet text-yellow-600"></i>
                 </div>
             </div>
-            <p class="text-2xl font-black text-gray-900 mb-2" th:text="${#numbers.formatInteger(currentMonthSales, 0, 'COMMA')} + ' 크레딧'">0 크레딧</p>
-            <p class="text-sm text-green-600 font-bold" th:text="${salesTrendLabel}">비교 데이터 없음</p>
+            <p class="text-2xl font-black text-gray-900 mb-2"
+               th:text="${#numbers.formatInteger(currentMonthSales, 1, 'COMMA')} + ' 크레딧'">0 크레딧</p>
+            <p class="text-sm font-bold"
+               th:classappend="${salesTrendLabel.startsWith('+') ? ' text-green-600' : (salesTrendLabel.startsWith('-') ? ' text-red-500' : ' text-gray-500')}"
+               th:text="${salesTrendLabel}">비교 데이터 없음</p>
         </a>
     </div>
 
@@ -130,19 +130,21 @@
                 <div class="space-y-4" th:unless="${#lists.isEmpty(pendingInstructorApprovals)}">
                     <div th:each="approval : ${pendingInstructorApprovals}"
                          class="flex items-center justify-between p-4 border-2 border-gray-200 rounded-xl hover:border-orange-300 transition-all">
-                        <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-4 min-w-0">
                             <div class="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center shadow-md">
                                 <i class="fa-solid fa-chalkboard-user text-white"></i>
                             </div>
-                            <div>
+                            <div class="min-w-0">
                                 <p class="font-black text-gray-900"
                                    th:text="${approval.applicantName != null ? approval.applicantName : '강사 승인 요청'}">강사 승인 요청</p>
-                                <p class="text-sm text-gray-600 font-medium"
-                                   th:text="${(approval.categoryName != null ? approval.categoryName : '카테고리 미정') + ' · ' + (approval.title != null ? approval.title : '강사 승인 요청')}">카테고리 · 강사 승인 요청</p>
+                                <p class="text-sm text-gray-600 font-medium truncate"
+                                   th:text="${(approval.categoryName != null ? approval.categoryName : '카테고리 미지정') + ' · ' + (approval.title != null ? approval.title : '강사 승인 요청')}">카테고리 · 제목</p>
                             </div>
                         </div>
                         <a th:href="@{/admin/instructor-approval}" href="/admin/instructor-approval"
-                           class="px-4 py-2 border-2 border-orange-300 rounded-lg hover:bg-orange-50 transition-all font-bold text-orange-600 text-sm">승인</a>
+                           class="px-4 py-2 border-2 border-orange-300 rounded-lg hover:bg-orange-50 transition-all font-bold text-orange-600 text-sm">
+                            승인
+                        </a>
                     </div>
                 </div>
             </div>
@@ -155,24 +157,26 @@
                         전체 보기
                     </a>
                 </div>
-                <div class="space-y-4">
-                    <div th:if="${#lists.isEmpty(dashboardCourses)}"
-                         class="p-8 border-2 border-dashed border-gray-200 rounded-xl text-center text-gray-400">
-                        등록된 강의가 없습니다.
-                    </div>
+
+                <div th:if="${#lists.isEmpty(dashboardCourses)}"
+                     class="p-8 border-2 border-dashed border-gray-200 rounded-xl text-center text-gray-400">
+                    표시할 강의 데이터가 없습니다.
+                </div>
+
+                <div class="space-y-4" th:unless="${#lists.isEmpty(dashboardCourses)}">
                     <div th:each="course : ${dashboardCourses}"
                          class="flex items-center justify-between p-4 border-2 border-gray-200 rounded-xl hover:border-purple-300 transition-all">
-                        <div class="flex-1">
+                        <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-3 mb-2">
-                                <p class="font-black text-gray-900" th:text="${course.title}">강의명</p>
-                                <span th:text="${course.statusLabel}"
-                                      th:classappend="${course.statusName == 'ACTIVE'} ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'"
-                                      class="px-2 py-1 text-xs font-bold rounded">상태</span>
+                                <p class="font-black text-gray-900 truncate" th:text="${course.title}">코스 제목</p>
+                                <span class="px-2 py-1 text-xs font-bold rounded"
+                                      th:classappend="${course.statusName == 'ACTIVE' ? ' bg-green-100 text-green-700' : (course.statusName == 'PENDING' ? ' bg-yellow-100 text-yellow-700' : ' bg-gray-100 text-gray-700')}"
+                                      th:text="${course.statusLabel}">상태</span>
                             </div>
                             <p class="text-sm text-gray-600 font-medium"
-                               th:text="'강사: ' + ${course.instructorName} + ' · 수강생 ' + ${course.studentCount} + '명'">강사: · 수강생 0명</p>
+                               th:text="'강사: ' + ${course.instructorName} + ' · 수강생 ' + ${#numbers.formatInteger(course.studentCount, 1, 'COMMA')} + '명'">강사 · 수강생</p>
                         </div>
-                        <a th:href="@{/admin/course-management/approval}"
+                        <a th:href="@{/admin/course-management/approval}" href="/admin/course-management/approval"
                            class="px-4 py-2 border-2 border-gray-300 rounded-lg hover:border-purple-600 hover:bg-purple-50 transition-all font-bold text-gray-700 hover:text-purple-600">
                             상세
                         </a>
@@ -182,21 +186,24 @@
 
             <div class="bg-white border-2 border-gray-200 rounded-2xl p-6">
                 <h2 class="text-2xl font-black text-gray-900 mb-6">회원 관리</h2>
-                <div class="grid grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="p-5 border-2 border-gray-200 rounded-xl hover:border-blue-300 transition-all text-center">
                         <p class="text-sm font-bold text-gray-600 mb-2">신규 가입</p>
-                        <p class="text-3xl font-black text-gray-900" th:text="${newMemberCount}">0</p>
+                        <p class="text-3xl font-black text-gray-900"
+                           th:text="${#numbers.formatInteger(newMemberCount, 1, 'COMMA')}">0</p>
                         <p class="text-xs text-gray-500 mt-1 font-medium">이번 주</p>
                     </div>
                     <div class="p-5 border-2 border-gray-200 rounded-xl hover:border-green-300 transition-all text-center">
                         <p class="text-sm font-bold text-gray-600 mb-2">활성 회원</p>
-                        <p class="text-3xl font-black text-gray-900" th:text="${activeMemberCount}">0</p>
-                        <p class="text-xs text-gray-500 mt-1 font-medium">최근 30일</p>
+                        <p class="text-3xl font-black text-gray-900"
+                           th:text="${#numbers.formatInteger(activeMemberCount, 1, 'COMMA')}">0</p>
+                        <p class="text-xs text-gray-500 mt-1 font-medium">현재 기준</p>
                     </div>
                     <div class="p-5 border-2 border-gray-200 rounded-xl hover:border-purple-300 transition-all text-center">
                         <p class="text-sm font-bold text-gray-600 mb-2">비활성 회원</p>
-                        <p class="text-3xl font-black text-gray-900" th:text="${inactiveMemberCount}">0</p>
-                        <p class="text-xs text-gray-500 mt-1 font-medium">전체 기준</p>
+                        <p class="text-3xl font-black text-gray-900"
+                           th:text="${#numbers.formatInteger(inactiveMemberCount, 1, 'COMMA')}">0</p>
+                        <p class="text-xs text-gray-500 mt-1 font-medium">현재 기준</p>
                     </div>
                 </div>
                 <a th:href="@{/admin/user-management}" href="/admin/user-management"
@@ -247,85 +254,71 @@
                     <div class="flex justify-between items-center pb-3 border-b border-gray-200">
                         <span class="text-sm font-bold text-gray-600">이번 달 매출</span>
                         <span class="text-lg font-black text-gray-900"
-                              th:text="${#numbers.formatInteger(currentMonthSales, 0, 'COMMA')} + ' 크레딧'">0 크레딧</span>
+                              th:text="${#numbers.formatInteger(currentMonthSales, 1, 'COMMA')} + ' 크레딧'">0 크레딧</span>
                     </div>
                     <div class="flex justify-between items-center pb-3 border-b border-gray-200">
                         <span class="text-sm font-bold text-gray-600">강사 정산 예정</span>
                         <span class="text-lg font-black text-orange-600"
-                              th:text="${#numbers.formatInteger(currentMonthInstructorAmount, 0, 'COMMA')} + ' 크레딧'">0 크레딧</span>
+                              th:text="${#numbers.formatInteger(currentMonthInstructorAmount, 1, 'COMMA')} + ' 크레딧'">0 크레딧</span>
                     </div>
                     <div class="flex justify-between items-center pt-2">
                         <span class="text-sm font-black text-gray-900">플랫폼 수익</span>
                         <span class="text-2xl font-black text-green-600"
-                              th:text="${#numbers.formatInteger(currentMonthPlatformRevenue, 0, 'COMMA')} + ' 크레딧'">0 크레딧</span>
+                              th:text="${#numbers.formatInteger(currentMonthPlatformRevenue, 1, 'COMMA')} + ' 크레딧'">0 크레딧</span>
                     </div>
                 </div>
-                <p class="text-xs text-gray-500 text-center mb-3 font-medium">다음 정산일: 2026년 5월 5일</p>
+                <p class="text-xs text-gray-500 text-center mb-3 font-medium"
+                   th:text="'다음 정산일: ' + ${nextSettlementDateLabel}">다음 정산일: 2026년 5월 5일</p>
                 <a th:href="@{/admin/settlement}" href="/admin/settlement"
                    class="block w-full py-3 border-2 border-gray-300 rounded-xl hover:border-yellow-600 hover:bg-yellow-50 transition-all font-bold text-gray-700 hover:text-yellow-700 text-center">
                     정산 내역 관리
                 </a>
             </div>
 
+            <div class="bg-white border-2 border-gray-200 rounded-2xl p-6">
+                <h2 class="text-xl font-black text-gray-900 mb-6 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-bar text-blue-600"></i>
+                    <span>통계</span>
+                </h2>
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-bold text-gray-600">활성 회원</span>
+                            <span class="text-lg font-black text-gray-900"
+                                  th:text="${#numbers.formatInteger(activeMemberCount, 1, 'COMMA')}">0</span>
+                        </div>
+                        <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-blue-600 to-green-600 rounded-full"
+                                 th:style="'width:' + ${totalMemberCount > 0 ? (activeMemberCount * 100 / totalMemberCount) : 0} + '%'"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-bold text-gray-600">운영 중 강의</span>
+                            <span class="text-lg font-black text-gray-900"
+                                  th:text="${activeCourseCount} + '개'">0개</span>
+                        </div>
+                        <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-green-600 to-emerald-600 rounded-full"
+                                 th:style="'width:' + ${totalCourseCount > 0 ? (activeCourseCount * 100 / totalCourseCount) : 0} + '%'"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-bold text-gray-600">승인 대기 강사</span>
+                            <span class="text-lg font-black text-gray-900"
+                                  th:text="${pendingInstructorApprovalCount} + '명'">0명</span>
+                        </div>
+                        <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-purple-600 to-pink-600 rounded-full"
+                                 th:style="'width:' + ${registeredInstructorCount > 0 ? (pendingInstructorApprovalCount * 100 / registeredInstructorCount) : 0} + '%'"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<div id="detailModal" class="detail-modal fixed inset-0 bg-black/50 items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-2xl p-8 max-w-2xl w-full mx-4 shadow-xl max-h-[90vh] overflow-y-auto">
-        <h3 class="text-2xl font-black text-gray-900 mb-6">코스 상세 정보</h3>
-        <div class="space-y-4 mb-6">
-            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                <span class="text-sm font-bold text-gray-600">상태</span>
-                <span class="px-3 py-1 rounded-full text-sm font-bold bg-yellow-100 text-yellow-700">승인대기</span>
-            </div>
-            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                <span class="text-sm font-bold text-gray-600">코스명</span>
-                <span class="text-sm font-bold text-gray-900">Python 데이터 분석</span>
-            </div>
-            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                <span class="text-sm font-bold text-gray-600">강사명</span>
-                <span class="text-sm font-bold text-gray-900">김데이터</span>
-            </div>
-            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                <span class="text-sm font-bold text-gray-600">카테고리</span>
-                <span class="text-sm font-medium text-gray-900">데이터</span>
-            </div>
-            <div class="p-4 bg-gray-50 rounded-xl">
-                <span class="text-sm font-bold text-gray-600 block mb-2">코스 설명</span>
-                <p class="text-sm text-gray-900 leading-relaxed">Python을 사용한 데이터 분석 기초부터 실전 프로젝트까지 다루는 강의입니다.</p>
-            </div>
-            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                <span class="text-sm font-bold text-gray-600">요청일</span>
-                <span class="text-sm font-mono text-gray-900">2026-04-10</span>
-            </div>
-            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                <span class="text-sm font-bold text-gray-600">수강생수</span>
-                <span class="text-sm font-medium text-gray-900">0명</span>
-            </div>
-        </div>
-        <button type="button" onclick="closeModal()"
-                class="w-full px-6 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-all font-bold text-gray-700">
-            닫기
-        </button>
-    </div>
-</div>
-
-<script>
-    function openModal() {
-        document.getElementById('detailModal').classList.add('open');
-    }
-
-    function closeModal() {
-        document.getElementById('detailModal').classList.remove('open');
-    }
-
-    document.addEventListener('click', function (e) {
-        const modal = document.getElementById('detailModal');
-        if (e.target === modal) {
-            closeModal();
-        }
-    });
-</script>
 </body>
 </html>

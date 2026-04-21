@@ -1,5 +1,6 @@
 package com.wanted.naeil.domain.settlement.service;
 
+import com.wanted.naeil.domain.course.entity.Course;
 import com.wanted.naeil.domain.payment.entity.PaymentItem;
 import com.wanted.naeil.domain.payment.entity.enums.PaymentItemType;
 import com.wanted.naeil.domain.payment.repository.PaymentItemRepository;
@@ -25,6 +26,9 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class SettlementService {
 
+    // 성민 수정: 강의 결제분 정산 시 적용할 플랫폼 수수료율
+    private static final double PLATFORM_FEE_RATE = 0.1;
+
     private final SettlementRepository settlementRepository;
     private final SettlementDetailRepository settlementDetailRepository;
     private final PaymentItemRepository paymentItemRepository;
@@ -33,6 +37,65 @@ public class SettlementService {
     // 강사 정산 목록 조회
     public List<Settlement> getMySettlements(Long instructorId) {
         return settlementRepository.findAllByInstructor_IdOrderBySettlementMonthDesc(instructorId);
+    }
+
+    // 성민 수정: 결제 성공한 유료 강의 금액을 해당 월 정산에 즉시 누적 반영
+    @Transactional
+    public void reflectCoursePayments(List<PaymentItem> paymentItems, LocalDateTime paidAt) {
+        if (paymentItems == null || paymentItems.isEmpty()) {
+            return;
+        }
+
+        LocalDateTime paidDateTime = paidAt != null ? paidAt : LocalDateTime.now();
+        String settlementMonth = YearMonth.from(paidDateTime).toString();
+
+        List<PaymentItem> coursePayments = paymentItems.stream()
+                .filter(item -> item.getItemType() == PaymentItemType.COURSE)
+                .filter(item -> item.getCourse() != null)
+                .filter(item -> item.getFinalPrice() > 0)
+                .toList();
+
+        for (PaymentItem paymentItem : coursePayments) {
+            Course course = paymentItem.getCourse();
+            User instructor = course.getInstructor();
+            int saleAmount = paymentItem.getFinalPrice();
+            int platformFee = calculatePlatformFee(saleAmount);
+            int settlementAmount = saleAmount - platformFee;
+
+            Settlement settlement = settlementRepository
+                    .findByInstructor_IdAndSettlementMonth(instructor.getId(), settlementMonth)
+                    .orElseGet(() -> settlementRepository.save(
+                            Settlement.builder()
+                                    .instructor(instructor)
+                                    .admin(null)
+                                    .settlementMonth(settlementMonth)
+                                    .totalSalesAmount(0)
+                                    .platformFee(0)
+                                    .finalAmount(0)
+                                    .totalAmount(0)
+                                    .requestedAmount(0)
+                                    .status(SettlementStatus.READY)
+                                    .createdAt(paidDateTime)
+                                    .completedAt(null)
+                                    .build()
+                    ));
+
+            settlement.accumulateSale(saleAmount, platformFee, settlementAmount);
+
+            SettlementDetail detail = settlement.findDetailByCourseId(course.getId())
+                    .orElseGet(() -> {
+                        SettlementDetail newDetail = SettlementDetail.builder()
+                                .course(course)
+                                .saleCount(0)
+                                .totalSalesAmount(0)
+                                .finalAmount(0)
+                                .build();
+                        settlement.addDetail(newDetail);
+                        return newDetail;
+                    });
+
+            detail.accumulateSale(1, saleAmount, settlementAmount);
+        }
     }
 
     // 강사 본인 정산 1건 조회
@@ -81,7 +144,7 @@ public class SettlementService {
                 .sum();
 
         // TODO: 수수료 정책 확정 시 수정
-        int platformFee = (int) (totalSalesAmount * 0.1);
+        int platformFee = calculatePlatformFee(totalSalesAmount);
 
         int finalAmount = totalSalesAmount - platformFee;
 
@@ -114,7 +177,8 @@ public class SettlementService {
                     .mapToInt(PaymentItem::getFinalPrice)
                     .sum();
 
-            int courseFinalAmount = (int) (courseTotalSalesAmount * 0.9);
+            int coursePlatformFee = calculatePlatformFee(courseTotalSalesAmount);
+            int courseFinalAmount = courseTotalSalesAmount - coursePlatformFee;
 
             SettlementDetail detail = SettlementDetail.builder()
                     .course(firstItem.getCourse())
@@ -148,5 +212,10 @@ public class SettlementService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 정산 내역을 찾을 수 없습니다."));
 
         settlement.cancel();
+    }
+
+    // 성민 수정: 정산 생성/누적 계산에서 동일 수수료 기준을 공통 사용
+    private int calculatePlatformFee(int salesAmount) {
+        return (int) (salesAmount * PLATFORM_FEE_RATE);
     }
 }
