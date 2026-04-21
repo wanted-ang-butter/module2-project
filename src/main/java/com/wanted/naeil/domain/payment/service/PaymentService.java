@@ -18,6 +18,7 @@ import com.wanted.naeil.domain.payment.repository.CartItemRepository;
 import com.wanted.naeil.domain.payment.repository.CreditRepository;
 import com.wanted.naeil.domain.payment.repository.PaymentRepository;
 import com.wanted.naeil.domain.payment.repository.SubscriptionRepository;
+import com.wanted.naeil.domain.settlement.service.SettlementService;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.domain.user.repository.UserRepository;
 import lombok.Builder;
@@ -41,6 +42,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final SubscriptionRepository subscriptionRepository;
+    private final SettlementService settlementService;
 
     // 장바구니에서 선택한 코스만 결제로 이동!
     public Long checkoutSelectedCartItems(Long userId, List<Long> selectedCartItemIds) {
@@ -102,6 +104,9 @@ public class PaymentService {
 
         // 결제 성공 상태 변경
         payment.markSuccess();
+
+        // 유료 강의 결제 금액은 강사 월별 정산 데이터에 즉시 반영
+        settlementService.reflectCoursePayments(calculation.paymentItems, payment.getPaidAt());
 
         // 결제 데이터 저장
         Payment savedPayment = paymentRepository.save(payment);
