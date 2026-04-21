@@ -17,7 +17,6 @@ import java.util.List;
 @Controller
 @RequestMapping("/instructor/settlements")
 @RequiredArgsConstructor
-@PreAuthorize("hasAnyAuthority('ADMIN', 'INSTRUCTOR')")
 public class SettlementController {
 
     private final SettlementService settlementService;

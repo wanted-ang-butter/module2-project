@@ -26,6 +26,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -237,6 +238,7 @@ public class SectionService {
     }
 
     // 섹션 정보 수정 - 강사
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'INSTRUCTOR')")
     @Transactional
     public void updateSection(Long instructorId, Long courseId, Long sectionId, @Valid SectionUpdateRequest request) {
 

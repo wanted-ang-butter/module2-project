@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -225,6 +226,7 @@ public class CourseService {
     }
 
     // 코스 수정
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'INSTRUCTOR')")
     @Transactional
     public void updateCourse(Long instructorId, Long courseId, @Valid CourseUpdateRequest request) {
 
@@ -354,6 +356,7 @@ public class CourseService {
     }
 
     // 코스 삭제 요청
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'INSTRUCTOR')")
     @Transactional
     public void requestCourseDelete(Long instructorId, Long courseId) {
 

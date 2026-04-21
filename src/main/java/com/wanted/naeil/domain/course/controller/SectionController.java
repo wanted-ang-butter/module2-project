@@ -45,7 +45,6 @@ public class SectionController {
     // 섹션 수정 - 강사
     @PatchMapping(value = "/instructor/courses/{courseId}/sections/{sectionId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'INSTRUCTOR')")
     public ResponseEntity<Void> updateSection(
             @AuthenticationPrincipal AuthDetails authDetails,
             @PathVariable Long courseId,
@@ -64,7 +63,6 @@ public class SectionController {
     // 섹션 추가 - 강사
     @PostMapping("/instructor/courses/{courseId}/sections")
     @ResponseBody
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'INSTRUCTOR')")
     public ResponseEntity<Void> addSection(
             @AuthenticationPrincipal AuthDetails authDetails,
             @PathVariable Long courseId,
@@ -82,7 +80,6 @@ public class SectionController {
     // 섹션 삭제 - 강사
     @DeleteMapping("/instructor/courses/{courseId}/sections/{sectionId}")
     @ResponseBody
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'INSTRUCTOR')")
     public ResponseEntity<Void> deleteSection(
             @AuthenticationPrincipal AuthDetails authDetails,
             @PathVariable Long courseId,
