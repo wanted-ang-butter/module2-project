@@ -48,7 +48,7 @@ public class MyCourseController {
                         .orElse(0);
 
         model.addAttribute("myCourses", myCourses);
-        model.addAttribute("averageRate", (int) averageRate);
+        model.addAttribute("averageRate", (int) Math.round(averageRate));
         model.addAttribute("liveReservations", liveReservations);
 
         log.info("[내 강의] 목록 조회 완료. 수강 강의 수: {}", myCourses.size());

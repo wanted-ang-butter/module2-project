@@ -180,7 +180,8 @@ public class DashboardController {
                     .orElseThrow(() -> new NoSuchElementException("유저를 찾을 수 없습니다."));
             mv.addObject("user", loginUser);
             mv.addObject("enrolledCount", mainPageService.getEnrolledCount(loginUser));
-            mv.addObject("averageProgress", mainPageService.getAverageProgress(loginUser));
+            double avgProgress = mainPageService.getAverageProgress(loginUser);
+            mv.addObject("averageProgress", (int) Math.round(avgProgress));
             mv.addObject("recommendedCourses", mainPageService.getRecommendedCourses(loginUser));
             mv.addObject("popularCourses", mainPageService.getPopularCourses(null));
             mv.addObject("newCourses", mainPageService.getNewCourses(null));

@@ -210,8 +210,8 @@ public class CourseService {
         }
         return CourseDetailsResponse.of(
                 course,
-                studentCount,
                 likeCount,
+                studentCount,
                 avgRating,
                 sectionsResponses,
                 isLiked,
