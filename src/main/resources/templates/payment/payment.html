@@ -1,10 +1,386 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>결제하기 | 내일</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+            background: #f8f9fc;
+            color: #111827;
+        }
+
+        .page-wrap {
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 48px 32px 80px;
+        }
+
+        .page-title {
+            font-size: 64px;
+            font-weight: 900;
+            color: #111827;
+            line-height: 1.15;
+            margin-bottom: 14px;
+        }
+
+        .page-subtitle {
+            font-size: 22px;
+            font-weight: 500;
+            color: #6b7280;
+            margin-bottom: 44px;
+        }
+
+        .payment-layout {
+            display: flex;
+            gap: 48px;
+            align-items: flex-start;
+        }
+
+        .order-section {
+            flex: 1;
+            min-width: 0;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 28px;
+            padding: 38px 38px 30px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+        }
+
+        .summary-section {
+            width: 430px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 28px;
+            padding: 36px 34px 34px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+            position: sticky;
+            top: 32px;
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 900;
+            color: #111827;
+            margin-bottom: 28px;
+        }
+
+        .order-list {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .order-card {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            padding: 26px;
+            border: 1px solid #dcdfe6;
+            border-radius: 24px;
+            background: #fff;
+        }
+
+        .order-thumbnail {
+            width: 190px;
+            height: 118px;
+            border-radius: 18px;
+            background: #f3f4f6;
+            flex-shrink: 0;
+        }
+
+        .order-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .course-title {
+            font-size: 28px;
+            font-weight: 900;
+            color: #111827;
+            margin-bottom: 10px;
+            line-height: 1.35;
+        }
+
+        .price-line {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .course-price {
+            font-size: 28px;
+            font-weight: 900;
+            color: #4f67ff;
+        }
+
+        .original-price {
+            font-size: 17px;
+            color: #9ca3af;
+            text-decoration: line-through;
+            font-weight: 600;
+        }
+
+        .free-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 18px;
+            border-radius: 999px;
+            background: #eef9ee;
+            border: 1px solid #9cdd9c;
+            color: #4caf50;
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+
+        .summary-label {
+            font-size: 20px;
+            font-weight: 700;
+            color: #4b5563;
+        }
+
+        .summary-value {
+            font-size: 28px;
+            font-weight: 900;
+            color: #111827;
+            text-align: right;
+        }
+
+        .summary-value.discount {
+            color: #4caf50;
+        }
+
+        .summary-value.final {
+            color: #4f67ff;
+        }
+
+        .summary-guide {
+            margin-top: -6px;
+            margin-bottom: 26px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #4caf50;
+        }
+
+        .divider {
+            width: 100%;
+            height: 1px;
+            background: #e5e7eb;
+            margin: 28px 0;
+        }
+
+        .payment-status-box {
+            margin-top: 10px;
+            margin-bottom: 26px;
+            padding: 24px 20px;
+            border-radius: 22px;
+            background: #eef8ef;
+            border: 1px solid #b7e3ba;
+            text-align: center;
+        }
+
+        .payment-status-title {
+            font-size: 18px;
+            font-weight: 900;
+            color: #3f9b47;
+            margin-bottom: 8px;
+        }
+
+        .payment-status-desc {
+            font-size: 16px;
+            font-weight: 700;
+            color: #4f9b58;
+            line-height: 1.5;
+        }
+
+        .pay-btn {
+            width: 100%;
+            border: none;
+            border-radius: 22px;
+            padding: 24px 20px;
+            background: linear-gradient(135deg, #5d6dff 0%, #3d4ee8 100%);
+            color: white;
+            font-size: 22px;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .pay-btn:disabled {
+            background: #cfd4dc;
+            cursor: not-allowed;
+        }
+
+        .refund-guide {
+            margin-top: 18px;
+            text-align: center;
+            font-size: 15px;
+            color: #6b7280;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .empty-message {
+            padding: 60px 20px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: #6b7280;
+        }
+    </style>
 </head>
 <body>
+<div class="page-wrap">
+    <h1 class="page-title">결제하기</h1>
+    <p class="page-subtitle">선택하신 강의를 확인하고 결제를 진행하세요</p>
 
+    <form th:action="@{/payments/courses}" method="post">
+
+        <!-- 선택된 장바구니 id는 따로 전달 -->
+        <input type="hidden" name="selectedCartItemIds"
+               th:each="cartItemId : ${selectedCartItemIds}"
+               th:value="${cartItemId}" />
+
+        <div class="payment-layout">
+
+            <section class="order-section">
+                <h2 class="section-title">주문 내역</h2>
+
+                <div class="order-list" th:if="${preview.paymentItems != null and !#lists.isEmpty(preview.paymentItems)}">
+                    <div class="order-card" th:each="item : ${preview.paymentItems}">
+
+                        <!-- 안전하게 썸네일은 일단 고정 박스 -->
+                        <div class="order-thumbnail"></div>
+
+                        <div class="order-info">
+                            <h3 class="course-title" th:text="${item.course.title}">강의명</h3>
+
+                            <div class="price-line">
+                                <th:block th:if="${item.finalPrice == 0}">
+                                    <span class="original-price"
+                                          th:text="${#numbers.formatInteger(item.price, 3, 'COMMA') + ' 크레딧'}">
+                                        59,000 크레딧
+                                    </span>
+                                    <span class="course-price">0 크레딧</span>
+                                    <span class="free-badge">무료 구매!</span>
+                                </th:block>
+
+                                <th:block th:unless="${item.finalPrice == 0}">
+                                    <span class="course-price"
+                                          th:text="${#numbers.formatInteger(item.finalPrice, 3, 'COMMA') + ' 크레딧'}">
+                                        35,000 크레딧
+                                    </span>
+                                </th:block>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="empty-message" th:if="${preview.paymentItems == null or #lists.isEmpty(preview.paymentItems)}">
+                    선택한 결제 항목이 없습니다.
+                </div>
+            </section>
+
+            <aside class="summary-section">
+                <h2 class="section-title">결제 요약</h2>
+
+                <div class="summary-row">
+                    <span class="summary-label">총 원가</span>
+                    <strong class="summary-value"
+                            th:text="${#numbers.formatInteger(preview.totalAmount, 3, 'COMMA')}">
+                        208,000
+                    </strong>
+                </div>
+
+                <div class="summary-row" th:if="${preview.isSubscriber and preview.discountAmount > 0}">
+                    <span class="summary-label">구독 할인</span>
+                    <strong class="summary-value discount"
+                            th:text="${'-' + #numbers.formatInteger(preview.discountAmount, 3, 'COMMA')}">
+                        -173,000
+                    </strong>
+                </div>
+
+                <p class="summary-guide"
+                   th:if="${preview.isSubscriber and preview.discountAmount > 0}"
+                   th:text="${#numbers.formatInteger(preview.discountAmount, 3, 'COMMA') + ' 크레딧 할인 적용됨'}">
+                    173,000 크레딧 할인 적용됨
+                </p>
+
+                <div class="divider"></div>
+
+                <div class="summary-row">
+                    <span class="summary-label">최종 결제 금액</span>
+                    <strong class="summary-value final"
+                            th:text="${#numbers.formatInteger(preview.finalAmount, 3, 'COMMA')}">
+                        35,000
+                    </strong>
+                </div>
+
+                <div class="summary-row">
+                    <span class="summary-label">보유 크레딧</span>
+                    <strong class="summary-value"
+                            th:text="${#numbers.formatInteger(preview.myCredit, 3, 'COMMA')}">
+                        120,000
+                    </strong>
+                </div>
+
+                <div class="summary-row">
+                    <span class="summary-label">결제 후 잔액</span>
+                    <strong class="summary-value final"
+                            th:text="${#numbers.formatInteger(preview.remainingCredit, 3, 'COMMA')}">
+                        85,000
+                    </strong>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="payment-status-box" th:if="${preview.canPay}">
+                    <p class="payment-status-title"
+                       th:text="${preview.finalAmount == 0 ? '무료 신청 가능' : '결제 가능'}">
+                        결제 가능
+                    </p>
+                    <p class="payment-status-desc"
+                       th:text="${preview.finalAmount == 0 ? '구독권 혜택이 적용되었습니다.' : '충분한 크레딧이 있습니다.'}">
+                        충분한 크레딧이 있습니다.
+                    </p>
+                </div>
+
+                <div class="payment-status-box"
+                     th:if="${!preview.canPay}"
+                     style="background:#fff4f4; border:1px solid #f1b6b6;">
+                    <p class="payment-status-title" style="color:#d64545;">결제 불가</p>
+                    <p class="payment-status-desc" style="color:#d64545;">보유 크레딧이 부족합니다.</p>
+                </div>
+
+                <button type="submit"
+                        class="pay-btn"
+                        th:disabled="${!preview.canPay}"
+                        th:text="${preview.finalAmount == 0 ? '무료로 수강 신청하기' : '결제하기'}">
+                    결제하기
+                </button>
+
+                <p class="refund-guide">
+                    결제 시 환불 정책에 동의한 것으로 간주됩니다
+                </p>
+            </aside>
+        </div>
+    </form>
+</div>
 </body>
 </html>

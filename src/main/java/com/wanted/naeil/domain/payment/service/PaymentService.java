@@ -5,6 +5,7 @@ import com.wanted.naeil.domain.learning.entity.Enrollment;
 import com.wanted.naeil.domain.learning.entity.enums.EnrollmentStatus;
 import com.wanted.naeil.domain.learning.repository.EnrollmentRepository;
 import com.wanted.naeil.domain.payment.dto.request.SubscriptionPaymentRequest;
+import com.wanted.naeil.domain.payment.dto.response.PaymentPreviewResponse;
 import com.wanted.naeil.domain.payment.entity.CartItem;
 import com.wanted.naeil.domain.payment.entity.Credit;
 import com.wanted.naeil.domain.payment.entity.Payment;
@@ -19,6 +20,8 @@ import com.wanted.naeil.domain.payment.repository.PaymentRepository;
 import com.wanted.naeil.domain.payment.repository.SubscriptionRepository;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.domain.user.repository.UserRepository;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,53 +60,23 @@ public class PaymentService {
         validateCartItems(selectedCartItemIds, cartItems);
         validateAlreadyPurchased(userId, cartItems);
 
-        // 구독이 있으면 무료 횟수 갖고오기
-        // 구독이 있으면 0으로 처리
-        Subscription subscription = getActiveSubscription(userId);
-        int remainingFreeCount = (subscription != null) ? subscription.getRemainingFreeCount() : 0;
+        PaymentCalculation calculation = calculateCartPayment(cartItems, userId);
 
-        int totalAmount = calculateTotalAmount(cartItems);
-        List<PaymentItem> paymentItems = new ArrayList<>();
-
-        for (CartItem cartItem : cartItems) {
-            Course course = cartItem.getCourse();
-
-            int price = course.getPrice();
-            int itemDiscountAmount = 0;
-            int itemFinalPrice = price;
-
-            // 구독 무료 적용
-            if (remainingFreeCount > 0) {
-                itemDiscountAmount = price;
-                itemFinalPrice = 0;
-                remainingFreeCount--;
-            }
-
-            PaymentItem paymentItem = createPaymentItem(
-                    course,
-                    PaymentItemType.COURSE,
-                    price,
-                    itemDiscountAmount,
-                    itemFinalPrice
-            );
-
-            paymentItems.add(paymentItem);
+        if (calculation.finalAmount < 0) {
+            throw new IllegalArgumentException("최종 결제 금액이 올바르지 않습니다.");
         }
 
-        int discountAmount = paymentItems.stream()
-                .mapToInt(PaymentItem::getDiscountAmount)
-                .sum();
+        validateEnoughCredit(credit, calculation.finalAmount);
 
-        int finalAmount = paymentItems.stream()
-                .mapToInt(PaymentItem::getFinalPrice)
-                .sum();
-
-        validateEnoughCredit(credit, finalAmount);
-
-        Payment payment = createPayment(user, totalAmount, discountAmount, finalAmount);
+        Payment payment = createPayment(
+                user,
+                calculation.totalAmount,
+                calculation.discountAmount,
+                calculation.finalAmount
+        );
 
         // PaymentItem 연관관계 연결
-        paymentItems.forEach(payment::addPaymentItem);
+        calculation.paymentItems.forEach(payment::addPaymentItem);
 
         // 수강 등록 생성
         for (CartItem cartItem : cartItems) {
@@ -118,12 +91,14 @@ public class PaymentService {
         }
 
         // 구독 무료 횟수 차감 반영
-        if (subscription != null) {
-            subscription.updateRemainingFreeCount(remainingFreeCount);
+        if (calculation.subscription != null) {
+            calculation.subscription.updateRemainingFreeCount(calculation.remainingFreeCountAfterUse);
         }
 
-        // 크레딧 차감
-        credit.deduct(finalAmount);
+        // finalAmount가 0보다 클 때만 크레딧 차감
+        if (calculation.finalAmount > 0) {
+            credit.deduct(calculation.finalAmount);
+        }
 
         // 결제 성공 상태 변경
         payment.markSuccess();
@@ -135,6 +110,51 @@ public class PaymentService {
         cartItemRepository.deleteAll(cartItems);
 
         return savedPayment.getId();
+    }
+
+    // 결제 페이지 미리보기
+    @Transactional(readOnly = true)
+    public PaymentPreviewResponse getPaymentPreview(Long userId, List<Long> selectedCartItemIds) {
+
+        // 아무것도 선택하지 않았을 때
+        if (selectedCartItemIds == null || selectedCartItemIds.isEmpty()) {
+            throw new IllegalArgumentException("선택된 장바구니 항목이 없습니다.");
+        }
+
+        Credit credit = getCredit(userId);
+
+        // 선택한 장바구니 항목 조회
+        List<CartItem> cartItems = cartItemRepository.findAllByIdInAndUserId(selectedCartItemIds, userId);
+
+        // 장바구니 유효성 검증
+        validateCartItems(selectedCartItemIds, cartItems);
+        validateAlreadyPurchased(userId, cartItems);
+
+        PaymentCalculation calculation = calculateCartPayment(cartItems, userId);
+
+        int myCredit = credit.getBalance();
+
+        return PaymentPreviewResponse.builder()
+                .paymentItems(calculation.paymentItems)
+                .totalAmount(calculation.totalAmount)
+                .discountAmount(calculation.discountAmount)
+                .finalAmount(calculation.finalAmount)
+                .myCredit(myCredit)
+                .remainingCredit(myCredit - calculation.finalAmount)
+                .canPay(myCredit >= calculation.finalAmount)
+                .isSubscriber(calculation.subscription != null)
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public Subscription getActiveSubscriptionForView(Long userId) {
+        return getActiveSubscription(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PaymentItem> getPreviewPaymentItemsFromCart(Long userId) {
+        List<CartItem> cartItems = cartItemRepository.findAllByUserId(userId);
+        return calculateCartPayment(cartItems, userId).getPaymentItems();
     }
 
     // 구독권 구매
@@ -342,5 +362,66 @@ public class PaymentService {
                 .discountAmount(discountAmount)
                 .finalPrice(finalPrice)
                 .build();
+    }
+
+    private PaymentCalculation calculateCartPayment(List<CartItem> cartItems, Long userId) {
+        Subscription subscription = getActiveSubscription(userId);
+        int remainingFreeCount = (subscription != null) ? subscription.getRemainingFreeCount() : 0;
+
+        int totalAmount = calculateTotalAmount(cartItems);
+        List<PaymentItem> paymentItems = new ArrayList<>();
+
+        for (CartItem cartItem : cartItems) {
+            Course course = cartItem.getCourse();
+
+            int price = course.getPrice();
+            int itemDiscountAmount = 0;
+            int itemFinalPrice = price;
+
+            // 구독 무료 적용
+            if (remainingFreeCount > 0) {
+                itemDiscountAmount = price;
+                itemFinalPrice = 0;
+                remainingFreeCount--;
+            }
+
+            PaymentItem paymentItem = createPaymentItem(
+                    course,
+                    PaymentItemType.COURSE,
+                    price,
+                    itemDiscountAmount,
+                    itemFinalPrice
+            );
+
+            paymentItems.add(paymentItem);
+        }
+
+        int discountAmount = paymentItems.stream()
+                .mapToInt(PaymentItem::getDiscountAmount)
+                .sum();
+
+        int finalAmount = paymentItems.stream()
+                .mapToInt(PaymentItem::getFinalPrice)
+                .sum();
+
+        return PaymentCalculation.builder()
+                .subscription(subscription)
+                .paymentItems(paymentItems)
+                .totalAmount(totalAmount)
+                .discountAmount(discountAmount)
+                .finalAmount(finalAmount)
+                .remainingFreeCountAfterUse(remainingFreeCount)
+                .build();
+    }
+
+    @Getter
+    @Builder
+    private static class PaymentCalculation {
+        private Subscription subscription;
+        private List<PaymentItem> paymentItems;
+        private int totalAmount;
+        private int discountAmount;
+        private int finalAmount;
+        private int remainingFreeCountAfterUse;
     }
 }
