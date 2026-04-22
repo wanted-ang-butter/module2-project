@@ -16,6 +16,7 @@ import com.wanted.naeil.domain.user.entity.enums.Role;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.domain.user.repository.InsturctorApplicationRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -112,6 +113,7 @@ public class AdminApprovalService {
                 .collect(Collectors.toList());
         }
     //  승인 처리
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Transactional
     public void approve(Long approvalId, User admin) {
         // 1) 승인건 찾아오기
@@ -142,6 +144,7 @@ public class AdminApprovalService {
         courseApprovalRepository.save(approval);
     }
     //  반려 처리
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Transactional
     public  void reject(Long approvalId , User admin , String rejectReason) {
         // 1) 반려건 찾아오기

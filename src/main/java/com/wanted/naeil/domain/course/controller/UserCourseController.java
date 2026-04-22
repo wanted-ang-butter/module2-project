@@ -45,7 +45,7 @@ public class UserCourseController {
 
         log.info("[Course] 전체 코스 목록 페이지 조회 - category: {}, keyword: {}", category, keyword);
 
-        int pageSize = 12;
+        int pageSize = 9;
         int currentPage = Math.max(page, 0);
 
         Pageable pageable = PageRequest.of(currentPage, pageSize);

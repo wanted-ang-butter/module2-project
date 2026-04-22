@@ -20,6 +20,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -154,6 +155,7 @@ public class LiveLectureService {
     }
 
     // 실시간 강의 삭제
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'INSTRUCTOR')")
     @Transactional
     public void deleteLiveLecture(Long instructorId, Long liveId) {
 

@@ -25,7 +25,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/instructor")
 @Slf4j
-@PreAuthorize("hasAnyAuthority('ADMIN', 'INSTRUCTOR')")
 public class InstLiveController {
 
     private final LiveLectureService liveLectureService;
@@ -43,11 +42,6 @@ public class InstLiveController {
             ) {
 
         Role userRole = authDetails.getLoginUserDTO().getRole();
-
-        // 권한 검증
-        if (userRole != Role.INSTRUCTOR && userRole != Role.ADMIN) {
-            throw new AccessDeniedException("관리자 혹은 강사만 생성 할 수 있습니다.");
-        }
 
         log.info("[Live Lecture] 실시간 강의 신청 페이지 조회 시작");
 

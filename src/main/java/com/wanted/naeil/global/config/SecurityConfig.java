@@ -4,6 +4,7 @@ import com.wanted.naeil.global.auth.handler.AuthFailureHandler;
 import com.wanted.naeil.global.auth.handler.AuthSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.session.SessionRegistry;
@@ -13,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
+@EnableMethodSecurity // @PreAuthorize 활성화위한 어노테이셔
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig {
