@@ -1,8 +1,13 @@
 package com.wanted.naeil.domain.settlement.service;
 
+import com.wanted.naeil.domain.admin.entity.AdminApproval;
+import com.wanted.naeil.domain.admin.entity.enums.ApprovalRequestType;
+import com.wanted.naeil.domain.admin.entity.enums.ApprovalStatus;
+import com.wanted.naeil.domain.admin.repository.AdminApprovalRepository;
 import com.wanted.naeil.domain.course.entity.Course;
 import com.wanted.naeil.domain.payment.entity.PaymentItem;
 import com.wanted.naeil.domain.payment.entity.enums.PaymentItemType;
+import com.wanted.naeil.domain.payment.entity.enums.PaymentStatus;
 import com.wanted.naeil.domain.payment.repository.PaymentItemRepository;
 import com.wanted.naeil.domain.settlement.entity.Settlement;
 import com.wanted.naeil.domain.settlement.entity.SettlementDetail;
@@ -26,20 +31,18 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class SettlementService {
 
-    // 성민 수정: 강의 결제분 정산 시 적용할 플랫폼 수수료율
     private static final double PLATFORM_FEE_RATE = 0.1;
 
     private final SettlementRepository settlementRepository;
     private final SettlementDetailRepository settlementDetailRepository;
     private final PaymentItemRepository paymentItemRepository;
     private final UserRepository userRepository;
+    private final AdminApprovalRepository adminApprovalRepository;
 
-    // 강사 정산 목록 조회
     public List<Settlement> getMySettlements(Long instructorId) {
         return settlementRepository.findAllByInstructor_IdOrderBySettlementMonthDesc(instructorId);
     }
 
-    // 성민 수정: 결제 성공한 유료 강의 금액을 해당 월 정산에 즉시 누적 반영
     @Transactional
     public void reflectCoursePayments(List<PaymentItem> paymentItems, LocalDateTime paidAt) {
         if (paymentItems == null || paymentItems.isEmpty()) {
@@ -98,54 +101,55 @@ public class SettlementService {
         }
     }
 
-    // 강사 본인 정산 1건 조회
     public Settlement getMySettlement(Long instructorId, Long settlementId) {
         return settlementRepository.findByIdAndInstructor_Id(settlementId, instructorId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 정산 내역을 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("Settlement not found."));
     }
 
-    // 정산 생성 후 신청
     @Transactional
     public Long createAndRequestSettlement(Long instructorId, YearMonth settlementMonth) {
+        String settlementMonthValue = settlementMonth.toString();
 
-        User instructor = userRepository.findById(instructorId)
-                .orElseThrow(() -> new IllegalArgumentException("강사 정보를 찾을 수 없습니다."));
+        Settlement existingSettlement = settlementRepository
+                .findByInstructor_IdAndSettlementMonth(instructorId, settlementMonthValue)
+                .orElse(null);
 
-        String settlementMonthValue = settlementMonth.toString(); // 예: 2026-04
+        if (existingSettlement != null) {
+            if (existingSettlement.getStatus() == SettlementStatus.APPROVED) {
+                throw new IllegalStateException("This settlement has already been approved.");
+            }
 
-        // 같은 월 정산 중복 생성 방지
-        boolean exists = settlementRepository.existsByInstructor_IdAndSettlementMonth(instructorId, settlementMonthValue);
-        if (exists) {
-            throw new IllegalStateException("이미 해당 월의 정산 내역이 존재합니다.");
+            if (existingSettlement.getStatus() != SettlementStatus.PENDING) {
+                existingSettlement.request();
+            }
+
+            createPendingSettlementApprovalIfMissing(existingSettlement);
+            return existingSettlement.getId();
         }
 
-        // 강사가 맡은 강의의 결제 내역 조회
+        User instructor = userRepository.findById(instructorId)
+                .orElseThrow(() -> new IllegalArgumentException("Instructor not found."));
+
         List<PaymentItem> paymentItems =
                 paymentItemRepository.findByCourse_Instructor_IdAndItemType(instructorId, PaymentItemType.COURSE);
 
-        // TODO:
-        // 실제로는 아래 조건을 더 붙여야 함
-        // 1) 결제 성공 건만
-        // 2) 해당 정산월에 해당하는 건만
-        // 3) 이미 정산된 건 제외
-        // 현재는 엔티티 추가 없이 가는 방향이라 최소 구조만 반영
-
-        // 0원 결제(구독 무료) 제외
         List<PaymentItem> settleTargetItems = paymentItems.stream()
+                .filter(item -> item.getPayment() != null)
+                .filter(item -> item.getPayment().getStatus() == PaymentStatus.SUCCESS)
+                .filter(item -> item.getPayment().getPaidAt() != null)
+                .filter(item -> YearMonth.from(item.getPayment().getPaidAt()).equals(settlementMonth))
                 .filter(item -> item.getFinalPrice() > 0)
                 .toList();
 
         if (settleTargetItems.isEmpty()) {
-            throw new IllegalStateException("정산 가능한 내역이 없습니다.");
+            throw new IllegalStateException("No settlement items are available for the selected month.");
         }
 
         int totalSalesAmount = settleTargetItems.stream()
                 .mapToInt(PaymentItem::getFinalPrice)
                 .sum();
 
-        // TODO: 수수료 정책 확정 시 수정
         int platformFee = calculatePlatformFee(totalSalesAmount);
-
         int finalAmount = totalSalesAmount - platformFee;
 
         Settlement settlement = Settlement.builder()
@@ -164,19 +168,15 @@ public class SettlementService {
 
         settlementRepository.save(settlement);
 
-        // 코스별 집계
         Map<Long, List<PaymentItem>> groupedByCourse = settleTargetItems.stream()
                 .collect(Collectors.groupingBy(item -> item.getCourse().getId()));
 
         for (List<PaymentItem> items : groupedByCourse.values()) {
             PaymentItem firstItem = items.get(0);
-
             int saleCount = items.size();
-
             int courseTotalSalesAmount = items.stream()
                     .mapToInt(PaymentItem::getFinalPrice)
                     .sum();
-
             int coursePlatformFee = calculatePlatformFee(courseTotalSalesAmount);
             int courseFinalAmount = courseTotalSalesAmount - coursePlatformFee;
 
@@ -190,32 +190,55 @@ public class SettlementService {
             settlement.addDetail(detail);
         }
 
-        // detail cascade 저장 반영
         settlement.request();
+        createPendingSettlementApprovalIfMissing(settlement);
 
         return settlement.getId();
     }
 
-    // 정산 신청
     @Transactional
     public void requestSettlement(Long instructorId, Long settlementId) {
         Settlement settlement = settlementRepository.findByIdAndInstructor_Id(settlementId, instructorId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 정산 내역을 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("Settlement not found."));
 
         settlement.request();
+        createPendingSettlementApprovalIfMissing(settlement);
     }
 
-    // 정산 취소
     @Transactional
     public void cancelSettlement(Long instructorId, Long settlementId) {
         Settlement settlement = settlementRepository.findByIdAndInstructor_Id(settlementId, instructorId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 정산 내역을 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("Settlement not found."));
 
         settlement.cancel();
+        adminApprovalRepository.deleteBySettlementIdAndRequestTypeAndStatus(
+                settlementId,
+                ApprovalRequestType.SETTLEMENT_REGISTER,
+                ApprovalStatus.PENDING
+        );
     }
 
-    // 성민 수정: 정산 생성/누적 계산에서 동일 수수료 기준을 공통 사용
+    @Transactional
+    public void syncPendingSettlementApprovals() {
+        settlementRepository.findAllByStatus(SettlementStatus.PENDING)
+                .forEach(this::createPendingSettlementApprovalIfMissing);
+    }
+
     private int calculatePlatformFee(int salesAmount) {
         return (int) (salesAmount * PLATFORM_FEE_RATE);
+    }
+
+    private void createPendingSettlementApprovalIfMissing(Settlement settlement) {
+        boolean alreadyRequested = adminApprovalRepository.existsBySettlementIdAndRequestTypeAndStatus(
+                settlement.getId(),
+                ApprovalRequestType.SETTLEMENT_REGISTER,
+                ApprovalStatus.PENDING
+        );
+
+        if (alreadyRequested) {
+            return;
+        }
+
+        adminApprovalRepository.save(new AdminApproval(settlement));
     }
 }

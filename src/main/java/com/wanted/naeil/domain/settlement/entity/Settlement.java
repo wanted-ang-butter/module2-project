@@ -2,7 +2,19 @@ package com.wanted.naeil.domain.settlement.entity;
 
 import com.wanted.naeil.domain.settlement.entity.enums.SettlementStatus;
 import com.wanted.naeil.domain.user.entity.User;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -69,7 +81,6 @@ public class Settlement {
         detail.assignSettlement(this);
     }
 
-    // 성민 수정: 결제 발생 시 월 정산 합계를 즉시 누적 반영
     public void accumulateSale(int saleAmount, int feeAmount, int settlementAmount) {
         this.totalSalesAmount += saleAmount;
         this.platformFee += feeAmount;
@@ -84,7 +95,6 @@ public class Settlement {
         }
     }
 
-    // 성민 수정: 같은 월 정산 안에서 기존 코스 상세 row를 찾기 위한 메서드 추가
     public Optional<SettlementDetail> findDetailByCourseId(Long courseId) {
         return details.stream()
                 .filter(detail -> detail.getCourse().getId().equals(courseId))
@@ -92,19 +102,46 @@ public class Settlement {
     }
 
     public void request() {
-        if (this.status != SettlementStatus.READY) {
-            throw new IllegalStateException("신청 가능한 정산만 신청할 수 있습니다.");
+        if (this.status != SettlementStatus.READY
+                && this.status != SettlementStatus.REJECTED
+                && this.status != SettlementStatus.CANCELED) {
+            throw new IllegalStateException("Only ready, rejected, or canceled settlements can be requested.");
         }
 
         this.status = SettlementStatus.PENDING;
+        this.admin = null;
+        this.completedAt = null;
+        this.requestedAmount = this.finalAmount;
     }
 
     public void cancel() {
         if (this.status != SettlementStatus.PENDING) {
-            throw new IllegalStateException("대기 중인 정산만 취소할 수 있습니다.");
+            throw new IllegalStateException("Only pending settlements can be canceled.");
         }
 
         this.status = SettlementStatus.CANCELED;
+        this.admin = null;
+        this.completedAt = null;
+    }
+
+    public void approve(User admin) {
+        if (this.status != SettlementStatus.PENDING) {
+            throw new IllegalStateException("Only pending settlements can be approved.");
+        }
+
+        this.status = SettlementStatus.APPROVED;
+        this.admin = admin;
+        this.completedAt = LocalDateTime.now();
+    }
+
+    public void reject(User admin) {
+        if (this.status != SettlementStatus.PENDING) {
+            throw new IllegalStateException("Only pending settlements can be rejected.");
+        }
+
+        this.status = SettlementStatus.REJECTED;
+        this.admin = admin;
+        this.completedAt = LocalDateTime.now();
     }
 
     @Builder

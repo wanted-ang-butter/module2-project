@@ -21,4 +21,6 @@ public interface SettlementRepository extends JpaRepository<Settlement, Long> {
     boolean existsByInstructor_IdAndSettlementMonth(Long instructorId, String settlementMonth);
 
     List<Settlement> findAllByInstructor_IdAndStatus(Long instructorId, SettlementStatus status);
+
+    List<Settlement> findAllByStatus(SettlementStatus status);
 }

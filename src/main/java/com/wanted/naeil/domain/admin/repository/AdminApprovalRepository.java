@@ -123,12 +123,24 @@ public interface AdminApprovalRepository extends JpaRepository<AdminApproval, Lo
             ApprovalStatus status
     );
 
+    boolean existsBySettlementIdAndRequestTypeAndStatus(
+            Long settlementId,
+            ApprovalRequestType requestType,
+            ApprovalStatus status
+    );
+
     void deleteByInstructorApplications(InstructorApplications instructorApplications);
 
     void deleteByLecture(LiveLecture lecture);
 
     void deleteByCourseIdAndRequestTypeAndStatus(
             Long courseId,
+            ApprovalRequestType requestType,
+            ApprovalStatus status
+    );
+
+    void deleteBySettlementIdAndRequestTypeAndStatus(
+            Long settlementId,
             ApprovalRequestType requestType,
             ApprovalStatus status
     );
