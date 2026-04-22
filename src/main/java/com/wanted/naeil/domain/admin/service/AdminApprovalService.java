@@ -15,13 +15,16 @@ import com.wanted.naeil.domain.user.entity.InstructorApplications;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.domain.user.entity.enums.Role;
 import com.wanted.naeil.domain.user.repository.InsturctorApplicationRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -122,6 +125,7 @@ public class AdminApprovalService {
         return builder.build();
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Transactional
     public void approve(Long approvalId, User admin) {
         AdminApproval approval = courseApprovalRepository.findById(approvalId)
@@ -144,7 +148,8 @@ public class AdminApprovalService {
         }
         courseApprovalRepository.save(approval);
     }
-
+    //  반려 처리
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Transactional
     public void reject(Long approvalId, User admin, String rejectReason) {
         AdminApproval approval = courseApprovalRepository.findById(approvalId)
