@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Table(name = "settlement")
@@ -66,6 +67,28 @@ public class Settlement {
     public void addDetail(SettlementDetail detail) {
         this.details.add(detail);
         detail.assignSettlement(this);
+    }
+
+    // 성민 수정: 결제 발생 시 월 정산 합계를 즉시 누적 반영
+    public void accumulateSale(int saleAmount, int feeAmount, int settlementAmount) {
+        this.totalSalesAmount += saleAmount;
+        this.platformFee += feeAmount;
+        this.finalAmount += settlementAmount;
+        this.totalAmount += settlementAmount;
+
+        if (this.status == SettlementStatus.READY
+                || this.status == SettlementStatus.REJECTED
+                || this.status == SettlementStatus.CANCELED) {
+            this.status = SettlementStatus.READY;
+            this.requestedAmount = this.finalAmount;
+        }
+    }
+
+    // 성민 수정: 같은 월 정산 안에서 기존 코스 상세 row를 찾기 위한 메서드 추가
+    public Optional<SettlementDetail> findDetailByCourseId(Long courseId) {
+        return details.stream()
+                .filter(detail -> detail.getCourse().getId().equals(courseId))
+                .findFirst();
     }
 
     public void request() {

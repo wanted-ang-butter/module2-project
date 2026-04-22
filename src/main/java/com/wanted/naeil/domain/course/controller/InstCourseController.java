@@ -31,7 +31,6 @@ import java.util.List;
 @RequestMapping("/instructor")
 @RequiredArgsConstructor
 @Slf4j
-@PreAuthorize("hasAnyAuthority('ADMIN', 'INSTRUCTOR')")
 public class InstCourseController {
 
     private final CourseService courseService;

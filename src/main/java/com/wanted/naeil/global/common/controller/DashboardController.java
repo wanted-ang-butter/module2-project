@@ -11,12 +11,10 @@ import com.wanted.naeil.domain.course.service.CourseService;
 import com.wanted.naeil.domain.live.dto.response.InstructorLiveLectureResponse;
 import com.wanted.naeil.domain.live.service.LiveLectureService;
 import com.wanted.naeil.domain.mainpage.service.MainPageService;
-import com.wanted.naeil.domain.payment.service.MySubscriptionService;
 import com.wanted.naeil.domain.settlement.entity.Settlement;
 import com.wanted.naeil.domain.settlement.entity.enums.SettlementStatus;
 import com.wanted.naeil.domain.settlement.repository.SettlementRepository;
 import com.wanted.naeil.domain.settlement.service.SettlementService;
-import com.wanted.naeil.domain.learning.repository.EnrollmentRepository;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.domain.user.entity.enums.Role;
 import com.wanted.naeil.domain.user.entity.enums.UserStatus;
@@ -31,9 +29,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -48,13 +46,11 @@ public class DashboardController {
     private final CourseService courseService;
     private final LiveLectureService liveLectureService;
     private final MainPageService mainPageService;
-    private final MySubscriptionService mySubscriptionService;
     private final SettlementService settlementService;
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
     private final SettlementRepository settlementRepository;
     private final AdminApprovalService adminApprovalService;
-    private final EnrollmentRepository enrollmentRepository;
 
     @GetMapping("/admin")
     public ModelAndView adminDashboard(@AuthenticationPrincipal AuthDetails authDetails) {
@@ -109,6 +105,9 @@ public class DashboardController {
                 .sum();
 
         String salesTrendLabel = buildTrendLabel(currentMonthSales, previousMonthSales);
+        String nextSettlementDateLabel = now.plusMonths(1)
+                .atDay(5)
+                .format(DateTimeFormatter.ofPattern("yyyy년 M월 d일"));
 
         if (authDetails != null) {
             mv.addObject("user", authDetails.getLoginUserDTO());
@@ -128,6 +127,7 @@ public class DashboardController {
         mv.addObject("currentMonthInstructorAmount", currentMonthInstructorAmount);
         mv.addObject("currentMonthPlatformRevenue", currentMonthPlatformRevenue);
         mv.addObject("salesTrendLabel", salesTrendLabel);
+        mv.addObject("nextSettlementDateLabel", nextSettlementDateLabel);
 
         return mv;
     }
@@ -162,23 +162,6 @@ public class DashboardController {
                     .mapToInt(Settlement::getFinalAmount)
                     .sum();
 
-            // 신규 수강생 (이번 달)
-            LocalDateTime startOfMonth = LocalDate.now().withDayOfMonth(1).atStartOfDay();
-            long newStudentCount = enrollmentRepository.countNewStudentsThisMonth(instructorId, startOfMonth);
-
-            // 평균 완강률
-            Double avgCompletionRate = enrollmentRepository.findAvgCompletionRateByInstructorId(instructorId);
-            int completionRate = avgCompletionRate != null ? (int) Math.round(avgCompletionRate) : 0;
-
-            // 평균 평점
-            double avgRating = courses.stream()
-                    .mapToDouble(c -> {
-                        try { return Double.parseDouble(c.getRating()); } catch (Exception e) { return 0.0; }
-                    })
-                    .average()
-                    .orElse(0.0);
-
-            mv.addObject("subscription", mySubscriptionService.getMySubscription(instructorId));
             mv.addObject("user", authDetails.getLoginUserDTO());
             mv.addObject("courses", courses);
             mv.addObject("featuredCourse", courses.isEmpty() ? null : courses.get(0));
@@ -187,9 +170,6 @@ public class DashboardController {
             mv.addObject("currentMonthSales", currentMonthSales);
             mv.addObject("currentMonthFee", currentMonthFee);
             mv.addObject("availableAmount", availableAmount);
-            mv.addObject("newStudentCount", newStudentCount);
-            mv.addObject("completionRate", completionRate);
-            mv.addObject("avgRating", String.format("%.2f", avgRating));
         }
 
         return mv;
@@ -204,10 +184,8 @@ public class DashboardController {
             User loginUser = userRepository.findByUsername(authDetails.getUsername())
                     .orElseThrow(() -> new NoSuchElementException("유저를 찾을 수 없습니다."));
             mv.addObject("user", loginUser);
-            mv.addObject("subscription", mySubscriptionService.getMySubscription(loginUser.getId()));
             mv.addObject("enrolledCount", mainPageService.getEnrolledCount(loginUser));
-            double avgProgress = mainPageService.getAverageProgress(loginUser);
-            mv.addObject("averageProgress", (int) Math.round(avgProgress));
+            mv.addObject("averageProgress", mainPageService.getAverageProgress(loginUser));
             mv.addObject("recommendedCourses", mainPageService.getRecommendedCourses(loginUser));
             mv.addObject("popularCourses", mainPageService.getPopularCourses(null));
             mv.addObject("newCourses", mainPageService.getNewCourses(null));
