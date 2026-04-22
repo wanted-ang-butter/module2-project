@@ -38,7 +38,7 @@ public class IndexController {
         return switch (role) {
             case ADMIN -> "redirect:/dashboard/admin";
             case INSTRUCTOR -> "redirect:/dashboard/instructor";
-            case USER -> "redirect:/dashboard/user";
+            case USER, SUBSCRIBER -> "redirect:/dashboard/user";
             default -> "redirect:/dashboard/guest";
         };
     }

@@ -53,6 +53,7 @@ public class CartController {
                               Model model) {
 
         Long loginUserId = getLoginUserId(authDetails);
+        model.addAttribute("user", authDetails.getLoginUserDTO());
 
         CartPageResponse cartPage = cartService.getCartPage(loginUserId, selectedCartItemId);
         model.addAttribute("cartPage", cartPage);

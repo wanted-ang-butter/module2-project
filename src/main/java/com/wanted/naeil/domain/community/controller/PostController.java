@@ -78,6 +78,10 @@ public class PostController {
 
         log.info("[게시글 상세] 조회 시작. postId: {}", postId);
 
+        if (authDetails != null) {
+            mv.addObject("user", authDetails.getLoginUserDTO());
+        }
+
         User loginUser = getLoginUser(authDetails);
         PostDetailResponse post = postService.getPost(postId, loginUser);
 
@@ -113,6 +117,10 @@ public class PostController {
                                  ModelAndView mv) {
 
         log.info("[게시글 작성 폼] category: {}", category);
+
+        if (authDetails != null) {
+            mv.addObject("user", authDetails.getLoginUserDTO());
+        }
 
         mv.addObject("category", category);
 
