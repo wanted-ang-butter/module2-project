@@ -59,7 +59,7 @@ public class DashboardController {
 
         ModelAndView mv = new ModelAndView("dashboard/adminDashboard");
         List<ApprovalResponse> instructorApprovals =
-                adminApprovalService.getApprovals(ApprovalRequestType.INSTRUCTOR_REGISTER);
+                adminApprovalService.getPendingApprovals(ApprovalRequestType.INSTRUCTOR_REGISTER);
 
         long totalMemberCount = userRepository.countByRoleIn(MEMBER_ROLES);
         long newMemberCount = userRepository.countByRoleInAndCreatedAtAfter(MEMBER_ROLES, LocalDateTime.now().minusDays(7));
