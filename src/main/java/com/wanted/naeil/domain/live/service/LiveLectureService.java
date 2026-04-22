@@ -15,6 +15,7 @@ import com.wanted.naeil.domain.live.repository.LiveReservationRepository;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.domain.user.entity.enums.Role;
 import com.wanted.naeil.domain.user.repository.UserRepository;
+import com.wanted.naeil.global.aop.annotation.AuditLog;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -223,7 +224,6 @@ public class LiveLectureService {
     }
 
     // 실시간 강의 예약 기능 - 유저
-    @PreAuthorize("isAuthenticated()")
     @Transactional
     public void reserveLiveLecture(Long userId, Long liveId) {
 
@@ -267,7 +267,7 @@ public class LiveLectureService {
     }
 
     // 실시간 강의 취소 기능 - 유저
-    @PreAuthorize("isAuthenticated()")
+    @AuditLog(action = "LIVE_RESERVATION_CANCEL")
     @Transactional
     public void cancelLiveLectureReservation(Long userId, Long liveId) {
 
@@ -346,7 +346,6 @@ public class LiveLectureService {
                 .toList();
     }
 
-    @PreAuthorize("isAuthenticated()")
     @Transactional(readOnly = true)
     public UserLiveLectureRoomResponse getUserLiveLectureRoom(Long userId, Long liveId) {
         log.info("[LiveLectureRoom] 실시간 강의 입장 상세 조회 시작 - userId: {}, liveId: {}", userId, liveId);

@@ -12,6 +12,7 @@ import com.wanted.naeil.domain.course.dto.request.CourseUpdateRequest;
 import com.wanted.naeil.domain.course.dto.response.*;
 import com.wanted.naeil.domain.course.entity.Category;
 import com.wanted.naeil.domain.course.entity.Course;
+import com.wanted.naeil.domain.course.entity.enums.CourseSortType;
 import com.wanted.naeil.domain.course.entity.enums.CourseStatus;
 import com.wanted.naeil.domain.course.repository.CategoryRepository;
 import com.wanted.naeil.domain.course.repository.CourseRepository;
@@ -24,6 +25,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -414,16 +417,47 @@ public class CourseService {
 
     // 검색기능
     @Transactional(readOnly = true)
-    public List<CourseListResponse> getCourses(String category, String keyword) {
+    public Slice<CourseListResponse> getCourses(
+            String category,
+            String keyword,
+            String sort,
+            Pageable pageable
+    ) {
         String normalizedCategory = (category == null || category.isBlank()) ? null : category;
         String normalizedKeyword = (keyword == null || keyword.isBlank()) ? null : keyword;
+        CourseSortType sortType = CourseSortType.from(sort);
 
-        return courseRepository.searchCourseList(
-                normalizedCategory,
-                normalizedKeyword,
-                CourseStatus.ACTIVE
-        );
+        // 전통적인 Switch 문 방식
+        switch (sortType) {
+            case LATEST:
+                return courseRepository.searchCourseListLatest(
+                        normalizedCategory,
+                        normalizedKeyword,
+                        CourseStatus.ACTIVE,
+                        pageable
+                );
+            case OLDEST:
+                return courseRepository.searchCourseListOldest(
+                        normalizedCategory,
+                        normalizedKeyword,
+                        CourseStatus.ACTIVE,
+                        pageable
+                );
+            case POPULAR:
+                return courseRepository.searchCourseListPopular(
+                        normalizedCategory,
+                        normalizedKeyword,
+                        CourseStatus.ACTIVE,
+                        pageable
+                );
+            default:
+                // Enum의 모든 케이스를 처리하더라도 정석적인 문법에서는
+                // 예외 상황에 대비한 default 혹은 throw 문이 필요합니다.
+                throw new IllegalArgumentException("지원하지 않는 정렬 타입입니다: " + sortType);
+        }
     }
+
+
 
 
     // ==== 내부 편의 메서드 ====
