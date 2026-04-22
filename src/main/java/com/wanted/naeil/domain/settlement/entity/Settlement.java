@@ -1,8 +1,9 @@
 package com.wanted.naeil.domain.settlement.entity;
 
-import com.wanted.naeil.domain.settlement.entity.enums.SettlementStatus;
 import com.wanted.naeil.domain.user.entity.User;
+import com.wanted.naeil.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
