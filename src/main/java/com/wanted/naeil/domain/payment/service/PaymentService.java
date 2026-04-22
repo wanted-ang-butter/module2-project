@@ -5,6 +5,7 @@ import com.wanted.naeil.domain.learning.entity.Enrollment;
 import com.wanted.naeil.domain.learning.entity.enums.EnrollmentStatus;
 import com.wanted.naeil.domain.learning.repository.EnrollmentRepository;
 import com.wanted.naeil.domain.payment.dto.request.SubscriptionPaymentRequest;
+import com.wanted.naeil.domain.payment.dto.response.PaymentPreviewItemResponse;
 import com.wanted.naeil.domain.payment.dto.response.PaymentPreviewResponse;
 import com.wanted.naeil.domain.payment.entity.CartItem;
 import com.wanted.naeil.domain.payment.entity.Credit;
@@ -22,12 +23,14 @@ import com.wanted.naeil.domain.settlement.service.SettlementService;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.domain.user.entity.enums.Role;
 import com.wanted.naeil.domain.user.repository.UserRepository;
+import com.wanted.naeil.global.util.file.LocalFileService;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +47,7 @@ public class PaymentService {
     private final EnrollmentRepository enrollmentRepository;
     private final SubscriptionRepository subscriptionRepository;
     private final SettlementService settlementService;
+    private final LocalFileService localFileService;
 
     // 장바구니에서 선택한 코스만 결제로 이동!
     public Long checkoutSelectedCartItems(Long userId, List<Long> selectedCartItemIds) {
@@ -139,9 +143,23 @@ public class PaymentService {
         PaymentCalculation calculation = calculateCartPayment(cartItems, userId);
 
         int myCredit = credit.getBalance();
+        List<PaymentPreviewItemResponse> items = calculation.paymentItems.stream()
+                .map(paymentItem -> PaymentPreviewItemResponse.builder()
+                        .course(PaymentPreviewItemResponse.CourseInfo.builder()
+                                .title(paymentItem.getCourse().getTitle())
+                                .thumbnail(localFileService.normalizePublicUrl(paymentItem.getCourse().getThumbnail()))
+                                .build())
+                        .courseTitle(paymentItem.getCourse().getTitle())
+                        .courseThumbnail(localFileService.normalizePublicUrl(paymentItem.getCourse().getThumbnail()))
+                        .price(paymentItem.getPrice())
+                        .discountAmount(paymentItem.getDiscountAmount())
+                        .finalPrice(paymentItem.getFinalPrice())
+                        .build())
+                .toList();
 
         return PaymentPreviewResponse.builder()
                 .paymentItems(calculation.paymentItems)
+                .items(items)
                 .totalAmount(calculation.totalAmount)
                 .discountAmount(calculation.discountAmount)
                 .finalAmount(calculation.finalAmount)
@@ -375,11 +393,14 @@ public class PaymentService {
     private PaymentCalculation calculateCartPayment(List<CartItem> cartItems, Long userId) {
         Subscription subscription = getActiveSubscription(userId);
         int remainingFreeCount = (subscription != null) ? subscription.getRemainingFreeCount() : 0;
+        List<CartItem> orderedCartItems = cartItems.stream()
+                .sorted(Comparator.comparing(CartItem::getId))
+                .toList();
 
-        int totalAmount = calculateTotalAmount(cartItems);
+        int totalAmount = calculateTotalAmount(orderedCartItems);
         List<PaymentItem> paymentItems = new ArrayList<>();
 
-        for (CartItem cartItem : cartItems) {
+        for (CartItem cartItem : orderedCartItems) {
             Course course = cartItem.getCourse();
 
             int price = course.getPrice();

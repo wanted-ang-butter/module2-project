@@ -5,16 +5,17 @@ import com.wanted.naeil.domain.course.repository.CourseRepository;
 import com.wanted.naeil.domain.learning.repository.EnrollmentRepository;
 import com.wanted.naeil.domain.payment.dto.response.CartItemResponse;
 import com.wanted.naeil.domain.payment.dto.response.CartPageResponse;
-import com.wanted.naeil.domain.payment.dto.response.CartPageResponse;
 import com.wanted.naeil.domain.payment.entity.CartItem;
 import com.wanted.naeil.domain.payment.entity.Credit;
 import com.wanted.naeil.domain.payment.repository.CartItemRepository;
 import com.wanted.naeil.domain.payment.repository.CreditRepository;
 import com.wanted.naeil.domain.user.entity.User;
 import com.wanted.naeil.domain.user.repository.UserRepository;
+import com.wanted.naeil.global.util.file.LocalFileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +28,7 @@ public class CartService {
     private final CourseRepository courseRepository;
     private final CreditRepository creditRepository;
     private final EnrollmentRepository enrollmentRepository;
+    private final LocalFileService localFileService;
 
     // 1. 장바구니 담기
     public void addCartItem(Long userId, Long courseId) {
@@ -76,7 +78,9 @@ public class CartService {
     // 4. 장바구니 조회
     public CartPageResponse getCartPage(Long userId, Long selectedCartItemId) {
 
-        List<CartItem> cartItems = cartItemRepository.findAllByUserId(userId);
+        List<CartItem> cartItems = cartItemRepository.findAllByUserId(userId).stream()
+                .sorted(Comparator.comparing(CartItem::getId))
+                .toList();
 
         Credit credit = creditRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("크레딧 정보가 존재하지 않습니다."));
@@ -104,7 +108,7 @@ public class CartService {
                         .courseTitle(item.getCourse().getTitle())
                         .instructorName(item.getCourse().getInstructor().getName())
                         .price(item.getCourse().getPrice())
-                        .thumbnail(item.getCourse().getThumbnail())
+                        .thumbnail(localFileService.normalizePublicUrl(item.getCourse().getThumbnail()))
                         .build())
                 .toList();
 

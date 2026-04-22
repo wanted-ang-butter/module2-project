@@ -1,7 +1,6 @@
 package com.wanted.naeil.domain.payment.controller;
 
 import com.wanted.naeil.domain.payment.dto.response.CartPageResponse;
-import com.wanted.naeil.domain.payment.entity.PaymentItem;
 import com.wanted.naeil.domain.payment.entity.Subscription;
 import com.wanted.naeil.domain.payment.service.CartService;
 import com.wanted.naeil.domain.payment.service.PaymentService;
@@ -64,14 +63,8 @@ public class CartController {
         int remainingFreeCount = isSubscriber ? subscription.getRemainingFreeCount() : 0;
 
         // 장바구니 전체 기준 할인 예상 금액 계산
-        List<PaymentItem> previewItems = paymentService.getPreviewPaymentItemsFromCart(loginUserId);
-        int discountAmount = previewItems.stream()
-                .mapToInt(PaymentItem::getDiscountAmount)
-                .sum();
-
         model.addAttribute("isSubscriber", isSubscriber);
         model.addAttribute("remainingFreeCount", remainingFreeCount);
-        model.addAttribute("discountAmount", discountAmount);
 
         return "payment/cart";
     }

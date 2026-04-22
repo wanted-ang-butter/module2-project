@@ -94,6 +94,8 @@
             border-radius: 18px;
             background: #f3f4f6;
             flex-shrink: 0;
+            display: block;
+            object-fit: cover;
         }
 
         .order-info {
@@ -262,11 +264,17 @@
             <section class="order-section">
                 <h2 class="section-title">주문 내역</h2>
 
-                <div class="order-list" th:if="${preview.paymentItems != null and !#lists.isEmpty(preview.paymentItems)}">
-                    <div class="order-card" th:each="item : ${preview.paymentItems}">
+                <div class="order-list" th:if="${preview.items != null and !#lists.isEmpty(preview.items)}">
+                    <div class="order-card" th:each="item : ${preview.items}">
 
                         <!-- 안전하게 썸네일은 일단 고정 박스 -->
-                        <div class="order-thumbnail"></div>
+                        <img th:if="${!#strings.isEmpty(item.courseThumbnail)}"
+                             th:src="${item.courseThumbnail}"
+                             th:alt="${item.courseTitle}"
+                             onerror="this.onerror=null;this.src='data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 320 200%27%3E%3Crect width=%27320%27 height=%27200%27 fill=%27%23e2e8f0%27/%3E%3Ctext x=%2750%25%27 y=%2750%25%27 dominant-baseline=%27middle%27 text-anchor=%27middle%27 fill=%27%2364758b%27 font-family=%27Arial%27 font-size=%2720%27%3ENo%20Image%3C/text%3E%3C/svg%3E';"
+                             class="order-thumbnail">
+                        <div th:if="${#strings.isEmpty(item.courseThumbnail)}"
+                             class="order-thumbnail"></div>
 
                         <div class="order-info">
                             <h3 class="course-title" th:text="${item.course.title}">강의명</h3>

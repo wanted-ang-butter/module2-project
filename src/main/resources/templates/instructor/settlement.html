@@ -412,6 +412,13 @@
             <button type="button" class="filter-tab" onclick="filterSettlements('APPROVED', this)">정산 완료</button>
         </div>
 
+        <form th:if="${showCreateRequestButton}"
+              th:action="@{/instructor/settlements/request}"
+              method="post"
+              style="margin-bottom: 20px;">
+            <button type="submit" class="btn-request">이번 달 정산 생성/신청</button>
+        </form>
+
         <div class="settlement-list" th:if="${settlements != null and !#lists.isEmpty(settlements)}">
             <div class="settlement-card" th:each="settlement : ${settlements}" th:attr="data-status=${settlement.status.name()}">
                 <div class="card-header">
@@ -465,7 +472,9 @@
                 </div>
 
                 <div class="card-actions">
-                    <form th:if="${settlement.status.name() == 'READY'}"
+                    <form th:if="${settlement.status.name() == 'READY'
+                                  || settlement.status.name() == 'REJECTED'
+                                  || settlement.status.name() == 'CANCELED'}"
                           th:action="@{'/instructor/settlements/' + ${settlement.id} + '/request'}"
                           method="post">
                         <button type="submit" class="btn-request">정산 신청</button>

@@ -3,6 +3,7 @@ package com.wanted.naeil.domain.admin.controller;
 import com.wanted.naeil.domain.admin.dto.response.ApprovalResponse;
 import com.wanted.naeil.domain.admin.entity.enums.ApprovalRequestType;
 import com.wanted.naeil.domain.admin.service.AdminApprovalService;
+import com.wanted.naeil.domain.settlement.service.SettlementService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -19,6 +20,7 @@ import java.util.List;
 public class AdminApprovalController {
 
     private final AdminApprovalService adminApprovalService;
+    private final SettlementService settlementService;
 
     // 승인 목록 상태별 카운트를 model에 추가하는 공통 메서드
     private void addApprovalCounts(Model model, List<ApprovalResponse> approvals) {
@@ -58,6 +60,7 @@ public class AdminApprovalController {
     // 정산 관리 페이지 - SETTLEMENT_REGISTER 타입 승인 목록
     @GetMapping("/settlement")
     public String settlement(Model model) {
+        settlementService.syncPendingSettlementApprovals();
         List<ApprovalResponse> approvals = adminApprovalService.getApprovals(ApprovalRequestType.SETTLEMENT_REGISTER);
         long pendingCount = approvals.stream().filter(a -> "PENDING".equals(a.getStatus().name())).count();
         int totalPlatformFee = approvals.stream().mapToInt(a -> a.getPlatformFee() != null ? a.getPlatformFee() : 0).sum();
