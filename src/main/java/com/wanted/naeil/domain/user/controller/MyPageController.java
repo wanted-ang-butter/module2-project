@@ -36,6 +36,7 @@ public class MyPageController {
     private final InstructorApplicationService instructorApplicationService;
     private final CategoryRepository categoryRepository;
 
+    // 커밋시점 잡기
     @GetMapping("/me")
     public ModelAndView myPage(@AuthenticationPrincipal AuthDetails authDetails, ModelAndView mv) {
         AccountSettingResponse myPage = memberService.getMyPage(authDetails.getUsername());
