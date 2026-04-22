@@ -166,6 +166,7 @@ public class AdminApprovalService {
                 approval.getLecture().changeStatus(LiveLectureStatus.APPROVED);
                 liveLectureRepository.save(approval.getLecture());
             }
+            case SETTLEMENT_REGISTER -> approval.getSettlement().approve(admin);
         }
         courseApprovalRepository.save(approval);
     }
@@ -191,9 +192,7 @@ public class AdminApprovalService {
                 approval.getLecture().changeStatus(LiveLectureStatus.REJECTED);
                 liveLectureRepository.save(approval.getLecture());
             }
-            case SETTLEMENT_REGISTER -> {
-                // TODO : Add a settlement rejection policy when the workflow is defined.
-            }
+            case SETTLEMENT_REGISTER -> approval.getSettlement().reject(admin);
         }
         courseApprovalRepository.save(approval);
     }

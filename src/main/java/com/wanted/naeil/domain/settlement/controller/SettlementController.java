@@ -50,11 +50,21 @@ public class SettlementController {
                 .mapToInt(Settlement::getFinalAmount)
                 .sum();
 
+        boolean hasCurrentMonthReady = settlements.stream()
+                .anyMatch(settlement -> currentMonth.equals(settlement.getSettlementMonth())
+                        && settlement.getStatus() == SettlementStatus.READY);
+
+        boolean hasCurrentMonthPendingOrApproved = settlements.stream()
+                .anyMatch(settlement -> currentMonth.equals(settlement.getSettlementMonth())
+                        && (settlement.getStatus() == SettlementStatus.PENDING
+                        || settlement.getStatus() == SettlementStatus.APPROVED));
+
         model.addAttribute("settlements", settlements);
         model.addAttribute("currentMonthSales", currentMonthSales);
         model.addAttribute("currentMonthFee", currentMonthFee);
         model.addAttribute("availableAmount", availableAmount);
         model.addAttribute("totalCompletedAmount", totalCompletedAmount);
+        model.addAttribute("showCreateRequestButton", !hasCurrentMonthReady && !hasCurrentMonthPendingOrApproved);
 
         return "instructor/settlement";
     }

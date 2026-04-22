@@ -11,6 +11,7 @@ import java.util.List;
 public class PaymentPreviewResponse {
 
     private List<PaymentItem> paymentItems;
+    private List<PaymentPreviewItemResponse> items;
     private int totalAmount;
     private int discountAmount;
     private int finalAmount;

@@ -89,4 +89,30 @@ public class LocalFileService {
             }
         }
     }
+
+    public String normalizePublicUrl(String fileUrl) {
+        if (!StringUtils.hasText(fileUrl)) {
+            return null;
+        }
+
+        String normalized = fileUrl.trim().replace("\\", "/");
+
+        if (normalized.startsWith("http://")
+                || normalized.startsWith("https://")
+                || normalized.startsWith("data:")) {
+            return normalized;
+        }
+
+        int absoluteUploadsIndex = normalized.indexOf("/uploads/");
+        if (absoluteUploadsIndex >= 0) {
+            return normalized.substring(absoluteUploadsIndex);
+        }
+
+        int relativeUploadsIndex = normalized.indexOf("uploads/");
+        if (relativeUploadsIndex >= 0) {
+            return "/" + normalized.substring(relativeUploadsIndex);
+        }
+
+        return normalized.startsWith("/") ? normalized : "/" + normalized;
+    }
 }

@@ -11,8 +11,8 @@
   <style>
     .grid-bg {
       background-image:
-              linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+              linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
       background-size: 40px 40px;
     }
   </style>
@@ -53,22 +53,30 @@
              class="cart-card bg-white border-2 border-blue-500 p-6 rounded-xl flex items-center gap-5"
              th:attr="data-price=${item.price},data-cart-id=${item.cartItemId}">
 
-          <input type="checkbox" class="cart-checkbox w-6 h-6" th:value="${item.cartItemId}" checked>
+          <input type="checkbox"
+                 class="cart-checkbox w-6 h-6"
+                 th:value="${item.cartItemId}"
+                 th:checked="${#lists.contains(cartPage.selectedCartItemIds, item.cartItemId)}">
 
-          <img th:src="${item.thumbnail}" class="w-32 h-20 rounded-lg object-cover">
+          <img th:src="${item.thumbnail}"
+               th:alt="${item.courseTitle}"
+               onerror="this.onerror=null;this.src='data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 320 200%27%3E%3Crect width=%27320%27 height=%27200%27 fill=%27%23e2e8f0%27/%3E%3Ctext x=%2750%25%27 y=%2750%25%27 dominant-baseline=%27middle%27 text-anchor=%27middle%27 fill=%27%2364758b%27 font-family=%27Arial%27 font-size=%2720%27%3ENo%20Image%3C/text%3E%3C/svg%3E';"
+               class="w-32 h-20 rounded-lg object-cover bg-slate-100">
 
           <div class="flex-1">
-            <p class="font-bold text-xl" th:text="${item.courseTitle}"></p>
-            <p class="text-slate-500" th:text="${item.instructorName}"></p>
+            <p class="font-bold text-xl" th:text="${item.courseTitle}">강의 제목</p>
+            <p class="text-slate-500" th:text="${item.instructorName}">강사명</p>
             <p class="text-blue-600 font-bold text-xl">
-              <span th:text="${#numbers.formatInteger(item.price,3,'COMMA')}"></span> 크레딧
+              <span th:text="${#numbers.formatInteger(item.price, 3, 'COMMA')}">0</span> 크레딧
             </p>
           </div>
 
           <form th:action="@{/cart/delete/{id}(id=${item.cartItemId})}" method="post">
             <input type="hidden" name="_method" value="delete"/>
-            <button type="submit" onclick="return confirm('삭제하시겠습니까?')">
-              🗑
+            <button type="submit"
+                    class="text-slate-400 hover:text-red-500 transition"
+                    onclick="return confirm('삭제하시겠습니까?')">
+              <i class="fa-regular fa-trash-can"></i>
             </button>
           </form>
         </div>
@@ -76,7 +84,6 @@
       </div>
     </div>
 
-    <!-- 결제 -->
     <aside class="sticky top-24">
       <div class="bg-white p-6 rounded-2xl border shadow-sm">
 
@@ -89,7 +96,6 @@
             <span id="selectedCount" class="font-bold">0</span>
           </div>
 
-          <!-- 구독자일 때만 노출 -->
           <div th:if="${isSubscriber}" class="rounded-2xl bg-yellow-50 border border-yellow-200 p-4">
             <div class="inline-flex items-center px-3 py-1 rounded-full bg-yellow-400 text-slate-900 font-extrabold text-sm mb-3">
               👑 구독자 혜택
@@ -105,19 +111,17 @@
             <span id="totalRequiredCredit" class="font-bold">0</span>
           </div>
 
-          <div th:if="${isSubscriber and discountAmount > 0}" class="flex justify-between">
+          <div th:if="${isSubscriber}" id="discountRow" class="hidden justify-between">
             <span class="text-green-600 font-semibold">총 할인 금액</span>
             <span class="font-bold text-green-600">
-              -<span th:text="${#numbers.formatInteger(discountAmount, 3, 'COMMA')}">0</span>
+              -<span id="discountAmountText">0</span>
             </span>
           </div>
 
           <div class="flex justify-between">
             <span class="text-gray-600">보유 크레딧</span>
             <span id="currentCreditText"
-                  th:data-credit="${cartPage.creditBalance}"
-                  th:text="${#numbers.formatInteger(cartPage.creditBalance, 3, 'COMMA')}">
-            </span>
+                  th:text="${#numbers.formatInteger(cartPage.creditBalance, 3, 'COMMA')}">0</span>
           </div>
 
           <div class="flex justify-between text-xl font-black">
@@ -133,19 +137,16 @@
             <i class="fa-solid fa-circle-exclamation text-red-600 text-xl mt-1"></i>
 
             <div>
-              <p class="text-red-700 font-extrabold text-lg">
-                크레딧이 부족합니다
-              </p>
+              <p class="text-red-700 font-extrabold text-lg">크레딧이 부족합니다</p>
 
               <a href="/credit/charge"
                  class="text-red-600 font-bold underline mt-1 inline-block hover:text-red-700 transition">
-                크레딧 충전하기 →
+                크레딧 충전하러 가기 →
               </a>
             </div>
           </div>
         </div>
 
-        <!-- 결제 페이지 이동 -->
         <form id="checkoutForm" th:action="@{/payments/courses}" method="get">
           <div id="selectedCartItemInputs"></div>
 
@@ -163,49 +164,96 @@
 </main>
 
 <div id="cartPageData"
-     th:attr="data-credit=${cartPage.creditBalance}"
+     th:attr="data-credit=${cartPage.creditBalance},data-remaining-free-count=${remainingFreeCount}"
      class="hidden"></div>
 
 <script>
-  const currentCredit = Number(document.getElementById('cartPageData').dataset.credit || 0);
+  const cartPageData = document.getElementById('cartPageData');
+  const currentCredit = Number(cartPageData.dataset.credit || 0);
+  const remainingFreeCount = Number(cartPageData.dataset.remainingFreeCount || 0);
 
   const checkboxes = document.querySelectorAll('.cart-checkbox');
   const selectedCountEl = document.getElementById('selectedCount');
   const totalRequiredCreditEl = document.getElementById('totalRequiredCredit');
   const remainingCreditEl = document.getElementById('remainingCredit');
   const currentCreditText = document.getElementById('currentCreditText');
+  const discountRow = document.getElementById('discountRow');
+  const discountAmountText = document.getElementById('discountAmountText');
   const creditWarningBox = document.getElementById('creditWarningBox');
   const checkoutBtn = document.getElementById('checkoutBtn');
   const selectedCartItemInputs = document.getElementById('selectedCartItemInputs');
 
+  const EMPTY_SELECTION_TEXT = '\uC120\uD0DD\uD55C \uAC15\uC758 \uC5C6\uC74C';
+  const FREE_CHECKOUT_TEXT = '\uBB34\uB8CC\uB85C \uC218\uAC15 \uC2E0\uCCAD\uD558\uAE30';
+  const PAY_TEXT = '\uACB0\uC81C\uD558\uAE30';
+  const NOT_ENOUGH_CREDIT_TEXT = '\uD06C\uB808\uB527 \uBD80\uC871';
+
   function updateSummary() {
     let count = 0;
-    let total = 0;
-    let ids = [];
+    let subtotal = 0;
+    let discount = 0;
+    let freeSlots = remainingFreeCount;
+    const ids = [];
 
-    checkboxes.forEach(cb => {
-      if (cb.checked) {
-        const card = cb.closest('.cart-card');
-        total += Number(card.dataset.price);
-        ids.push(card.dataset.cartId);
-        count++;
+    checkboxes.forEach((cb) => {
+      if (!cb.checked) {
+        return;
       }
+
+      const card = cb.closest('.cart-card');
+      const price = Number(card.dataset.price || 0);
+
+      subtotal += price;
+      if (freeSlots > 0) {
+        discount += price;
+        freeSlots--;
+      }
+
+      ids.push(card.dataset.cartId);
+      count++;
     });
 
-    const remaining = currentCredit - total;
+    const payableCredit = subtotal - discount;
+    const remaining = currentCredit - payableCredit;
 
     selectedCountEl.textContent = count;
-    totalRequiredCreditEl.textContent = total.toLocaleString();
+    totalRequiredCreditEl.textContent = subtotal.toLocaleString();
     currentCreditText.textContent = currentCredit.toLocaleString();
 
+    if (discountRow && discountAmountText) {
+      discountAmountText.textContent = discount.toLocaleString();
+
+      if (discount > 0) {
+        discountRow.classList.remove('hidden');
+        discountRow.classList.add('flex');
+      } else {
+        discountRow.classList.add('hidden');
+        discountRow.classList.remove('flex');
+      }
+    }
+
     selectedCartItemInputs.innerHTML = '';
-    ids.forEach(id => {
+    ids.forEach((id) => {
       const input = document.createElement('input');
       input.type = 'hidden';
       input.name = 'selectedCartItemIds';
       input.value = id;
       selectedCartItemInputs.appendChild(input);
     });
+
+    if (count === 0) {
+      remainingCreditEl.textContent = currentCredit.toLocaleString();
+      remainingCreditEl.classList.remove('text-red-600');
+      remainingCreditEl.classList.add('text-slate-900');
+
+      creditWarningBox.classList.add('hidden');
+
+      checkoutBtn.disabled = true;
+      checkoutBtn.textContent = EMPTY_SELECTION_TEXT;
+      checkoutBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'text-white');
+      checkoutBtn.classList.add('bg-slate-200', 'text-slate-500', 'cursor-not-allowed');
+      return;
+    }
 
     if (remaining >= 0) {
       remainingCreditEl.textContent = remaining.toLocaleString();
@@ -214,32 +262,26 @@
 
       creditWarningBox.classList.add('hidden');
 
-      if (count === 0) {
-        checkoutBtn.disabled = true;
-        checkoutBtn.textContent = '선택된 강의 없음';
-        checkoutBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'text-white');
-        checkoutBtn.classList.add('bg-slate-200', 'text-slate-500', 'cursor-not-allowed');
-      } else {
-        checkoutBtn.disabled = false;
-        checkoutBtn.textContent = total === 0 ? '무료로 수강 신청하기' : '결제하기';
-        checkoutBtn.classList.remove('bg-slate-200', 'text-slate-500', 'cursor-not-allowed');
-        checkoutBtn.classList.add('bg-blue-600', 'hover:bg-blue-700', 'text-white');
-      }
-    } else {
-      remainingCreditEl.textContent = '-' + Math.abs(remaining).toLocaleString();
-      remainingCreditEl.classList.remove('text-slate-900');
-      remainingCreditEl.classList.add('text-red-600');
-
-      creditWarningBox.classList.remove('hidden');
-
-      checkoutBtn.disabled = true;
-      checkoutBtn.textContent = '크레딧 부족';
-      checkoutBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'text-white');
-      checkoutBtn.classList.add('bg-slate-200', 'text-slate-500', 'cursor-not-allowed');
+      checkoutBtn.disabled = false;
+      checkoutBtn.textContent = payableCredit === 0 ? FREE_CHECKOUT_TEXT : PAY_TEXT;
+      checkoutBtn.classList.remove('bg-slate-200', 'text-slate-500', 'cursor-not-allowed');
+      checkoutBtn.classList.add('bg-blue-600', 'hover:bg-blue-700', 'text-white');
+      return;
     }
+
+    remainingCreditEl.textContent = '-' + Math.abs(remaining).toLocaleString();
+    remainingCreditEl.classList.remove('text-slate-900');
+    remainingCreditEl.classList.add('text-red-600');
+
+    creditWarningBox.classList.remove('hidden');
+
+    checkoutBtn.disabled = true;
+    checkoutBtn.textContent = NOT_ENOUGH_CREDIT_TEXT;
+    checkoutBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'text-white');
+    checkoutBtn.classList.add('bg-slate-200', 'text-slate-500', 'cursor-not-allowed');
   }
 
-  checkboxes.forEach(cb => cb.addEventListener('change', updateSummary));
+  checkboxes.forEach((cb) => cb.addEventListener('change', updateSummary));
   updateSummary();
 </script>
 
