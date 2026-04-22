@@ -42,16 +42,37 @@ public class AdminApprovalService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public List<ApprovalResponse> getPendingApprovals(ApprovalRequestType type) {
+        return loadApprovals(type, ApprovalStatus.PENDING).stream()
+                .map(this::toApprovalResponse)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
     private List<AdminApproval> loadApprovals(ApprovalRequestType type) {
         return switch (type) {
             case COURSE_REGISTER, COURSE_DELETE ->
-                    courseApprovalRepository.findCourseApprovalsWithCourse(type, ApprovalStatus.PENDING);
+                    courseApprovalRepository.findCourseApprovalsWithCourse(type);
             case INSTRUCTOR_REGISTER ->
-                    courseApprovalRepository.findInstructorApprovalsWithDetails(type, ApprovalStatus.PENDING);
+                    courseApprovalRepository.findInstructorApprovalsWithDetails(type);
             case LIVE_REGISTER ->
-                    courseApprovalRepository.findLiveApprovalsWithInstructor(type, ApprovalStatus.PENDING);
+                    courseApprovalRepository.findLiveApprovalsWithInstructor(type);
             case SETTLEMENT_REGISTER ->
-                    courseApprovalRepository.findSettlementApprovalsWithDetails(type, ApprovalStatus.PENDING);
+                    courseApprovalRepository.findSettlementApprovalsWithDetails(type);
+        };
+    }
+
+    private List<AdminApproval> loadApprovals(ApprovalRequestType type, ApprovalStatus status) {
+        return switch (type) {
+            case COURSE_REGISTER, COURSE_DELETE ->
+                    courseApprovalRepository.findCourseApprovalsWithCourse(type, status);
+            case INSTRUCTOR_REGISTER ->
+                    courseApprovalRepository.findInstructorApprovalsWithDetails(type, status);
+            case LIVE_REGISTER ->
+                    courseApprovalRepository.findLiveApprovalsWithInstructor(type, status);
+            case SETTLEMENT_REGISTER ->
+                    courseApprovalRepository.findSettlementApprovalsWithDetails(type, status);
         };
     }
 

@@ -21,8 +21,35 @@ public interface AdminApprovalRepository extends JpaRepository<AdminApproval, Lo
             join fetch course.instructor
             where approval.requestType = :type
               and approval.status = :status
+            order by approval.createdAt desc
             """)
     List<AdminApproval> findCourseApprovalsWithCourse(
+            @Param("type") ApprovalRequestType type,
+            @Param("status") ApprovalStatus status
+    );
+
+    @Query("""
+            select approval
+            from AdminApproval approval
+            join fetch approval.course course
+            join fetch course.category
+            join fetch course.instructor
+            where approval.requestType = :type
+            order by approval.createdAt desc
+            """)
+    List<AdminApproval> findCourseApprovalsWithCourse(@Param("type") ApprovalRequestType type);
+
+    @Query("""
+            select approval
+            from AdminApproval approval
+            join fetch approval.instructorApplications applications
+            join fetch applications.user
+            join fetch applications.category
+            where approval.requestType = :type
+              and approval.status = :status
+            order by approval.createdAt desc
+            """)
+    List<AdminApproval> findInstructorApprovalsWithDetails(
             @Param("type") ApprovalRequestType type,
             @Param("status") ApprovalStatus status
     );
@@ -34,9 +61,20 @@ public interface AdminApprovalRepository extends JpaRepository<AdminApproval, Lo
             join fetch applications.user
             join fetch applications.category
             where approval.requestType = :type
-              and approval.status = :status
+            order by approval.createdAt desc
             """)
-    List<AdminApproval> findInstructorApprovalsWithDetails(
+    List<AdminApproval> findInstructorApprovalsWithDetails(@Param("type") ApprovalRequestType type);
+
+    @Query("""
+            select approval
+            from AdminApproval approval
+            join fetch approval.lecture lecture
+            join fetch lecture.instructor
+            where approval.requestType = :type
+              and approval.status = :status
+            order by approval.createdAt desc
+            """)
+    List<AdminApproval> findLiveApprovalsWithInstructor(
             @Param("type") ApprovalRequestType type,
             @Param("status") ApprovalStatus status
     );
@@ -47,9 +85,22 @@ public interface AdminApprovalRepository extends JpaRepository<AdminApproval, Lo
             join fetch approval.lecture lecture
             join fetch lecture.instructor
             where approval.requestType = :type
-              and approval.status = :status
+            order by approval.createdAt desc
             """)
-    List<AdminApproval> findLiveApprovalsWithInstructor(
+    List<AdminApproval> findLiveApprovalsWithInstructor(@Param("type") ApprovalRequestType type);
+
+    @Query("""
+            select distinct approval
+            from AdminApproval approval
+            join fetch approval.settlement settlement
+            join fetch settlement.instructor
+            left join fetch settlement.details detail
+            left join fetch detail.course
+            where approval.requestType = :type
+              and approval.status = :status
+            order by approval.createdAt desc
+            """)
+    List<AdminApproval> findSettlementApprovalsWithDetails(
             @Param("type") ApprovalRequestType type,
             @Param("status") ApprovalStatus status
     );
@@ -62,12 +113,9 @@ public interface AdminApprovalRepository extends JpaRepository<AdminApproval, Lo
             left join fetch settlement.details detail
             left join fetch detail.course
             where approval.requestType = :type
-              and approval.status = :status
+            order by approval.createdAt desc
             """)
-    List<AdminApproval> findSettlementApprovalsWithDetails(
-            @Param("type") ApprovalRequestType type,
-            @Param("status") ApprovalStatus status
-    );
+    List<AdminApproval> findSettlementApprovalsWithDetails(@Param("type") ApprovalRequestType type);
 
     boolean existsByCourseIdAndRequestTypeAndStatus(
             Long courseId,
