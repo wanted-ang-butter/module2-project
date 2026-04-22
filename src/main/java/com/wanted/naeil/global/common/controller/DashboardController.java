@@ -11,6 +11,7 @@ import com.wanted.naeil.domain.course.service.CourseService;
 import com.wanted.naeil.domain.live.dto.response.InstructorLiveLectureResponse;
 import com.wanted.naeil.domain.live.service.LiveLectureService;
 import com.wanted.naeil.domain.mainpage.service.MainPageService;
+import com.wanted.naeil.domain.payment.service.MySubscriptionService; // 삭제
 import com.wanted.naeil.domain.settlement.entity.Settlement;
 import com.wanted.naeil.domain.settlement.entity.enums.SettlementStatus;
 import com.wanted.naeil.domain.settlement.repository.SettlementRepository;
@@ -51,6 +52,7 @@ public class DashboardController {
     private final CourseRepository courseRepository;
     private final SettlementRepository settlementRepository;
     private final AdminApprovalService adminApprovalService;
+    private final MySubscriptionService mySubscriptionService; // 삭제
 
     @GetMapping("/admin")
     public ModelAndView adminDashboard(@AuthenticationPrincipal AuthDetails authDetails) {
@@ -184,6 +186,7 @@ public class DashboardController {
             User loginUser = userRepository.findByUsername(authDetails.getUsername())
                     .orElseThrow(() -> new NoSuchElementException("유저를 찾을 수 없습니다."));
             mv.addObject("user", loginUser);
+            mv.addObject("subscription", mySubscriptionService.getMySubscription(loginUser.getId()));
             mv.addObject("enrolledCount", mainPageService.getEnrolledCount(loginUser));
             mv.addObject("averageProgress", mainPageService.getAverageProgress(loginUser));
             mv.addObject("recommendedCourses", mainPageService.getRecommendedCourses(loginUser));
