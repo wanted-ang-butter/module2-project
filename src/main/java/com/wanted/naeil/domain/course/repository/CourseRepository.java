@@ -4,6 +4,8 @@ import com.wanted.naeil.domain.course.dto.response.CourseListResponse;
 import com.wanted.naeil.domain.course.entity.Category;
 import com.wanted.naeil.domain.course.entity.Course;
 import com.wanted.naeil.domain.course.entity.enums.CourseStatus;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -108,23 +110,69 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             @Param("status") CourseStatus status
     );
 
-    // 강의 검색 기능
+    // 강의 검색 기능 : 최신순
     @Query("select new com.wanted.naeil.domain.course.dto.response.CourseListResponse(" +
             "c.id, c.thumbnail, cat.name, c.title, c.description, u.name, " +
             "AVG(r.rating), COUNT(distinct e.id), c.price) " +
             "FROM Course c " +
             "JOIN c.category cat " +
             "JOIN c.instructor u " +
-            "LEFT join Review r ON r.course = c " +
+            "LEFT JOIN Review r ON r.course = c " +
             "LEFT JOIN Enrollment e ON e.course = c " +
             "WHERE c.status = :status " +
             "AND (:category IS NULL OR cat.name = :category) " +
             "AND (:keyword IS NULL OR (c.title LIKE %:keyword% OR c.description LIKE %:keyword% OR u.name LIKE %:keyword%)) " +
-            "GROUP BY c.id, cat.name, u.name, c.thumbnail, c.title, c.description, c.price")
-    List<CourseListResponse> searchCourseList(
+            "GROUP BY c.id, cat.name, u.name, c.thumbnail, c.title, c.description, c.price, c.createdAt " +
+            "ORDER BY c.createdAt DESC")
+    Slice<CourseListResponse> searchCourseListLatest(
             @Param("category") String category,
             @Param("keyword") String keyword,
-            @Param("status") CourseStatus status
+            @Param("status") CourseStatus status,
+            Pageable pageable
     );
+
+    // 오래된 순
+    @Query("select new com.wanted.naeil.domain.course.dto.response.CourseListResponse(" +
+            "c.id, c.thumbnail, cat.name, c.title, c.description, u.name, " +
+            "AVG(r.rating), COUNT(distinct e.id), c.price) " +
+            "FROM Course c " +
+            "JOIN c.category cat " +
+            "JOIN c.instructor u " +
+            "LEFT JOIN Review r ON r.course = c " +
+            "LEFT JOIN Enrollment e ON e.course = c " +
+            "WHERE c.status = :status " +
+            "AND (:category IS NULL OR cat.name = :category) " +
+            "AND (:keyword IS NULL OR (c.title LIKE %:keyword% OR c.description LIKE %:keyword% OR u.name LIKE %:keyword%)) " +
+            "GROUP BY c.id, cat.name, u.name, c.thumbnail, c.title, c.description, c.price, c.createdAt " +
+            "ORDER BY c.createdAt ASC")
+    Slice<CourseListResponse> searchCourseListOldest(
+            @Param("category") String category,
+            @Param("keyword") String keyword,
+            @Param("status") CourseStatus status,
+            Pageable pageable
+    );
+
+
+    // 인기 순
+    @Query("select new com.wanted.naeil.domain.course.dto.response.CourseListResponse(" +
+            "c.id, c.thumbnail, cat.name, c.title, c.description, u.name, " +
+            "AVG(r.rating), COUNT(distinct e.id), c.price) " +
+            "FROM Course c " +
+            "JOIN c.category cat " +
+            "JOIN c.instructor u " +
+            "LEFT JOIN Review r ON r.course = c " +
+            "LEFT JOIN Enrollment e ON e.course = c " +
+            "WHERE c.status = :status " +
+            "AND (:category IS NULL OR cat.name = :category) " +
+            "AND (:keyword IS NULL OR (c.title LIKE %:keyword% OR c.description LIKE %:keyword% OR u.name LIKE %:keyword%)) " +
+            "GROUP BY c.id, cat.name, u.name, c.thumbnail, c.title, c.description, c.price, c.createdAt " +
+            "ORDER BY COUNT(distinct e.id) DESC, c.createdAt DESC")
+    Slice<CourseListResponse> searchCourseListPopular(
+            @Param("category") String category,
+            @Param("keyword") String keyword,
+            @Param("status") CourseStatus status,
+            Pageable pageable
+    );
+
 
 }
