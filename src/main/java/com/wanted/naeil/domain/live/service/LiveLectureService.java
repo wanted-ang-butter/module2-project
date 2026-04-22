@@ -223,7 +223,6 @@ public class LiveLectureService {
                 .toList();
     }
 
-    // 테스트 위한 커밋 시점 작성
     // 실시간 강의 예약 기능 - 유저
     @Transactional
     public void reserveLiveLecture(Long userId, Long liveId) {
