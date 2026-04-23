@@ -81,7 +81,6 @@ public class CourseService {
             throw new IllegalArgumentException("동일한 이름의 강의가 존재합니다. 다시 작성해주세요.");
         }
 
-        // TODO : 추후 categoryRepo 에서 findById로 존재 여부 확인
         // 카테고리 검증
         if (request.getCategoryId() == null) {
             throw new IllegalArgumentException("잘못된 카테고리 입니다.");
@@ -322,7 +321,7 @@ public class CourseService {
             return;
         }
 
-        if (currentStatus == CourseStatus.CANCELLED || currentStatus == CourseStatus.REJECTED
+        if ((currentStatus == CourseStatus.CANCELLED || currentStatus == CourseStatus.REJECTED)
                 && nextStatus == CourseStatus.PENDING) {
 
             log.info("[코스 상태 변경] 취소 / 반려 -> 승인대기 상태 변경 시작!");
@@ -427,7 +426,6 @@ public class CourseService {
         String normalizedKeyword = (keyword == null || keyword.isBlank()) ? null : keyword;
         CourseSortType sortType = CourseSortType.from(sort);
 
-        // 전통적인 Switch 문 방식
         switch (sortType) {
             case LATEST:
                 return courseRepository.searchCourseListLatest(
@@ -451,8 +449,6 @@ public class CourseService {
                         pageable
                 );
             default:
-                // Enum의 모든 케이스를 처리하더라도 정석적인 문법에서는
-                // 예외 상황에 대비한 default 혹은 throw 문이 필요합니다.
                 throw new IllegalArgumentException("지원하지 않는 정렬 타입입니다: " + sortType);
         }
     }
@@ -470,7 +466,7 @@ public class CourseService {
     private void validateChangeableCourseStatus(Course course) {
         if (course.getStatus() != CourseStatus.ACTIVE && course.getStatus() != CourseStatus.INACTIVE) {
             throw new IllegalStateException(course.getStatus().getDescription() +
-                    " 상태의 강의는 상태를 변경할 수 없습니다.");
+                    "상태의 강의는 상태를 변경할 수 없습니다.");
         }
     }
 

@@ -289,7 +289,7 @@ public class LiveLectureService {
         }
 
         // 테스트를 위해, 10초 뒤 취소 가능! 원래는 30분입니다!
-        LocalDateTime cancelAvailableAt = createdAt.plusSeconds(10);
+        LocalDateTime cancelAvailableAt = createdAt.plusSeconds(3);
         LocalDateTime now = LocalDateTime.now();
 
         if (now.isBefore(cancelAvailableAt)) {
@@ -464,7 +464,8 @@ public class LiveLectureService {
             return;
         }
 
-        LocalDateTime reReservationAvailableAt = canceledAt.plusSeconds(10);
+        // 시간 대기
+        LocalDateTime reReservationAvailableAt = canceledAt.plusSeconds(3);
         LocalDateTime now = LocalDateTime.now();
 
         if (now.isBefore(reReservationAvailableAt)) {

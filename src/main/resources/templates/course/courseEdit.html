@@ -541,7 +541,7 @@
             formData.set('isActive', 'false');
         }
 
-        const response = await fetch(`/instructor/course/${courseId}/sections/${sectionId}`, {
+        const response = await fetch(`/instructor/courses/${courseId}/sections/${sectionId}`, {
             method: 'PATCH',
             body: formData
         });
