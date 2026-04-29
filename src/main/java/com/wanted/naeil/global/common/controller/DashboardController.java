@@ -3,6 +3,7 @@ package com.wanted.naeil.global.common.controller;
 import com.wanted.naeil.domain.admin.dto.response.ApprovalResponse;
 import com.wanted.naeil.domain.admin.entity.enums.ApprovalRequestType;
 import com.wanted.naeil.domain.admin.service.AdminApprovalService;
+import com.wanted.naeil.domain.course.dto.response.CourseListResponse;
 import com.wanted.naeil.domain.course.dto.response.InstructorCourseResponse;
 import com.wanted.naeil.domain.course.entity.Course;
 import com.wanted.naeil.domain.course.entity.enums.CourseStatus;
@@ -23,11 +24,13 @@ import com.wanted.naeil.domain.user.repository.UserRepository;
 import com.wanted.naeil.global.auth.model.dto.AuthDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDateTime;
@@ -189,9 +192,6 @@ public class DashboardController {
             mv.addObject("subscription", mySubscriptionService.getMySubscription(loginUser.getId()));
             mv.addObject("enrolledCount", mainPageService.getEnrolledCount(loginUser));
             mv.addObject("averageProgress", mainPageService.getAverageProgress(loginUser));
-            mv.addObject("recommendedCourses", mainPageService.getRecommendedCourses(loginUser));
-            mv.addObject("popularCourses", mainPageService.getPopularCourses(null));
-            mv.addObject("newCourses", mainPageService.getNewCourses(null));
             mv.addObject("categories", mainPageService.getCategoryCourses());
         }
         return mv;
@@ -207,6 +207,36 @@ public class DashboardController {
         mv.addObject("categories", mainPageService.getCategoryCourses());
         mv.addObject("selectedCategory", category);
         return mv;
+    }
+
+    // 추천순
+    @GetMapping("/user/recommended")
+    @ResponseBody
+    public ResponseEntity<List<CourseListResponse>> recommendedCourses(
+            @AuthenticationPrincipal AuthDetails authDetails
+    ) {
+        if (authDetails == null) {
+            return ResponseEntity.ok(List.of());
+        }
+
+        User loginUser = userRepository.findByUsername(authDetails.getUsername())
+                .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
+
+        return ResponseEntity.ok(mainPageService.getRecommendedCourses(loginUser));
+    }
+
+    // 인기순
+    @GetMapping("/user/popular")
+    @ResponseBody
+    public ResponseEntity<List<CourseListResponse>> popularCourses() {
+        return ResponseEntity.ok(mainPageService.getPopularCourses(null));
+    }
+
+    // 신규순
+    @GetMapping("/user/new")
+    @ResponseBody
+    public ResponseEntity<List<CourseListResponse>> newCourses() {
+        return ResponseEntity.ok(mainPageService.getNewCourses(null));
     }
 
     private String buildTrendLabel(int currentValue, int previousValue) {

@@ -13,6 +13,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface CourseRepository extends JpaRepository<Course, Long> {
     boolean existsByCategoryId(Long categoryId);
@@ -23,6 +24,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     long countByStatus(CourseStatus status);
 
+    // 코스 전체 조회, 추천 순
     @Query("select new com.wanted.naeil.domain.course.dto.response.CourseListResponse(" +
             "c.id, c.thumbnail, cat.name, c.title, c.description, u.name, " +
             "AVG(r.rating), COUNT(distinct e.id), c.price) " +
@@ -35,6 +37,31 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             "GROUP BY c.id, cat.name, u.name, c.thumbnail, c.title, c.description, c.price")
     List<CourseListResponse> findAllWithStatus(@Param("status") CourseStatus status);
 
+
+    // 추천 순 - 수정 후
+    @Query("select new com.wanted.naeil.domain.course.dto.response.CourseListResponse(" +
+            "c.id, c.thumbnail, cat.name, c.title, c.description, u.name, " +
+            "AVG(r.rating), COUNT(distinct e.id), c.price) " +
+            "FROM Course c " +
+            "JOIN c.category cat " +
+            "JOIN c.instructor u " +
+            "LEFT JOIN Review r ON r.course = c " +
+            "LEFT JOIN Enrollment e ON e.course = c " +
+            "WHERE c.status = :status " +
+            "AND cat.name IN :categories " +
+            "AND c.id NOT IN :excludedCourseIds " +
+            "GROUP BY c.id, cat.name, u.name, c.thumbnail, c.title, c.description, c.price, c.createdAt " +
+            "ORDER BY COUNT(distinct e.id) DESC, c.createdAt DESC")
+    List<CourseListResponse> findRecommendedCourses(
+            @Param("categories") Set<String> categories,
+            @Param("excludedCourseIds") Set<Long> excludedCourseIds,
+            @Param("status") CourseStatus status,
+            Pageable pageable
+    );
+
+
+
+    // 최신 순 - 수정 후
     @Query("select new com.wanted.naeil.domain.course.dto.response.CourseListResponse(" +
             "c.id, c.thumbnail, cat.name, c.title, c.description, u.name, " +
             "AVG(r.rating), COUNT(distinct e.id), c.price) " +
@@ -44,24 +71,30 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             "LEFT join Review r ON r.course = c " +
             "LEFT JOIN Enrollment e ON e.course = c " +
             "WHERE c.status = :status " +
-            "GROUP BY c.id, cat.name, u.name, c.thumbnail, c.title, c.description, c.price " +
+            "AND (:category IS NULL OR cat.name = :category) " +
+            "GROUP BY c.id, cat.name, u.name, c.thumbnail, c.title, c.description, c.price, c.createdAt " +
             "ORDER BY c.createdAt DESC")
-    List<CourseListResponse> findAllOrderByCreatedAtDesc(@Param("status") CourseStatus status);
+    List<CourseListResponse> findNewCourses(@Param("category") String category, @Param("status") CourseStatus status,
+                                            Pageable pageable);
 
-
+    // 인기 강의 조회 - 수정 후
     @Query("select new com.wanted.naeil.domain.course.dto.response.CourseListResponse(" +
             "c.id, c.thumbnail, cat.name, c.title, c.description, u.name, " +
             "AVG(r.rating), COUNT(distinct e.id), c.price) " +
             "FROM Course c " +
             "JOIN c.category cat " +
             "JOIN c.instructor u " +
-            "LEFT join Review r ON r.course = c " +
+            "LEFT JOIN Review r ON r.course = c " +
             "LEFT JOIN Enrollment e ON e.course = c " +
             "WHERE c.status = :status " +
-            "GROUP BY c.id, cat.name, u.name, c.thumbnail, c.title, c.description, c.price " +
-            "ORDER BY COUNT(distinct e.id) DESC")
-    List<CourseListResponse> findAllOrderByStudentCountDesc(@Param("status") CourseStatus status);
-
+            "AND (:category IS NULL OR cat.name = :category) " +
+            "GROUP BY c.id, cat.name, u.name, c.thumbnail, c.title, c.description, c.price, c.createdAt " +
+            "ORDER BY COUNT(distinct e.id) DESC, c.createdAt DESC")
+    List<CourseListResponse> findPopularCourses(
+            @Param("category") String category,
+            @Param("status") CourseStatus status,
+            Pageable pageable
+    );
 
     @Query("select new com.wanted.naeil.domain.course.dto.response.CourseListResponse(" +
             "c.id, c.thumbnail, cat.name, c.title, c.description, u.name, " +
