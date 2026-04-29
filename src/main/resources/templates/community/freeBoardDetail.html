@@ -16,7 +16,7 @@
   <div th:replace="~{fragments/guestHeader :: guestHeader}"></div>
 </th:block>
 
-<th:block th:if="${user != null and user.role != null and user.role.name() == 'USER'}">
+<th:block th:if="${user != null and user.role != null and (user.role.name() == 'USER' or user.role.name() == 'SUBSCRIBER')}">
   <div th:replace="~{fragments/userHeader :: userHeader}"></div>
 </th:block>
 

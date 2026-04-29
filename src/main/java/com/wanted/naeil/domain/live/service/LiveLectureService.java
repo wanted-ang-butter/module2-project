@@ -235,8 +235,8 @@ public class LiveLectureService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자 정보를 찾을 수 없습니다. ID: " + userId));
 
-        if (user.getRole() != Role.USER) {
-            throw new AccessDeniedException("강의를 예약하려면 로그인을 해주세요.");
+        if (user.getRole() != Role.USER && user.getRole() != Role.SUBSCRIBER) {
+            throw new AccessDeniedException("실시간 강의 예약은 일반 회원 또는 구독자만 가능합니다.");
         }
 
         boolean alreadyReserved = liveReservationRepository
@@ -289,7 +289,7 @@ public class LiveLectureService {
         }
 
         // 테스트를 위해, 10초 뒤 취소 가능! 원래는 30분입니다!
-        LocalDateTime cancelAvailableAt = createdAt.plusSeconds(10);
+        LocalDateTime cancelAvailableAt = createdAt.plusSeconds(3);
         LocalDateTime now = LocalDateTime.now();
 
         if (now.isBefore(cancelAvailableAt)) {
@@ -464,7 +464,8 @@ public class LiveLectureService {
             return;
         }
 
-        LocalDateTime reReservationAvailableAt = canceledAt.plusSeconds(10);
+        // 시간 대기
+        LocalDateTime reReservationAvailableAt = canceledAt.plusSeconds(3);
         LocalDateTime now = LocalDateTime.now();
 
         if (now.isBefore(reReservationAvailableAt)) {

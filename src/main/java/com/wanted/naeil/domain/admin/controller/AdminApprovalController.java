@@ -44,7 +44,10 @@ public class AdminApprovalController {
     // 강사 승인 페이지 - INSTRUCTOR_REGISTER 타입 승인 목록
     @GetMapping("/instructor-approval")
     public String instructorApproval(Model model) {
-        model.addAttribute("approvals", adminApprovalService.getApprovals(ApprovalRequestType.INSTRUCTOR_REGISTER));
+        model.addAttribute(
+                "approvals",
+                adminApprovalService.getPendingApprovals(ApprovalRequestType.INSTRUCTOR_REGISTER)
+        );
         return "admin/instructor-application";
     }
 
